@@ -1,7 +1,10 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { use } from "react";
+import { OfficialImage } from "@/components/OfficialImage";
 import { PieceThumb } from "@/components/PieceThumb";
+import { OfficialLink } from "@/components/SetArt";
+import { officialImage } from "@/lib/official";
 import { PageHeader, SectionTitle } from "@/components/ui";
 import { pieceList } from "@/lib/catalog";
 import type { PieceCategory } from "@/lib/track-engine";
@@ -24,7 +27,11 @@ export default function PiecesPage({ params }: PageProps<"/[locale]/pieces">) {
               .map((piece) => (
                 <li key={piece.id} className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4">
                   <span className="wood-floor rounded-xl p-2">
-                    <PieceThumb id={piece.id} className="h-24 w-full" />
+                    <OfficialImage
+                      src={officialImage(piece.ref)}
+                      className="h-24 w-full rounded-lg bg-white object-contain"
+                      fallback={<PieceThumb id={piece.id} className="h-24 w-full" />}
+                    />
                   </span>
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-extrabold leading-tight text-ink">{t(`pieceNames.${piece.id}`)}</h3>
@@ -41,6 +48,7 @@ export default function PiecesPage({ params }: PageProps<"/[locale]/pieces">) {
                       {t("pieces.connectors", { count: piece.connectors.length })}
                     </p>
                   )}
+                  <OfficialLink productRef={piece.ref} />
                 </li>
               ))}
           </ul>

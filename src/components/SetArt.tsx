@@ -1,6 +1,9 @@
+import { useLocale, useTranslations } from "next-intl";
 import { circuitFromCode } from "@/lib/circuits";
+import { officialImage, officialPage } from "@/lib/official";
 import { catalog } from "@/lib/catalog";
 import type { TrackSet } from "@/lib/track-engine";
+import { OfficialImage } from "./OfficialImage";
 import { PieceThumb } from "./PieceThumb";
 import { TrackPlan } from "./TrackPlan";
 
@@ -15,14 +18,45 @@ export const THEME_COLORS: Record<string, string> = {
 };
 
 /**
- * Illustration originale d'un coffret : le plus beau circuit réalisable avec ce seul coffret
- * (ou ses pièces, pour un sachet). Remplacée par la photo de la boîte si l'utilisateur en a pris une.
+ * Image d'un coffret : la photo de sa propre boîte si l'utilisateur en a pris une, sinon l'image officielle
+ * (avec crédit et lien), sinon une illustration originale : le plus beau circuit réalisable avec ce seul coffret.
  */
 export function SetArt({ set, previewCode, photo }: { set: TrackSet; previewCode?: string | null; photo?: string }) {
   if (photo) {
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={photo} alt="" className="aspect-[4/3] w-full object-cover" />;
   }
+  return (
+    <OfficialImage
+      src={officialImage(set.ref)}
+      className="aspect-[4/3] w-full bg-white object-contain p-2"
+      fallback={<SetDrawing set={set} previewCode={previewCode} />}
+    />
+  );
+}
+
+/** Crédit et lien vers la page officielle du produit (hors mode enfant, EF-51). */
+export function OfficialLink({ productRef }: { productRef: string | null }) {
+  const t = useTranslations("official");
+  const locale = useLocale();
+  const href = officialPage(productRef, locale);
+  if (!href) return null;
+  return (
+    <p className="text-xs text-muted">
+      {officialImage(productRef) && <span className="block">{t("credit")}</span>}
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer nofollow"
+        className="font-bold text-ink underline underline-offset-2"
+      >
+        {t("page")}
+      </a>
+    </p>
+  );
+}
+
+function SetDrawing({ set, previewCode }: { set: TrackSet; previewCode?: string | null }) {
   const preview = previewCode ? circuitFromCode(previewCode) : null;
   return (
     <div className="wood-floor relative aspect-[4/3] w-full" aria-hidden="true">

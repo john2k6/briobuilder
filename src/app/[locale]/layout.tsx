@@ -63,7 +63,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">{children}</main>
           <footer className="border-t border-border bg-soft print:hidden">
             <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 text-xs text-muted md:flex-row md:items-center md:justify-between">
-              <p className="max-w-3xl">{t("footer.compat")}</p>
+              <div className="max-w-3xl space-y-1">
+                <p>{t("footer.compat")}</p>
+                <p>{t("footer.images")}</p>
+              </div>
               <Link
                 href="/pieces"
                 className="inline-flex min-h-11 items-center font-bold text-ink underline-offset-4 hover:underline"

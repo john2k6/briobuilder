@@ -112,7 +112,8 @@
     "pack-supports": "Piliers"
   },
   "footer": {
-    "compat": "Compatible avec les rails en bois de type BRIO®. BRIO est une marque déposée de son propriétaire ; ce site n'est ni affilié ni approuvé par celui-ci."
+    "compat": "Compatible avec les rails en bois de type BRIO®. BRIO est une marque déposée de BRIO AB (groupe Ravensburger) ; ce site n'est ni affilié ni approuvé par celle-ci.",
+    "images": "Les images de produits restent la propriété de BRIO AB / Ravensburger : elles sont affichées depuis leurs sites avec un lien vers la page officielle et retirées sur simple demande. Les plans de circuits sont des dessins originaux."
   },
   "common": {
     "pieces": "{count, plural, one {# pièce} other {# pièces}}",
@@ -301,5 +302,9 @@
     "small": "petit",
     "medium": "moyen",
     "large": "grand"
+  },
+  "official": {
+    "credit": "Image © BRIO AB / Ravensburger, reproduite à titre d'illustration.",
+    "page": "Voir la page officielle"
   }
 }

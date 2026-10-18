@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { PieceThumb } from "@/components/PieceThumb";
-import { SetArt } from "@/components/SetArt";
+import { OfficialLink, SetArt } from "@/components/SetArt";
 import { blob, buttonPrimary, buttonSecondary, card, Icon, icons, PageHeader, SectionTitle } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { pieceList, setList } from "@/lib/catalog";
@@ -183,6 +183,7 @@ export function BoxView({ previews }: { previews: Record<string, string | null> 
                       <p className="font-mono text-sm text-muted">
                         {set.ref ? t("box.ref", { ref: set.ref }) : t("box.noRef")}
                       </p>
+                      {!photos[set.id] && <OfficialLink productRef={set.ref} />}
                     </div>
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <Stepper
@@ -276,6 +277,7 @@ export function BoxView({ previews }: { previews: Record<string, string | null> 
                     {set.ref ? `${t("box.ref", { ref: set.ref })} · ` : ""}
                     {t("common.pieces", { count: set.pieceCount })}
                   </p>
+                  <OfficialLink productRef={set.ref} />
                   <button
                     type="button"
                     className={`${buttonPrimary} mt-auto w-full px-3 text-sm sm:text-base`}
