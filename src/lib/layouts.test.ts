@@ -15,18 +15,22 @@ describe("bibliothèque de circuits", () => {
     expect(new Set(layouts.map((l) => l.id)).size).toBe(layouts.length);
   });
 
-  it("un coffret de démarrage permet au moins 4 circuits", () => {
+  it("un coffret de démarrage seul permet 5 circuits", () => {
     const inv = addSet({}, setList.find((s) => s.id === "starter")!);
     const { buildable, almost } = matchInventory(inv, layouts);
-    expect(buildable.map((m) => m.layout.id).sort()).toEqual(["circle", "long-oval", "oval", "stadium"]);
+    expect(buildable.map((m) => m.layout.id).sort()).toEqual(["circle", "long-oval", "oval", "short-oval", "stadium"]);
     expect(almost.length).toBeGreaterThan(0);
   });
 
-  it("une caisse bien remplie (2 coffrets de démarrage + 2 extensions aiguillages) : au moins 10 circuits", () => {
+  it("coffret de démarrage + 1 extension aiguillages : au moins 10 circuits (objectif du MVP)", () => {
     const starter = setList.find((s) => s.id === "starter")!;
     const ext = setList.find((s) => s.id === "expansion-switches")!;
-    const inv = addSet(addSet(addSet({}, starter), ext, 2), starter);
-    expect(matchInventory(inv, layouts).buildable.length).toBeGreaterThanOrEqual(10);
+    expect(matchInventory(addSet(addSet({}, starter), ext), layouts).buildable.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it("la bibliothèque compte au moins 20 circuits, dont un 8 avec croisement", () => {
+    expect(layouts.length).toBeGreaterThanOrEqual(20);
+    expect(layouts.find((l) => l.id === "figure-eight")?.bom.crossing).toBe(1);
   });
 });
 
@@ -55,8 +59,9 @@ describe("classement et suggestions", () => {
   it("suggère la pièce qui débloque le plus de circuits", () => {
     const inv = addSet({}, setList.find((s) => s.id === "starter")!);
     const [best] = suggestPurchases(inv, layouts, Object.keys(catalog));
-    expect(best.pieceTypeId).toBe("straight-long");
+    // 2 rails droits moyens débloquent 6 circuits d'un coup.
+    expect(best.pieceTypeId).toBe("straight-medium");
     expect(best.quantity).toBe(2);
-    expect(best.unlocks.sort()).toEqual(["giant-oval", "rectangle"]);
+    expect(best.unlocks).toHaveLength(6);
   });
 });

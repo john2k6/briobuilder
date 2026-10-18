@@ -104,7 +104,16 @@
     "mixed-oval": "The clever oval",
     "small-circle": "The little circle",
     "small-oval": "The little oval",
-    "small-long-oval": "The city track"
+    "small-long-oval": "The city track",
+    "short-oval": "The short oval",
+    "sunday-oval": "The Sunday oval",
+    "small-stadium": "The small stadium",
+    "small-rectangle": "The small rectangle",
+    "harbour": "The harbour loop",
+    "station-line": "The station line",
+    "main-line": "The main line",
+    "big-square": "The big square",
+    "figure-eight": "The figure eight"
   },
   "themes": {
     "classic": "Classic",

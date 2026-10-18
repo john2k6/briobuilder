@@ -132,7 +132,7 @@ export default function HomePage({ params }: PageProps<"/[locale]">) {
           </h2>
           <p className="text-lg text-muted">{t("showcaseText")}</p>
         </div>
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
           {buildable.map((layout) => (
             <li key={layout.id}>
               <Link

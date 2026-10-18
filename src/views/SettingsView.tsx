@@ -5,7 +5,7 @@ import { useState } from "react";
 import { buttonPrimary, buttonSecondary, card, Icon, icons, PageHeader } from "@/components/ui";
 import { actions } from "@/lib/store";
 
-const VERSION = "0.1";
+const VERSION = "0.2";
 
 export function SettingsView() {
   const t = useTranslations("settings");

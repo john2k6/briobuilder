@@ -27,7 +27,7 @@ test("parcours principal : profil, caisse, circuit, construction, badge", async 
 
   // 3. Idées de circuits
   await page.getByRole("link", { name: "Voir mes circuits" }).click();
-  await expect(page.getByRole("tab", { name: /Réalisables/ })).toContainText("4");
+  await expect(page.getByRole("tab", { name: /Réalisables/ })).toContainText("5");
   await snap(page, "2-circuits");
   await page.getByRole("tab", { name: /Presque/ }).click();
   await expect(page.getByText("Il manque").first()).toBeVisible();
@@ -79,6 +79,6 @@ test("la version anglaise affiche les mêmes écrans", async ({ page }) => {
   await page.getByRole("button", { name: "Add", exact: true }).first().click();
   await expect(page.getByText("14 pieces in total")).toBeVisible();
   await page.goto("/en/circuits");
-  await expect(page.getByRole("tab", { name: /Buildable/ })).toContainText("4");
+  await expect(page.getByRole("tab", { name: /Buildable/ })).toContainText("5");
   await snap(page, "8-en-circuits");
 });

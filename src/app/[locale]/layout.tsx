@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { MainNav } from "@/components/MainNav";
+import { ServiceWorker } from "@/components/ServiceWorker";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
@@ -19,8 +20,17 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "app" });
-  return { title: t("name"), description: t("description") };
+  return {
+    title: t("name"),
+    description: t("description"),
+    appleWebApp: { capable: true, title: t("name"), statusBarStyle: "black" },
+    icons: { apple: "/icons/apple-touch-icon.png" },
+  };
 }
+
+export const viewport: Viewport = {
+  themeColor: "#2e3236",
+};
 
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
@@ -32,17 +42,19 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     <html lang={locale}>
       <body className={`${display.variable} ${sans.variable} font-sans antialiased flex min-h-dvh flex-col`}>
         <NextIntlClientProvider>
+          <ServiceWorker />
           <header className="border-b-4 border-accent bg-header text-header-ink print:hidden">
             <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-3">
               <Link href="/" className="flex items-center gap-2 font-display text-xl font-bold">
-                <span className="flex size-8 items-center justify-center rounded-lg bg-accent" aria-hidden="true">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="size-5 fill-none stroke-white stroke-[2.5] [stroke-linecap:round]"
-                  >
-                    <path d="M4 18c0-7 4-12 16-12M7 20V16M12 20v-6.5M17 20v-9" />
-                  </svg>
-                </span>
+                <svg viewBox="0 0 64 64" className="size-8 shrink-0" aria-hidden="true">
+                  <rect width="64" height="64" rx="14" fill="var(--accent)" />
+                  <path d="M26 64A38 38 0 0 1 64 26" fill="none" stroke="#a6773f" strokeWidth="18" />
+                  <path d="M26 64A38 38 0 0 1 64 26" fill="none" stroke="#ddb67f" strokeWidth="14.5" />
+                  <g transform="translate(37.1 37.1) rotate(-45)">
+                    <rect x="-10" y="-7" width="20" height="14" rx="3" fill="#2e3236" />
+                    <circle cx="5" cy="0" r="2.6" fill="#ddb67f" />
+                  </g>
+                </svg>
                 {t("app.name")}
               </Link>
               <div className="order-3 w-full md:order-2 md:w-auto">

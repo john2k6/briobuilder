@@ -165,6 +165,28 @@ describe("fermeture (critères du lot 0)", () => {
   });
 });
 
+describe("chain", () => {
+  it("peut repartir d'une pièce déjà posée", () => {
+    const placements = chain(
+      [{ pieceTypeId: "crossing" }, { pieceTypeId: "straight-short", from: { index: 0, connector: 3 } }],
+      catalog,
+    );
+    const [inC] = transform(placements[1], catalog["straight-short"]);
+    expect(inC.x).toBeCloseTo(72);
+    expect(inC.y).toBeCloseTo(72);
+  });
+
+  it("signale une pièce de départ absente", () => {
+    expect(() => chain([{ pieceTypeId: "straight-short", from: { index: 4, connector: 0 } }], catalog)).toThrow();
+    expect(() =>
+      chain(
+        [{ pieceTypeId: "straight-short" }, { pieceTypeId: "straight-short", from: { index: 4, connector: 0 } }],
+        catalog,
+      ),
+    ).toThrow();
+  });
+});
+
 describe("chevauchements", () => {
   it("un ovale ne se chevauche pas", () => {
     expect(overlaps(chain(ovalSteps, catalog), catalog)).toEqual([]);

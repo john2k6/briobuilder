@@ -5,6 +5,7 @@ import { billOfMaterials, chain, type ChainStep, type Inventory, type Placement 
 /**
  * Notation compacte des circuits modèles : une lettre par pièce, posées bout à bout.
  * Majuscule/minuscule = grande/petite courbe ; R/r = courbe retournée (tourne à droite).
+ * X = croisement (on continue tout droit) ; « @2.3 » = la pièce suivante part du connecteur 3 de la 2e pièce.
  */
 export const SEQUENCE_CODES: Record<string, ChainStep> = {
   C: { pieceTypeId: "curve-large" },
@@ -14,6 +15,7 @@ export const SEQUENCE_CODES: Record<string, ChainStep> = {
   L: { pieceTypeId: "straight-long" },
   M: { pieceTypeId: "straight-medium" },
   S: { pieceTypeId: "straight-short" },
+  X: { pieceTypeId: "crossing" },
 };
 
 export type Theme = "classic" | "city" | "countryside";
@@ -31,14 +33,19 @@ export interface Layout {
 }
 
 export function sequenceToPlacements(sequence: string): Placement[] {
-  return chain(
-    [...sequence].map((code) => {
-      const step = SEQUENCE_CODES[code];
-      if (!step) throw new Error(`Code de pièce inconnu : ${code}`);
-      return step;
-    }),
-    catalog,
-  );
+  const steps: ChainStep[] = [];
+  let from: ChainStep["from"];
+  for (const [, jumpPiece, jumpConnector, code] of sequence.matchAll(/@(\d+)\.(\d+)|(\S)/g)) {
+    if (jumpPiece) {
+      from = { index: Number(jumpPiece) - 1, connector: Number(jumpConnector) };
+      continue;
+    }
+    const step = SEQUENCE_CODES[code];
+    if (!step) throw new Error(`Code de pièce inconnu : ${code}`);
+    steps.push(from ? { ...step, from } : step);
+    from = undefined;
+  }
+  return chain(steps, catalog);
 }
 
 export const layouts: Layout[] = rawLayouts.map(({ sequence, ...rest }) => {

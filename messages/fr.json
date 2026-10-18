@@ -104,7 +104,16 @@
     "mixed-oval": "L'ovale malin",
     "small-circle": "Le petit rond",
     "small-oval": "Le petit ovale",
-    "small-long-oval": "La piste de ville"
+    "small-long-oval": "La piste de ville",
+    "short-oval": "L'ovale court",
+    "sunday-oval": "L'ovale du dimanche",
+    "small-stadium": "Le petit stade",
+    "small-rectangle": "Le petit rectangle",
+    "harbour": "Le circuit du port",
+    "station-line": "La ligne de la gare",
+    "main-line": "La grande ligne",
+    "big-square": "Le grand carré",
+    "figure-eight": "Le huit"
   },
   "themes": {
     "classic": "Classique",

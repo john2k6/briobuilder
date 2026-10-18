@@ -12,6 +12,7 @@ npm test           # tests du moteur et des traductions
 npm run coverage   # couverture du moteur (seuil 90 %)
 npm run e2e        # parcours complet dans un navigateur (Playwright)
 npm run catalog    # régénère data/catalog/pieces.json
+node scripts/generate-icons.mjs  # régénère les icônes de l'application
 ```
 
 ## Organisation
@@ -32,7 +33,7 @@ npm run catalog    # régénère data/catalog/pieces.json
 2. Ajouter `"de"` dans `src/i18n/routing.ts`.
 3. `npm test` vérifie que le nouveau fichier a exactement les mêmes clés.
 
-## Avancement — version 0.1 (sans compte)
+## Avancement — version 0.2 (sans compte)
 - [x] Lot 0 — moteur géométrique + 10 pièces + 3 coffrets (critères validés par les tests)
 - [x] Socle bilingue français / anglais
 - [x] Ma caisse : ajout par coffret, compteurs +/−, recherche, annuler (EF-10 à 13, EF-15)
@@ -41,5 +42,7 @@ npm run catalog    # régénère data/catalog/pieces.json
 - [x] Mode enfant pas à pas : boutons géants, lecture audio, sortie protégée, badges (EF-06, 32 à 34)
 - [x] Profils enfants (6 max, surnom seulement), export JSON et suppression des données (EF-03, EF-05)
 - [ ] Lot 1 — comptes parents et sauvegarde en ligne (Supabase, région UE)
-- [ ] Bibliothèque : passer de 11 à 20+ circuits (objectif : 10 circuits avec un coffret + 1 extension ; 6 aujourd'hui)
-- [ ] Mesurer les vraies pièces (dimensions marquées « À mesurer »), back-office (EF-40 à 42), PWA hors ligne
+- [x] Bibliothèque de 20 circuits, dont un 8 avec croisement (12 réalisables avec un coffret de démarrage + 1 extension)
+- [x] PWA : installable sur tablette, circuits déjà ouverts disponibles hors ligne (ENF-05)
+- [ ] Mesurer les vraies pièces (dimensions marquées « À mesurer »), circuits avec aiguillages et ponts
+- [ ] Back-office (EF-40 à 42), affiliation (EF-50), premium (EF-52 à 55)
