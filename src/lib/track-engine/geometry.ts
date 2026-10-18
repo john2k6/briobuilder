@@ -6,13 +6,14 @@ export const POSITION_TOLERANCE = 3;
 export const ANGLE_TOLERANCE = 1;
 
 /**
- * Jeu des rails en bois : chaque raccord peut s'étirer de 2 à 3 mm et plier de quelques degrés.
- * Une boucle de n pièces absorbe donc un petit écart à la fermeture (plafonné pour rester réaliste).
+ * Jeu des rails en bois : chaque raccord peut s'étirer d'environ 1,5 mm et plier d'un demi-degré.
+ * Une boucle de n pièces absorbe donc un écart à la fermeture qui se répartit sur tous ses raccords
+ * (plafonné à 3 cm : c'est le cas du huit du coffret 33028, deux rampes de 432 mm pour 404 mm).
  */
 export function flexTolerance(pieces: number): { position: number; angle: number } {
   return {
-    position: POSITION_TOLERANCE + Math.min(5, 0.25 * pieces),
-    angle: ANGLE_TOLERANCE + Math.min(3, 0.15 * pieces),
+    position: POSITION_TOLERANCE + Math.min(28, 1.5 * pieces),
+    angle: ANGLE_TOLERANCE + Math.min(8, 0.4 * pieces),
   };
 }
 

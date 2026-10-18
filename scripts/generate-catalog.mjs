@@ -1,7 +1,7 @@
 // Génère data/catalog/pieces.json à partir de formes simples (droite, courbe…).
 // Lancer : npm run catalog
 // Géométrie des rails en bois compatibles (centre de la voie) : droites A2 54, A1 108, A 144, D 216 mm ;
-// courbes E (rayon 202 mm) et E1 (rayon 110 mm), 1/8 de cercle chacune ; aiguillages de la longueur d'un A.
+// courbes E (rayon 212 mm, d'après les circuits ronds officiels de 46,4 cm) et E1 (rayon 110 mm), 1/8 de cercle chacune ; aiguillages de la longueur d'un A.
 // verified: false = valeur à confirmer en mesurant une vraie pièce.
 import { writeFileSync } from "node:fs";
 
@@ -46,7 +46,7 @@ const curve = (id, ref, radius, verified) => {
   };
 };
 
-const E = 202;
+const E = 212;
 const E1 = 110;
 const branch = arc(E, 45).at(-1);
 

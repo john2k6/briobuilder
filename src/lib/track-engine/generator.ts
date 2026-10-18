@@ -1,6 +1,6 @@
 import { analyzeJoints, type ClosureReport } from "./connect";
 import { chain, type ChainStep } from "./chain";
-import { getPiece, transformTracks } from "./geometry";
+import { getPiece, transform, transformTracks } from "./geometry";
 import { fullBillOfMaterials } from "./inventory";
 import { overlaps } from "./overlaps";
 import type { Catalog, Inventory, Placement } from "./types";
@@ -105,7 +105,8 @@ export type Family =
   | "line"
   | "network"
   | "spiral"
-  | "lift";
+  | "lift"
+  | "theta";
 
 export const FAMILIES: Family[] = [
   "circle",
@@ -129,6 +130,7 @@ export const FAMILIES: Family[] = [
   "network",
   "spiral",
   "lift",
+  "theta",
 ];
 
 /** Transforme une suite de jetons en étapes de pose. « @3.2 » : repartir du connecteur 2 de la 3e pièce. */
@@ -295,7 +297,7 @@ function fixedNeeds(elems: Elem[]): Inventory {
   return needs;
 }
 
-const RADIUS = { C: 202, c: 110 } as const;
+const RADIUS = { C: 212, c: 110 } as const;
 
 /** Longueur de ligne droite réalisable la plus proche. */
 function nearestRun(length: number): number {
@@ -306,8 +308,8 @@ function nearestRun(length: number): number {
 // Deux lignes droites (« x » et « y ») sont calculées pour que la forme se referme.
 
 const CURVE_TURN: Record<string, { radius: number; turn: 1 | -1 }> = {
-  C: { radius: 202, turn: 1 },
-  R: { radius: 202, turn: -1 },
+  C: { radius: 212, turn: 1 },
+  R: { radius: 212, turn: -1 },
   c: { radius: 110, turn: 1 },
   r: { radius: 110, turn: -1 },
 };
@@ -365,7 +367,7 @@ function shape(turns: string[], runs: (string | number)[], values: Record<string
   const lengths: Record<string, number> = { ...values };
   for (const key of ["x", "y"] as const) {
     const run = nearestRun(solved[key]);
-    if (solved[key] < -3 || Math.abs(run - solved[key]) > 6) return null;
+    if (solved[key] < -3 || Math.abs(run - solved[key]) > 16) return null;
     lengths[key] = run;
   }
   return turns.flatMap((turn, i) => {
@@ -429,7 +431,7 @@ function* templates(maxRun: number): Generator<Template> {
     const w = p + 108 - radius;
     const q = u + radius - 108;
     const [w2, q2] = [nearestRun(w), nearestRun(q)];
-    if (w < -3 || Math.abs(w2 - w) > 6 || Math.abs(q2 - q) > 6) return null;
+    if (w < -3 || Math.abs(w2 - w) > 16 || Math.abs(q2 - q) > 16) return null;
     const c2 = curve + curve;
     return [{ run: p }, c2, { run: u }, c2, { run: w2 }, c2, { run: q2 }];
   };
@@ -537,27 +539,31 @@ function* templates(maxRun: number): Generator<Template> {
       }
     }
     // Huit avec pont : la voie verticale monte, passe au-dessus de l'autre, puis redescend.
+    // Les longueurs exactes tombent rarement juste : on essaie les plus proches (le jeu des rails fait le reste).
+    const near = (target: number) =>
+      RUN_LENGTHS.filter((l) => l >= 0 && Math.abs(l - target) <= 30 && l <= maxRun).slice(0, 3);
     for (const u of upTo(432)) {
-      const h = nearestRun(R + u);
       const loop = (c: string) => [c + c, { run: u }, c + c, { run: u }, c + c];
-      for (const b of upTo(216)) {
-        const e = nearestRun(2 * R + 2 * u - 2 * b - 432);
-        if (e <= 0) continue;
-        yield {
-          family: "eight-bridge",
-          elems: [
-            { run: h },
-            ...loop(r),
-            { run: b },
-            "U",
-            { run: e, elevated: true },
-            "V",
-            { run: b },
-            ...loop(k),
-            { run: h },
-          ],
-          checkOverlaps: true,
-        };
+      for (const h of near(R + u)) {
+        for (const b of upTo(216)) {
+          for (const e of near(2 * R + 2 * u - 2 * b - 432)) {
+            yield {
+              family: "eight-bridge",
+              elems: [
+                { run: h },
+                ...loop(r),
+                { run: b },
+                "U",
+                ...(e > 0 ? [{ run: e, elevated: true }] : []),
+                "V",
+                { run: b },
+                ...loop(k),
+                { run: h },
+              ],
+              checkOverlaps: true,
+            };
+          }
+        }
       }
     }
 
@@ -758,6 +764,160 @@ function* networks(maxRun: number): Generator<Template> {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Raccourcis : relier deux points d'une boucle par une nouvelle voie
+
+/** Boucles sur lesquelles on cherche des raccourcis. */
+const LINKABLE = new Set<Family>(["oval", "rectangle", "l-shape", "u-shape", "bean", "house", "octagon", "triangle"]);
+
+/** Suites de virages essayées pour la nouvelle voie (k : courbe à gauche, K : à droite). */
+const LINK_TURNS = (k: string, K: string): string[][] => [
+  [],
+  [k + k],
+  [K + K],
+  [k],
+  [K],
+  [k, K],
+  [K, k],
+  [k + k, K + K],
+  [K + K, k + k],
+  [k + k, k + k],
+  [K + K, K + K],
+];
+
+/**
+ * Trouve les longueurs des lignes droites d'une voie qui part de `from` (position, cap) et arrive
+ * en `to` avec le cap `toHeading`, en passant par les virages donnés. Deux lignes droites sont calculées,
+ * les autres valent `fill`. Renvoie les éléments du gabarit, ou null si impossible.
+ */
+function solveLink(
+  from: { x: number; y: number; heading: number },
+  to: { x: number; y: number; heading: number },
+  turns: string[],
+  fill: number,
+): Elem[] | null {
+  const n = turns.length + 1;
+  // Directions de chaque ligne droite et position d'arrivée avec toutes les lignes à `fill`.
+  const dirs: [number, number][] = [];
+  let { x, y, heading } = from;
+  for (let i = 0; i < n; i++) {
+    dirs.push([Math.cos(deg(heading)), Math.sin(deg(heading))]);
+    x += dirs[i][0] * fill;
+    y += dirs[i][1] * fill;
+    if (i < turns.length) {
+      const move = turnMove(turns[i], heading);
+      x += move.dx;
+      y += move.dy;
+      heading = move.heading;
+    }
+  }
+  if (Math.round(((heading - to.heading) % 360) + 360) % 360 !== 0) return null;
+  const gx = to.x - x;
+  const gy = to.y - y;
+  for (let a = 0; a < n; a++) {
+    for (let b = a + 1; b < n; b++) {
+      const [ax, ay] = dirs[a];
+      const [bx, by] = dirs[b];
+      const det = ax * by - ay * bx;
+      if (Math.abs(det) < 1e-6) continue;
+      const ua = (gx * by - gy * bx) / det + fill;
+      const ub = (ax * gy - ay * gx) / det + fill;
+      const ra = nearestRun(ua);
+      const rb = nearestRun(ub);
+      if (ua < -3 || ub < -3 || Math.abs(ra - ua) > 16 || Math.abs(rb - ub) > 16) continue;
+      const runs = Array.from({ length: n }, (_, i) => (i === a ? ra : i === b ? rb : fill));
+      return turns.flatMap((turn, i): Elem[] => [{ run: runs[i] }, turn]).concat([{ run: runs[n - 1] }]);
+    }
+  }
+  return null;
+}
+
+/** Stock illimité de rails droits : sert seulement à calculer la géométrie d'un gabarit. */
+const ENDLESS: Inventory = Object.fromEntries(ELEVATED_STRAIGHTS.map((t) => [t.id, 99]));
+
+/**
+ * Raccourcis d'une boucle : on coupe deux lignes droites pour y mettre un aiguillage (qui sépare les voies)
+ * et un aiguillage retourné (qui les réunit), puis une nouvelle voie relie l'un à l'autre,
+ * à l'intérieur ou à l'extérieur de la boucle.
+ */
+function* linkTemplates(base: Template, catalog: Catalog, maxRun: number): Generator<Template> {
+  const runIndexes = base.elems.flatMap((e, i) =>
+    typeof e === "object" && "run" in e && !e.elevated && e.run >= 144 ? [i] : [],
+  );
+  const splits = (run: number) =>
+    [0, nearestRun((run - 144) / 2), run - 144].filter(
+      (p, n, all) => all.indexOf(p) === n && RUN_LENGTHS.includes(run - 144 - p),
+    );
+  for (const i of runIndexes) {
+    for (const j of runIndexes) {
+      if (j <= i) continue;
+      const ri = (base.elems[i] as { run: number }).run;
+      const rj = (base.elems[j] as { run: number }).run;
+      for (const [diverge, merge] of [
+        ["W", "y"],
+        ["w", "Y"],
+      ]) {
+        for (const pi of splits(ri)) {
+          for (const pj of splits(rj)) {
+            const elems: Elem[] = base.elems.flatMap((e, n): Elem[] =>
+              n === i
+                ? [{ run: pi }, { tag: "a", token: diverge }, { run: ri - 144 - pi }]
+                : n === j
+                  ? [{ run: pj }, { tag: "b", token: merge }, { run: rj - 144 - pj }]
+                  : [e],
+            );
+            // Géométrie : on pose la boucle avec un stock illimité de rails droits.
+            const tags: Record<string, number> = {};
+            const tokens = expandWithTags(elems, tags);
+            if (tokens === null) continue;
+            let placements: Placement[];
+            try {
+              placements = chain(tokensToSteps(tokens), catalog);
+            } catch {
+              continue;
+            }
+            const pa = placements[tags.a - 1];
+            const pb = placements[tags.b - 1];
+            const a = transform(pa, getPiece(catalog, pa.pieceTypeId))[2];
+            const b = transform(pb, getPiece(catalog, pb.pieceTypeId))[2];
+            const from = { x: a.x, y: a.y, heading: a.angle };
+            const to = { x: b.x, y: b.y, heading: b.angle + 180 };
+            for (const k of ["C", "c"]) {
+              const K = k === "C" ? "R" : "r";
+              for (const turns of LINK_TURNS(k, K)) {
+                for (const fill of [0, 108]) {
+                  const path = solveLink(from, to, turns, fill);
+                  if (!path || maxRunOf(path) > maxRun) continue;
+                  yield {
+                    family: "theta",
+                    elems: [...elems, { jump: "a", connector: 2 }, ...path],
+                    checkOverlaps: true,
+                  };
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/** Développe un gabarit avec un stock illimité (géométrie seulement) et note la position des repères. */
+function expandWithTags(elems: Elem[], tags: Record<string, number>): string | null {
+  const pool = { ...ENDLESS };
+  const out = expand(elems, pool, {}, 0);
+  if (out === null) return null;
+  let count = 0;
+  for (const e of elems) {
+    if (typeof e === "string") count += e.replace(OPEN_END, "").length;
+    else if ("run" in e) count += composeRun(e.run, e.elevated ?? false, { ...ENDLESS }, {}, 0)?.length ?? 0;
+    else if ("tag" in e) tags[e.tag] = ++count;
+    else if ("end" in e) count += 1;
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------------------------
 // Génération
 
 export type Size = "small" | "medium" | "large";
@@ -936,35 +1096,36 @@ export function generateLayouts(
     yield* templates(maxRun);
     yield* networks(maxRun);
   };
-  for (const template of all()) {
-    if (options.families?.length && !options.families.includes(template.family)) continue;
-    if (full(template.family, "buildable") && full(template.family, "almost")) continue;
+  const templateOf = new Map<GeneratedLayout, Template>();
+  const process = (template: Template): GeneratedLayout | null => {
+    if (options.families?.length && !options.families.includes(template.family)) return null;
+    if (full(template.family, "buildable") && full(template.family, "almost")) return null;
     // Plus de lignes droites que de rails disponibles : inutile d'essayer.
     const runTotal = template.elems.reduce((sum, e) => sum + (typeof e === "object" && "run" in e ? e.run : 0), 0);
-    if (runTotal > straightLength + 216 * maxMissing) continue;
+    if (runTotal > straightLength + 216 * maxMissing) return null;
     // Pièces fixes : on écarte d'emblée ce qui manque trop.
     const fixedMissing = Object.entries(fixedNeeds(template.elems)).reduce(
       (s, [id, q]) => s + Math.max(0, q - (inventory[id] ?? 0)),
       0,
     );
-    if (fixedMissing > maxMissing) continue;
+    if (fixedMissing > maxMissing) return null;
 
     const pool = { ...inventory };
     const missing: Inventory = {};
     const tokens = expand(template.elems, pool, missing, maxMissing);
-    if (tokens === null) continue;
+    if (tokens === null) return null;
     const code = `${template.family}:${tokens}`;
-    if (seen.has(code)) continue;
+    if (seen.has(code)) return null;
     seen.add(code);
 
     let placements: Placement[];
     try {
       placements = chain(tokensToSteps(tokens), catalog);
     } catch {
-      continue;
+      return null;
     }
     const report = analyzeJoints(placements, catalog);
-    if (!isComplete(report, tokens)) continue;
+    if (!isComplete(report, tokens)) return null;
 
     const bom = fullBillOfMaterials(placements, catalog);
     // Les ponts empilables portent la voie comme des piliers : on les utilise d'abord.
@@ -980,11 +1141,11 @@ export function generateLayouts(
       if (lack > 0) lacking[id] = lack;
     }
     const missingCount = countOf(lacking);
-    if (missingCount > maxMissing) continue;
+    if (missingCount > maxMissing) return null;
 
     const pieces = placements.length;
     const size = sizeOf(pieces);
-    if (options.sizes?.length && !options.sizes.includes(size)) continue;
+    if (options.sizes?.length && !options.sizes.includes(size)) return null;
     const features = featuresOf(tokens);
     const req = options.require ?? {};
     if (
@@ -992,12 +1153,12 @@ export function generateLayouts(
       (req.switches && !features.switches) ||
       (req.crossing && !features.crossing)
     ) {
-      continue;
+      return null;
     }
     const kind = missingCount === 0 ? "buildable" : "almost";
-    if (full(template.family, kind)) continue;
+    if (full(template.family, kind)) return null;
     // Le test de chevauchement est le plus coûteux : on le fait en dernier.
-    if (template.checkOverlaps && overlaps(placements, catalog, true).length > 0) continue;
+    if (template.checkOverlaps && overlaps(placements, catalog, true).length > 0) return null;
 
     let accessories: AccessoryPlacement[] = [];
     let fullCode = code;
@@ -1038,6 +1199,21 @@ export function generateLayouts(
         (report.maxGap < 1 ? 0.3 : 0) -
         missingCount * 0.5,
     });
+    templateOf.set(results[results.length - 1], template);
+    return results[results.length - 1];
+  };
+
+  for (const template of all()) process(template);
+
+  // Raccourcis : on relie deux points des plus belles boucles par une nouvelle voie (aiguillages).
+  if (!options.families?.length || options.families.includes("theta")) {
+    const bases = results
+      .filter((r) => LINKABLE.has(r.family))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 12 * depth);
+    for (const base of bases) {
+      for (const template of linkTemplates(templateOf.get(base)!, catalog, maxRun)) process(template);
+    }
   }
 
   const pick = (list: GeneratedLayout[]) => {

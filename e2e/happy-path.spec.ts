@@ -33,7 +33,7 @@ test("parcours principal : profil, coffrets, générateur, construction, badge",
   await expect(page.getByText("Chaque circuit a été vérifié par le moteur.")).toBeVisible();
   await page.getByRole("button", { name: "Un pont" }).click();
   await expect(page.getByText("Chaque circuit a été vérifié par le moteur.")).toBeVisible();
-  await expect(page.getByRole("heading", { name: /La colline/ }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /La grande montée/ }).first()).toBeVisible();
   await snap(page, "2-generator");
   await page.getByRole("tab", { name: /pièces en plus/ }).click();
   await expect(page.getByText("Il manque").first()).toBeVisible();
@@ -41,10 +41,10 @@ test("parcours principal : profil, coffrets, générateur, construction, badge",
 
   // 4. Fiche du circuit
   await page
-    .getByRole("link", { name: /La colline/ })
+    .getByRole("link", { name: /La grande montée/ })
     .first()
     .click();
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("La colline");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("La grande montée");
   await expect(page.getByText("Pilier")).toBeVisible();
   await page.getByRole("button", { name: "Ajouter aux favoris" }).click();
   await snap(page, "3-circuit");
@@ -81,7 +81,7 @@ test("la version anglaise affiche les mêmes écrans", async ({ page }) => {
   await expect(page.getByText("1 set · 11 tracks")).toBeVisible();
   await page.goto("/en/circuits");
   await expect(page.getByText("Every layout has been checked by the engine.")).toBeVisible();
-  await expect(page.getByRole("heading", { name: /The oval/ }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /The race track/ }).first()).toBeVisible();
   await snap(page, "6-en-generator");
 });
 

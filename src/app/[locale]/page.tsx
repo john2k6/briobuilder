@@ -54,7 +54,7 @@ export default function HomePage({ params }: PageProps<"/[locale]">) {
   return (
     <div className="space-y-20 pb-8">
       {/* Accroche : de vrais coffrets */}
-      <section className="relative left-1/2 -mt-10 w-screen -translate-x-1/2 overflow-hidden bg-[linear-gradient(180deg,#fff7ec_0%,#f7f0e4_100%)]">
+      <section className="relative left-1/2 -mt-10 w-screen -translate-x-1/2 overflow-hidden bg-[var(--floor)]">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 lg:grid-cols-[1fr_1.1fr] lg:py-16">
           <div className="space-y-6">
             <p className="text-sm font-extrabold uppercase tracking-widest text-green">{t("eyebrow")}</p>
