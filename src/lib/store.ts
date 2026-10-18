@@ -55,8 +55,6 @@ export interface AppState extends Box {
   version: 2;
   /** États précédents de la caisse, pour annuler la dernière action. */
   history: Box[];
-  /** Photo de sa propre boîte (réduite), par coffret : reste sur l'appareil. */
-  photos: Record<string, string>;
   children: ChildProfile[];
   activeChildId: string | null;
   builds: BuildLog[];
@@ -75,7 +73,6 @@ const initial: AppState = {
   sets: {},
   adjustments: {},
   history: [],
-  photos: {},
   children: [],
   activeChildId: null,
   builds: [],
@@ -116,6 +113,8 @@ function load() {
     if (raw) {
       const saved = JSON.parse(raw) as AppState;
       state = { ...initial, ...saved, prefs: { ...initial.prefs, ...saved.prefs } };
+      // Les photos de boîte ne sont plus proposées : on efface celles d'une ancienne version.
+      delete (state as AppState & { photos?: unknown }).photos;
     } else {
       // Reprise de la version 1 : l'ancienne caisse devient des corrections pièce par pièce.
       const old = window.localStorage.getItem(OLD_KEY);
@@ -240,14 +239,6 @@ export const actions = {
   clearInventory() {
     update((s) => withHistory(s, { sets: {}, adjustments: {} }));
   },
-  setPhoto(setId: string, dataUrl: string | null) {
-    update((s) => {
-      const photos = { ...s.photos };
-      if (dataUrl) photos[setId] = dataUrl;
-      else delete photos[setId];
-      return { ...s, photos };
-    });
-  },
   setPrefs(patch: Partial<GeneratorPrefs>) {
     update((s) => ({ ...s, prefs: { ...s.prefs, ...patch } }));
   },
@@ -301,9 +292,8 @@ export const actions = {
   /** Export JSON de toutes les données (EF-05). */
   exportJson(): string {
     load();
-    const { history: _history, photos: _photos, ...data } = state;
+    const { history: _history, ...data } = state;
     void _history;
-    void _photos;
     return JSON.stringify({ exportedAt: new Date().toISOString(), ...data }, null, 2);
   },
 };

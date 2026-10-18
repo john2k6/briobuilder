@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TrackPlan, type StepState } from "@/components/TrackPlan";
 import { Avatar, Icon, icons } from "@/components/ui";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -12,7 +12,6 @@ import { useSearchParams } from "next/navigation";
 import type { Placement } from "@/lib/track-engine";
 import { actions, badgesFor, useAppState, type BadgeId } from "@/lib/store";
 
-const EXIT_HOLD_MS = 3000;
 const SPEECH_LANG: Record<string, string> = { fr: "fr-FR", en: "en-GB" };
 
 function speak(text: string, locale: string) {
@@ -25,54 +24,16 @@ function speak(text: string, locale: string) {
 }
 
 /** Sortie protégée : un adulte maintient le bouton 3 secondes (EF-06). */
-function ExitButton({ onExit, label, hint }: { onExit: () => void; label: string; hint: string }) {
-  const [progress, setProgress] = useState(0);
-  const frame = useRef<number>(0);
-
-  const begin = () => {
-    const startedAt = performance.now();
-    const loop = () => {
-      const p = Math.min(1, (performance.now() - startedAt) / EXIT_HOLD_MS);
-      setProgress(p);
-      if (p >= 1) onExit();
-      else frame.current = requestAnimationFrame(loop);
-    };
-    frame.current = requestAnimationFrame(loop);
-  };
-  const cancel = () => {
-    cancelAnimationFrame(frame.current);
-    setProgress(0);
-  };
-  useEffect(() => () => cancelAnimationFrame(frame.current), []);
-
-  const r = 26;
-  const circumference = 2 * Math.PI * r;
+/** Bouton pour quitter le mode construction : un simple appui. */
+function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
   return (
     <button
       type="button"
-      aria-label={`${label}. ${hint}`}
-      title={hint}
-      onPointerDown={begin}
-      onPointerUp={cancel}
-      onPointerLeave={cancel}
-      onPointerCancel={cancel}
-      onContextMenu={(e) => e.preventDefault()}
-      className="relative flex size-16 shrink-0 touch-none select-none items-center justify-center rounded-full bg-surface text-muted"
+      aria-label={label}
+      title={label}
+      onClick={onExit}
+      className="flex size-16 shrink-0 items-center justify-center rounded-full bg-surface text-muted"
     >
-      <svg viewBox="0 0 64 64" className="absolute inset-0 -rotate-90" aria-hidden="true">
-        <circle cx="32" cy="32" r={r} fill="none" stroke="var(--border)" strokeWidth="5" />
-        <circle
-          cx="32"
-          cy="32"
-          r={r}
-          fill="none"
-          stroke="var(--accent)"
-          strokeWidth="5"
-          strokeDasharray={circumference}
-          strokeDashoffset={circumference * (1 - progress)}
-          strokeLinecap="round"
-        />
-      </svg>
       <Icon d={icons.close} className="size-6" />
     </button>
   );
@@ -210,7 +171,7 @@ export function BuildView() {
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-background" role="dialog" aria-modal="true" aria-label={name}>
       <div className="flex items-center justify-between gap-3 px-4 py-3">
-        <ExitButton onExit={() => router.push(circuitHref(code))} label={t("build.exit")} hint={t("build.exitHint")} />
+        <ExitButton onExit={() => router.push(circuitHref(code))} label={t("build.exit")} />
         <p className="text-center font-display text-xl font-bold uppercase sm:text-2xl" aria-live="polite">
           {finished ? t("build.done") : t("build.step", { step: step + 1, total })}
         </p>

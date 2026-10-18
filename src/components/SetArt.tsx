@@ -22,14 +22,10 @@ export const THEME_COLORS: Record<string, string> = {
 };
 
 /**
- * Image d'un coffret : la photo de sa propre boîte si l'utilisateur en a pris une, sinon l'image officielle
+ * Image d'un coffret : l'image officielle
  * (avec crédit et lien), sinon une illustration originale : le plus beau circuit réalisable avec ce seul coffret.
  */
-export function SetArt({ set, previewCode, photo }: { set: TrackSet; previewCode?: string | null; photo?: string }) {
-  if (photo) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={photo} alt="" className="aspect-[4/3] w-full object-cover" />;
-  }
+export function SetArt({ set, previewCode }: { set: TrackSet; previewCode?: string | null }) {
   return (
     <OfficialImage
       src={officialImage(set.ref)}

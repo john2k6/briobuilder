@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { PieceThumb } from "@/components/PieceThumb";
 import { OfficialLink, SetArt } from "@/components/SetArt";
 import { blob, buttonPrimary, buttonSecondary, card, Icon, icons, PageHeader, SectionTitle } from "@/components/ui";
@@ -13,24 +13,6 @@ import { totalPieces, type PieceCategory, type TrackSet } from "@/lib/track-engi
 const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 type Kind = "all" | TrackSet["kind"];
-
-/** Réduit une photo à 480 px de large (JPEG) pour la garder sur l'appareil sans l'alourdir. */
-async function shrinkPhoto(file: File): Promise<string> {
-  const url = URL.createObjectURL(file);
-  try {
-    const img = new Image();
-    img.src = url;
-    await img.decode();
-    const scale = Math.min(1, 480 / img.width);
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(img.width * scale);
-    canvas.height = Math.round(img.height * scale);
-    canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", 0.75);
-  } finally {
-    URL.revokeObjectURL(url);
-  }
-}
 
 function Stepper({
   value,
@@ -98,13 +80,11 @@ function SetContents({ set }: { set: TrackSet }) {
 
 export function BoxView({ previews }: { previews: Record<string, string | null> }) {
   const t = useTranslations();
-  const { inventory, sets, adjustments, photos, history, ready } = useAppState();
+  const { inventory, sets, adjustments, history, ready } = useAppState();
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<Kind>("all");
   const [open, setOpen] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const fileInput = useRef<HTMLInputElement>(null);
-  const [photoFor, setPhotoFor] = useState<string | null>(null);
 
   const owned = setList.filter((s) => (sets[s.id] ?? 0) > 0);
   const q = normalize(query.trim());
@@ -123,12 +103,6 @@ export function BoxView({ previews }: { previews: Record<string, string | null> 
     actions.addSet(id);
     setToast(t("box.added", { name: t(`setNames.${id}`) }));
     window.setTimeout(() => setToast(null), 2500);
-  };
-
-  const onPhoto = async (file: File | undefined) => {
-    if (!file || !photoFor) return;
-    actions.setPhoto(photoFor, await shrinkPhoto(file));
-    setPhotoFor(null);
   };
 
   const categories = [...new Set(pieceList.map((p) => p.category))] as PieceCategory[];
@@ -158,17 +132,6 @@ export function BoxView({ previews }: { previews: Record<string, string | null> 
         </div>
       </PageHeader>
 
-      <input
-        ref={fileInput}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={(e) => {
-          void onPhoto(e.target.files?.[0]);
-          e.target.value = "";
-        }}
-      />
-
       {/* Mes coffrets */}
       {ready && owned.length > 0 && (
         <section className="space-y-5">
@@ -178,14 +141,14 @@ export function BoxView({ previews }: { previews: Record<string, string | null> 
               const name = t(`setNames.${set.id}`);
               return (
                 <li key={set.id} className={`${blob} flex flex-col border border-border bg-surface`}>
-                  <SetArt set={set} previewCode={previews[set.id]} photo={photos[set.id]} />
+                  <SetArt set={set} previewCode={previews[set.id]} />
                   <div className="flex flex-1 flex-col gap-3 p-5">
                     <div>
                       <h3 className="text-lg font-extrabold leading-tight text-ink">{name}</h3>
                       <p className="font-mono text-sm text-muted">
                         {set.ref ? t("box.ref", { ref: set.ref }) : t("box.noRef")}
                       </p>
-                      {!photos[set.id] && <OfficialLink productRef={set.ref} />}
+                      <OfficialLink productRef={set.ref} />
                     </div>
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <Stepper
@@ -193,20 +156,6 @@ export function BoxView({ previews }: { previews: Record<string, string | null> 
                         onChange={(n) => actions.setSetCount(set.id, n)}
                         label={name}
                       />
-                      <button
-                        type="button"
-                        className="inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-bold text-ink hover:bg-soft"
-                        onClick={() => {
-                          if (photos[set.id]) actions.setPhoto(set.id, null);
-                          else {
-                            setPhotoFor(set.id);
-                            fileInput.current?.click();
-                          }
-                        }}
-                      >
-                        <Icon d={icons.camera} className="size-5" />
-                        {photos[set.id] ? t("box.removePhoto") : t("box.addPhoto")}
-                      </button>
                     </div>
                     <button
                       type="button"

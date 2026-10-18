@@ -32,7 +32,7 @@ node scripts/generate-icons.mjs  # régénère les icônes de l'application
 - [x] Moteur : raccords tenon/trou, niveaux et piliers, jeu des rails, chevauchements
 - [x] 55 coffrets, extensions, sachets et ponts réels (contenu indicatif) et 29 pièces : rails, aiguillages (dont petit et en Y), croisements (droit et courbe), rampes et courbe montante, ponts (suspendu, levant, courbe), butoir, plaque tournante, décors
 - [x] Liens vers les pages officielles et crédit © des images officielles (adresses des images à renseigner)
-- [x] Mes coffrets : catalogue, recherche, quantités, photo de sa boîte, corrections pièce par pièce
+- [x] Mes coffrets : catalogue, recherche, quantités, corrections pièce par pièce
 - [x] Générateur : taille, pont, aiguillage, croisement, décors ; 18 familles de circuits vérifiés (formes en L, U, haricot, triangle, maison, octogone ; terminus, fourche, gare de triage, ligne ; voies sans issue)
 - [x] Fiche, mode enfant pas à pas, profils, badges, export/suppression, PWA hors ligne
 - [ ] Vérifier le contenu des coffrets sur de vraies boîtes
