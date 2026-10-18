@@ -181,7 +181,7 @@
     "contents": "Contenu",
     "indicative": "Contenu indicatif : vérifiez avec votre boîte et corrigez si besoin dans « Détail des pièces ».",
     "addSet": "Ajouter un coffret",
-    "addSetIntro": "Coffrets complets, coffrets d'évolution et sachets de rails compatibles. L'illustration montre un circuit possible avec cette seule boîte.",
+    "addSetIntro": "Coffrets complets, coffrets d'évolution, sachets de rails et ponts compatibles. Ajoute les tiens : leurs pièces s'additionnent.",
     "addSetButton": "Ajouter",
     "addAnother": "Ajouter (déjà {count})",
     "added": "{name} ajouté",
