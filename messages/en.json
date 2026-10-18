@@ -550,7 +550,21 @@
     "bridges": "bridges and ramps",
     "buildings": "stations and buildings",
     "vehicles": "trains and wagons",
-    "mySets": "My sets",
-    "create": "Build a layout with all this"
+    "create": "Build a layout with all this",
+    "groups": {
+      "sets": "Sets",
+      "extensions": "Expansions and packs",
+      "buildings": "Buildings and scenery",
+      "trains": "Trains and wagons",
+      "pieces": "My pieces"
+    },
+    "search": "Search (name or reference)",
+    "view": "View",
+    "views": {
+      "grid": "Grid",
+      "list": "List"
+    },
+    "filter": "Filter",
+    "officialHint": "Tap a product to open its official page (new tab)."
   }
 }

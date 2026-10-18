@@ -550,7 +550,21 @@
     "bridges": "ponts et rampes",
     "buildings": "gares et bâtiments",
     "vehicles": "trains et wagons",
-    "mySets": "Mes coffrets",
-    "create": "Créer un circuit avec tout ça"
+    "create": "Créer un circuit avec tout ça",
+    "groups": {
+      "sets": "Coffrets",
+      "extensions": "Évolutions et sachets",
+      "buildings": "Bâtiments et décors",
+      "trains": "Trains et wagons",
+      "pieces": "Mes pièces"
+    },
+    "search": "Rechercher (nom ou référence)",
+    "view": "Affichage",
+    "views": {
+      "grid": "Grille",
+      "list": "Liste"
+    },
+    "filter": "Filtrer",
+    "officialHint": "Touchez un produit pour ouvrir sa page officielle (nouvel onglet)."
   }
 }
