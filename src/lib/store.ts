@@ -31,7 +31,7 @@ export interface Favorite {
 
 /** Réglages du générateur, retenus d'une visite à l'autre. */
 export interface GeneratorPrefs {
-  sizes: ("small" | "medium" | "large")[];
+  sizes: ("small" | "medium" | "large" | "huge")[];
   bridge: boolean;
   switches: boolean;
   crossing: boolean;
@@ -39,7 +39,7 @@ export interface GeneratorPrefs {
   /** Types de circuits voulus (tous si vide). */
   groups: CircuitGroup[];
   /** « max » : ceux qui utilisent le plus de pièces d'abord ; « simple » : les plus faciles d'abord. */
-  sort: "max" | "simple";
+  sort: "max" | "pieces" | "simple";
 }
 
 export type CircuitGroup = "loops" | "eights" | "shapes" | "branches" | "networks";

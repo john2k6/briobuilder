@@ -488,7 +488,8 @@
     "sizeHint": {
       "small": "≤ 12 pieces",
       "medium": "13 to 20",
-      "large": "21 and up"
+      "large": "21 to 40",
+      "huge": "41+"
     },
     "want": "I want",
     "bridge": "A bridge",
@@ -509,7 +510,8 @@
     "sortTitle": "Order",
     "sort": {
       "max": "Use as many of my pieces as possible",
-      "simple": "Simplest first"
+      "simple": "Simplest first",
+      "pieces": "Most pieces first"
     },
     "more": "Show more layouts ({count} more)",
     "proposeMore": "Suggest more layouts"
@@ -536,12 +538,14 @@
     "network": "The big network",
     "spiral": "The corkscrew",
     "lift": "The magic lift",
-    "theta": "The shortcut loop"
+    "theta": "The shortcut loop",
+    "serpent": "The snake"
   },
   "sizes": {
     "small": "small",
     "medium": "medium",
-    "large": "large"
+    "large": "large",
+    "huge": "giant"
   },
   "official": {
     "credit": "Image © BRIO AB / Ravensburger, shown for illustration.",

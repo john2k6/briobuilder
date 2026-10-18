@@ -488,7 +488,8 @@
     "sizeHint": {
       "small": "≤ 12 pièces",
       "medium": "13 à 20",
-      "large": "21 et +"
+      "large": "21 à 40",
+      "huge": "41 et +"
     },
     "want": "Je veux",
     "bridge": "Un pont",
@@ -509,7 +510,8 @@
     "sortTitle": "Ordre",
     "sort": {
       "max": "Utiliser un maximum de mes pièces",
-      "simple": "Les plus simples d'abord"
+      "simple": "Les plus simples d'abord",
+      "pieces": "Le plus de pièces d'abord"
     },
     "more": "Voir plus de circuits ({count} de plus)",
     "proposeMore": "Proposer plus de circuits"
@@ -536,12 +538,14 @@
     "network": "Le grand réseau",
     "spiral": "Le tire-bouchon",
     "lift": "L'ascenseur magique",
-    "theta": "La boucle à raccourci"
+    "theta": "La boucle à raccourci",
+    "serpent": "Le serpent"
   },
   "sizes": {
     "small": "petit",
     "medium": "moyen",
-    "large": "grand"
+    "large": "grand",
+    "huge": "géant"
   },
   "official": {
     "credit": "Image © BRIO AB / Ravensburger, reproduite à titre d'illustration.",

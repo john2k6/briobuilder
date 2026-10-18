@@ -12,7 +12,7 @@ import { totalPieces, type Family, type GeneratedLayout, type Size } from "@/lib
 
 /** Types de circuits proposés dans les filtres. */
 const GROUPS: Record<CircuitGroup, Family[]> = {
-  loops: ["circle", "oval", "rectangle"],
+  loops: ["circle", "oval", "rectangle", "serpent"],
   eights: ["eight-crossing", "eight-bridge"],
   shapes: ["l-shape", "u-shape", "bean", "triangle", "house", "octagon"],
   branches: ["siding", "passing-loop", "terminus", "fork", "yard", "line", "theta"],
@@ -21,7 +21,7 @@ const GROUPS: Record<CircuitGroup, Family[]> = {
 const PAGE = 12;
 
 type Tab = "buildable" | "almost";
-const SIZES: Size[] = ["small", "medium", "large"];
+const SIZES: Size[] = ["small", "medium", "large", "huge"];
 
 function Toggle({
   pressed,
@@ -196,7 +196,7 @@ export function CircuitsView() {
         <div className="space-y-3">
           <h2 className="text-xl font-extrabold text-ink">{t("generator.sortTitle")}</h2>
           <div className="flex flex-wrap gap-2">
-            {(["max", "simple"] as const).map((sort) => (
+            {(["max", "pieces", "simple"] as const).map((sort) => (
               <Toggle key={sort} pressed={(prefs.sort ?? "max") === sort} onClick={() => setPrefs({ sort })}>
                 {t(`generator.sort.${sort}`)}
               </Toggle>
