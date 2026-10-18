@@ -17,6 +17,12 @@
     "collection": "My collection"
   },
   "home": {
+    "inspireEyebrow": "Our idea",
+    "inspireTitle": "Ideas, not rules",
+    "inspireText": "We never want to hold back your child's creativity. The site is here to give ideas and inspiration: new layouts that go off in every direction and make the most of every piece in your collection. Then it's over to imagination: change it, grow it, invent.",
+    "inspire1": "Hundreds of different layouts, never the same twice",
+    "inspire2": "As many of your tracks, stations, bridges and scenery as possible",
+    "inspire3": "A starting point: everyone makes it their own",
     "eyebrow": "For compatible wooden railway track",
     "title": "No more <hl>same old oval</hl> every Sunday.",
     "subtitle": "Add your sets, mix them: the app invents the layouts you can build right now, with bridges, switches and tunnels, then guides your child step by step.",
@@ -495,17 +501,18 @@
     "bridge": "A bridge",
     "switches": "A switch",
     "crossing": "A crossing",
+    "stations": "Stations at dead ends",
     "decorate": "Scenery",
     "loading": "The engine is looking for layouts…",
     "checked": "Every layout has been checked by the engine.",
     "type": "Layout type",
     "allTypes": "All",
     "groups": {
-      "loops": "Loops",
+      "loops": "Random shapes",
       "eights": "Figure eights",
-      "shapes": "Shapes",
+      "shapes": "L, U, triangle shapes…",
       "branches": "Branches and stations",
-      "networks": "Bridges and big networks"
+      "networks": "Train towns, bridges and levels"
     },
     "sortTitle": "Order",
     "sort": {
@@ -539,7 +546,9 @@
     "spiral": "The corkscrew",
     "lift": "The magic lift",
     "theta": "The shortcut loop",
-    "serpent": "The snake"
+    "serpent": "The snake",
+    "wander": "The big wander",
+    "mega": "Train town"
   },
   "sizes": {
     "small": "small",

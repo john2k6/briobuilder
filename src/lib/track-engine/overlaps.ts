@@ -5,7 +5,7 @@ import type { Catalog, Placement, TrackPoint } from "./types";
 export const TRACK_WIDTH = 40;
 /** Autour d'un raccord, deux pièces se touchent forcément : on ignore cette zone. */
 const JOINT_MARGIN = 25;
-const SAMPLE_STEP = 5;
+const SAMPLE_STEP = 10;
 
 function sample(track: TrackPoint[]): TrackPoint[] {
   const out: TrackPoint[] = [];

@@ -107,7 +107,9 @@ export type Family =
   | "spiral"
   | "lift"
   | "theta"
-  | "serpent";
+  | "serpent"
+  | "wander"
+  | "mega";
 
 export const FAMILIES: Family[] = [
   "circle",
@@ -133,7 +135,14 @@ export const FAMILIES: Family[] = [
   "lift",
   "theta",
   "serpent",
+  "wander",
+  "mega",
 ];
+
+/** Anciennes familles (rond, ovale, rectangle) : encore lisibles dans les codes, plus jamais proposées. */
+export const LEGACY_FAMILIES: Family[] = ["circle", "oval", "rectangle"];
+/** Familles que le générateur propose. */
+export const PROPOSED_FAMILIES = FAMILIES.filter((f) => !LEGACY_FAMILIES.includes(f));
 
 /** Transforme une suite de jetons en étapes de pose. « @3.2 » : repartir du connecteur 2 de la 3e pièce. */
 export function tokensToSteps(tokens: string): ChainStep[] {
@@ -406,7 +415,14 @@ const SWITCH_LENGTH: Record<string, number> = { w: 144, W: 144, n: 108, N: 108, 
  * Ajoute un embranchement sur la ligne droite `runIndex` d'une boucle : l'aiguillage est posé après `before` mm,
  * puis la branche (`branch`) part de sa sortie déviée.
  */
-function withBranch(loop: Elem[], runIndex: number, before: number, sw: string, branch: Elem[]): Elem[] | null {
+function withBranch(
+  loop: Elem[],
+  runIndex: number,
+  before: number,
+  sw: string,
+  branch: Elem[],
+  tag = "br",
+): Elem[] | null {
   const run = loop[runIndex];
   if (typeof run !== "object" || !("run" in run)) return null;
   const after = run.run - before - SWITCH_LENGTH[sw];
@@ -414,10 +430,10 @@ function withBranch(loop: Elem[], runIndex: number, before: number, sw: string, 
   return [
     ...loop.slice(0, runIndex),
     { run: before },
-    { tag: "br", token: sw },
+    { tag, token: sw },
     { run: after },
     ...loop.slice(runIndex + 1),
-    { jump: "br", connector: 2 },
+    { jump: tag, connector: 2 },
     ...branch,
   ];
 }
@@ -478,19 +494,8 @@ function* templates(maxRun: number): Generator<Template> {
     const k2 = k + k;
     const k4 = k2 + k2;
 
-    yield { family: "circle", elems: [k.repeat(8)], checkOverlaps: false };
-    for (const a of positive) {
-      yield { family: "oval", elems: [k4, { run: a }, k4, { run: a }], checkOverlaps: false };
-      // Rectangles : pas de 36 mm pour limiter le nombre d'essais.
-      if (a % 36 !== 0) continue;
-      for (const b of positive.filter((l) => l <= a && l % 108 === 0 && 2 * (a + l) <= 2 * maxRun)) {
-        yield {
-          family: "rectangle",
-          elems: [k2, { run: a }, k2, { run: b }, k2, { run: a }, k2, { run: b }],
-          checkOverlaps: false,
-        };
-      }
-    }
+    // Plus de simples ronds, ovales ni rectangles (demandé par Jonathan le 18 octobre 2026) :
+    // ces familles restent lisibles dans les anciens codes, mais le générateur ne les propose plus.
     // Colline : un côté de l'ovale monte sur un pont puis redescend.
     const big = (max: number) => upTo(max).filter((l) => l <= 432 || l % 216 === 0);
     for (const a1 of big(1080)) {
@@ -776,6 +781,105 @@ function* templates(maxRun: number): Generator<Template> {
   }
 }
 
+// ---------------------------------------------------------------------------------------------
+// Balades : des boucles de forme libre, tirées au hasard, qui tournent à gauche et à droite
+
+/** Générateur de nombres pseudo-aléatoires : toujours la même suite pour une même graine (codes stables). */
+function seeded(seed: number): () => number {
+  let s = seed;
+  return () => {
+    s = (s + 0x6d2b79f5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Vrai si la boucle n'est qu'un rond, un ovale ou un rectangle : que des virages à gauche,
+ * tous de la même taille une fois les virages collés (sans ligne droite entre eux) réunis.
+ */
+function plainLoop(elems: Elem[]): boolean {
+  const turns: string[] = [""];
+  for (const e of elems) {
+    if (typeof e === "string") turns[turns.length - 1] += e;
+    else if ("run" in e && e.run > 0) turns.push("");
+  }
+  // La boucle est fermée : le dernier virage continue le premier.
+  if (turns.length > 1) turns[0] = turns.pop()! + turns[0];
+  const groups = turns.filter(Boolean);
+  return !groups.some((t) => /[Rr]/.test(t)) && groups.every((t) => t.length === groups[0].length);
+}
+
+/**
+ * Boucles libres : 8 virages à gauche de plus que de virages à droite (la voie fait un tour complet),
+ * mélangés au hasard, avec des lignes droites de longueurs variées. Deux lignes droites sont calculées
+ * pour refermer la forme ; le moteur écarte ensuite celles qui se croisent.
+ */
+function* wanders(
+  inventory: Inventory,
+  maxMissing: number,
+  maxRun: number,
+  straightLength: number,
+  count: number,
+): Generator<Template> {
+  const big = inventory["curve-large"] ?? 0;
+  const small = inventory["curve-small"] ?? 0;
+  const budget = big + small + maxMissing;
+  if (budget < 8) return;
+  const rand = seeded(20261018);
+  const pickOne = <T>(list: T[]) => list[Math.floor(rand() * list.length)];
+  const shuffle = <T>(list: T[]) => {
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+  };
+  const lengths = [0, 0, 0, 108, 216, 216, 324, 432, 432, 648, 864, 1296, 1728, 2160].filter((l) => l <= maxRun);
+  // Plus on a de courbes, plus la forme peut serpenter : jusqu'à 40 courbes et plus de 100 pièces.
+  const maxRights = Math.min(16, Math.max(1, Math.floor((big + small - 8) / 2)));
+  for (let n = 0; n < count; n++) {
+    // Une fois sur trois, la plus grande forme possible ; parfois aucun virage à droite (forme biscornue).
+    const rights =
+      budget < 10 || rand() < 0.1
+        ? 0
+        : rand() < 0.35
+          ? Math.max(1, maxRights - Math.floor(rand() * 3))
+          : 1 + Math.floor(rand() * maxRights);
+    const huge = rights >= maxRights - 2 && maxRights >= 6;
+    const total = 8 + 2 * rights;
+    // Grandes courbes d'abord (celles qu'on possède), puis les petites.
+    if (total > budget) continue;
+    const largeCount = Math.min(total, Math.max(big, total - small));
+    const kinds = shuffle(Array.from({ length: total }, (_, i) => i < largeCount));
+    const dirs = shuffle(Array.from({ length: total }, (_, i) => i < rights));
+    const letters = kinds.map((large, i) => (large ? (dirs[i] ? "R" : "C") : dirs[i] ? "r" : "c"));
+    // On regroupe les courbes en virages, séparés par des lignes droites.
+    const turns: string[] = [];
+    for (const letter of letters) {
+      if (turns.length && rand() < 0.45) turns[turns.length - 1] += letter;
+      else turns.push(letter);
+    }
+    if (turns.length < 3) continue;
+    // Sans virage à droite, des virages tous pareils donneraient un rond, un ovale ou un rectangle : on les écarte.
+    if (rights === 0 && turns.every((t) => t.length === turns[0].length)) continue;
+    // Lignes droites à la mesure des rails qu'on possède (les plus longues pour les grandes formes).
+    const share = (straightLength * (huge ? 1 : 0.8)) / turns.length;
+    const fitting = lengths.filter((l) => l <= Math.max(108, share * 1.5));
+    const base = turns.map(() => pickOne(huge ? fitting.slice(Math.floor(fitting.length / 2)) : fitting));
+    const pairs = shuffle(turns.flatMap((_, i) => turns.map((__, j) => [i, j]).filter(([a, b]) => b > a)));
+    for (const [i, j] of pairs) {
+      const runs: (string | number)[] = base.map((l, k) => (k === i ? "x" : k === j ? "y" : l));
+      const elems = shape(turns, runs, {});
+      if (elems && maxRunOf(elems) <= maxRun && !plainLoop(elems)) {
+        yield { family: "wander", elems, checkOverlaps: true };
+        break;
+      }
+    }
+  }
+}
+
 /**
  * Grands réseaux : une boucle à pont, à croisement ou à voie d'évitement, plus un embranchement
  * qui part d'une ligne droite au sol vers un terminus (ou une fourche).
@@ -798,6 +902,62 @@ function* networks(base: Template): Generator<Template> {
   }
 }
 
+/** Voies qui partent d'un aiguillage : droite, en biais, en retour, ou fourche avec un aiguillage en Y. */
+const spurs = (n: number): Elem[][] => [
+  ["R", END],
+  ["RC", END],
+  [{ run: 108 }, END],
+  ["R", { run: 108 }, END],
+  ["C", { run: 108 }, END],
+  [{ run: 216 }, END],
+  [{ run: 432 }, END],
+  ["R", { run: 216 }, END],
+  ["C", { run: 324 }, END],
+  [{ run: 108 }, "RR", { run: 216 }, END],
+  [{ run: 108 }, "CC", { run: 108 }, END],
+  ["R", { run: 108 }, "C", { run: 216 }, END],
+  [{ run: 108 }, { tag: `j${n}`, token: "J" }, { run: 216 }, END, { jump: `j${n}`, connector: 2 }, { run: 216 }, END],
+];
+
+/**
+ * Villes des trains : sur un circuit déjà vérifié, on ajoute 2 à 4 embranchements, à l'intérieur
+ * comme à l'extérieur, qui partent dans tous les sens vers des gares. Tirés au hasard (toujours les mêmes).
+ */
+function* megas(base: Template, free: Inventory, rand: () => number, count: number): Generator<Template> {
+  const runs = base.elems.flatMap((e, i) =>
+    typeof e === "object" && "run" in e && !e.elevated && e.run >= 252 ? [i] : [],
+  );
+  // Aiguillages encore libres (un de plus peut manquer) : chacun ouvre un embranchement.
+  // L'aiguillage retourné ne sert pas ici : sa branche finit par un trou, il faudrait un adaptateur.
+  const switchIds = ["switch", "switch-small"];
+  const switchCount = switchIds.reduce((s, id) => s + Math.max(0, free[id] ?? 0), 1);
+  const most = Math.min(4, runs.length, switchCount);
+  if (most < 2) return;
+  for (let n = 0; n < count; n++) {
+    const wanted = 2 + Math.floor(rand() * (most - 1));
+    const chosen = [...runs]
+      .sort(() => rand() - 0.5)
+      .slice(0, wanted)
+      .sort((a, b) => b - a);
+    const left = { ...free };
+    let elems: Elem[] | null = base.elems;
+    chosen.forEach((runIndex, k) => {
+      if (!elems) return;
+      // De préférence un aiguillage qu'on possède encore.
+      const all = ["w", "W", "n", "N"];
+      const owned = all.filter((t) => (left[TOKENS[t].pieceTypeId] ?? 0) > 0);
+      const choices = owned.length ? owned : ["w", "W"];
+      const sw = choices[Math.floor(rand() * choices.length)];
+      left[TOKENS[sw].pieceTypeId] = (left[TOKENS[sw].pieceTypeId] ?? 0) - 1;
+      const run = (elems[runIndex] as { run: number }).run;
+      const before = [0, nearestRun((run - SWITCH_LENGTH[sw]) / 2)][Math.floor(rand() * 2)];
+      const options = spurs(k);
+      elems = withBranch(elems, runIndex, before, sw, options[Math.floor(rand() * options.length)], `m${k}`);
+    });
+    if (elems) yield { family: "mega", elems, checkOverlaps: true };
+  }
+}
+
 /** Circuits auxquels on ajoute un embranchement pour en faire un grand réseau. */
 const NETWORK_BASES = new Set<Family>([
   "hill",
@@ -814,7 +974,7 @@ const NETWORK_BASES = new Set<Family>([
 // Raccourcis : relier deux points d'une boucle par une nouvelle voie
 
 /** Boucles sur lesquelles on cherche des raccourcis. */
-const LINKABLE = new Set<Family>(["oval", "rectangle", "l-shape", "u-shape", "bean", "house", "octagon", "triangle"]);
+const LINKABLE = new Set<Family>(["wander", "l-shape", "u-shape", "bean", "house", "octagon", "triangle"]);
 
 /** Suites de virages essayées pour la nouvelle voie (k : courbe à gauche, K : à droite). */
 const LINK_TURNS = (k: string, K: string): string[][] => [
@@ -887,9 +1047,12 @@ const ENDLESS: Inventory = Object.fromEntries(ELEVATED_STRAIGHTS.map((t) => [t.i
  * à l'intérieur ou à l'extérieur de la boucle.
  */
 function* linkTemplates(base: Template, catalog: Catalog, maxRun: number): Generator<Template> {
-  const runIndexes = base.elems.flatMap((e, i) =>
-    typeof e === "object" && "run" in e && !e.elevated && e.run >= 144 ? [i] : [],
-  );
+  // Les cinq plus longues lignes droites au sol (une forme libre en a beaucoup : on reste rapide).
+  const runIndexes = base.elems
+    .flatMap((e, i) => (typeof e === "object" && "run" in e && !e.elevated && e.run >= 144 ? [i] : []))
+    .sort((a, b) => (base.elems[b] as { run: number }).run - (base.elems[a] as { run: number }).run)
+    .slice(0, 5)
+    .sort((a, b) => a - b);
   const splits = (run: number) =>
     [0, nearestRun((run - 144) / 2), run - 144].filter(
       (p, n, all) => all.indexOf(p) === n && RUN_LENGTHS.includes(run - 144 - p),
@@ -973,7 +1136,7 @@ export interface GeneratorOptions {
   /** Tailles acceptées (toutes si vide). */
   sizes?: Size[];
   /** Exiger un pont, un aiguillage, un croisement. */
-  require?: { bridge?: boolean; switches?: boolean; crossing?: boolean };
+  require?: { bridge?: boolean; switches?: boolean; crossing?: boolean; stations?: boolean };
   /** Familles acceptées (toutes si vide). */
   families?: Family[];
   /** Placer tunnels, gares, signaux… disponibles. */
@@ -1007,6 +1170,10 @@ export function sizeOf(pieces: number): Size {
 }
 
 const FAMILY_CAP = 60;
+/** Familles tirées au hasard : beaucoup plus de circuits différents. */
+const ABUNDANT = new Set<Family>(["wander", "mega"]);
+/** Simples boucles : proposées après les formes qui partent dans tous les sens. */
+const PLAIN = new Set<Family>(["circle", "oval", "rectangle"]);
 
 /** Pièces qui ne sont pas des rails : décors, bâtiments, trains. */
 const NOT_TRACK = new Set(["accessory", "building", "vehicle"]);
@@ -1138,13 +1305,18 @@ export function generateLayouts(
 
   // Au-delà de quelques dizaines de circuits par famille, on n'en montrerait pas plus : on s'arrête là.
   const perFamily = new Map<string, number>();
-  const full = (family: Family, kind: string) => (perFamily.get(`${family}:${kind}`) ?? 0) >= familyCap;
+  const full = (family: Family, kind: string) =>
+    (perFamily.get(`${family}:${kind}`) ?? 0) >= familyCap * (ABUNDANT.has(family) && kind === "buildable" ? 4 : 1);
   const all = function* () {
     yield* templates(maxRun);
+    yield* wanders(inventory, maxMissing, maxRun, straightLength, 400 * depth);
   };
   const templateOf = new Map<GeneratedLayout, Template>();
+  // Raccourcis, grands réseaux et villes des trains partent d'autres circuits : on les cherche aussi, sans les montrer.
+  const wanted = (family: Family) => !options.families?.length || options.families.includes(family);
+  const needsBases = ["theta", "network", "mega"].some((f) => options.families?.includes(f as Family));
   const process = (template: Template): GeneratedLayout | null => {
-    if (options.families?.length && !options.families.includes(template.family)) return null;
+    if (!wanted(template.family) && !needsBases) return null;
     if (full(template.family, "buildable") && full(template.family, "almost")) return null;
     // Plus de lignes droites que de rails disponibles : inutile d'essayer.
     const runTotal = template.elems.reduce((sum, e) => sum + (typeof e === "object" && "run" in e ? e.run : 0), 0);
@@ -1197,7 +1369,8 @@ export function generateLayouts(
     if (
       (req.bridge && !features.bridge) ||
       (req.switches && !features.switches) ||
-      (req.crossing && !features.crossing)
+      (req.crossing && !features.crossing) ||
+      (req.stations && !/[|Z]/.test(tokens))
     ) {
       return null;
     }
@@ -1245,7 +1418,8 @@ export function generateLayouts(
             ? pieces * 0.2
             : usage * 6 + accessories.length * 0.15 + specials * 0.7) +
         special * 0.8 +
-        Math.min(deadEndCount, 2) * 0.3 +
+        Math.min(deadEndCount, 4) * 0.3 +
+        (PLAIN.has(template.family) ? -1.5 : ABUNDANT.has(template.family) ? 0.5 : 0) +
         (report.maxGap < 1 ? 0.3 : 0) -
         missingCount * 0.5,
     });
@@ -1260,7 +1434,7 @@ export function generateLayouts(
     const bases = results
       .filter((r) => LINKABLE.has(r.family))
       .sort((a, b) => b.score - a.score)
-      .slice(0, 12 * depth);
+      .slice(0, 8 * depth);
     for (const base of bases) {
       for (const template of linkTemplates(templateOf.get(base)!, catalog, maxRun)) process(template);
     }
@@ -1275,6 +1449,35 @@ export function generateLayouts(
     for (const base of bases) for (const template of networks(templateOf.get(base)!)) process(template);
   }
 
+  // Villes des trains : plusieurs embranchements sur les plus beaux circuits, toutes formes confondues.
+  if (!options.families?.length || options.families.includes("mega")) {
+    const rand = seeded(1018);
+    // Les deux plus beaux circuits de chaque famille, en commençant par ceux qui ont le moins d'aiguillages.
+    const switchesIn = (r: GeneratedLayout) =>
+      (r.bom.switch ?? 0) + (r.bom["switch-small"] ?? 0) + (r.bom["switch-reverse"] ?? 0);
+    const taken = new Map<Family, number>();
+    // Il faut aussi des rails libres pour les embranchements.
+    const freeTrack = (r: GeneratedLayout) =>
+      GROUND_STRAIGHTS.reduce((s, t) => s + t.length * Math.max(0, (inventory[t.id] ?? 0) - (r.bom[t.id] ?? 0)), 0);
+    const bases = results
+      .filter((r) => r.missingCount === 0 && r.family !== "mega" && r.family !== "line" && freeTrack(r) >= 648)
+      .sort((a, b) => switchesIn(a) - switchesIn(b) || b.score - a.score)
+      .filter((r) => {
+        taken.set(r.family, (taken.get(r.family) ?? 0) + 1);
+        return taken.get(r.family)! <= depth;
+      });
+    // Et les plus grands circuits : avec des embranchements, ils dépassent la centaine de pièces.
+    const largest = results
+      .filter((r) => r.missingCount === 0 && r.family !== "mega" && r.family !== "line" && !bases.includes(r))
+      .sort((a, b) => b.pieces - a.pieces)
+      .slice(0, 4 * depth);
+    for (const base of [...bases, ...largest]) {
+      const free: Inventory = { ...inventory };
+      for (const [id, q] of Object.entries(base.bom)) free[id] = (free[id] ?? 0) - q;
+      for (const template of megas(templateOf.get(base)!, free, rand, 16)) process(template);
+    }
+  }
+
   const pick = (list: GeneratedLayout[]) => {
     // Variété : au plus 12 circuits par famille, tous différents ; on alterne les familles.
     const byFamily = new Map<Family, GeneratedLayout[]>();
@@ -1283,26 +1486,30 @@ export function generateLayouts(
       // Deux circuits sont « pareils » s'ils ont le même nombre de pièces et la même suite de virages.
       const turns = (c: GeneratedLayout) => c.code.split("~")[0].replace(/[^CRcr@]/g, "");
       const similar = group.some((g) => g.pieces === r.pieces && turns(g) === turns(r));
-      if (!similar && group.length < perFamilyShown) group.push(r);
+      if (!similar && group.length < perFamilyShown * (ABUNDANT.has(r.family) ? 3 : 1)) group.push(r);
       byFamily.set(r.family, group);
     }
     const out: GeneratedLayout[] = [];
     const queues = [...byFamily.values()].filter((q) => q.length).sort((a, b) => b[0].score - a[0].score);
     while (out.length < limit && queues.some((q) => q.length)) {
       for (const q of queues) {
-        const next = q.shift();
-        if (next && out.length < limit) out.push(next);
+        // Les formes libres et les villes des trains passent deux fois par tour.
+        for (let turn = 0; turn < (q[0] && ABUNDANT.has(q[0].family) ? 2 : 1); turn++) {
+          const next = q.shift();
+          if (next && out.length < limit) out.push(next);
+        }
       }
     }
     return out;
   };
-  const buildable = results.filter((r) => r.missingCount === 0);
+  const shown = results.filter((r) => wanted(r.family));
+  const buildable = shown.filter((r) => r.missingCount === 0);
   // Tri par nombre de pièces : la sélection reste variée, puis on range du plus grand au plus petit.
   const order = (list: GeneratedLayout[]) =>
     options.sort === "pieces" ? [...list].sort((a, b) => b.pieces - a.pieces) : list;
   return {
-    total: { buildable: buildable.length, almost: results.length - buildable.length },
+    total: { buildable: buildable.length, almost: shown.length - buildable.length },
     buildable: order(pick(buildable)),
-    almost: order(pick(results.filter((r) => r.missingCount > 0)).sort((a, b) => a.missingCount - b.missingCount)),
+    almost: order(pick(shown.filter((r) => r.missingCount > 0)).sort((a, b) => a.missingCount - b.missingCount)),
   };
 }

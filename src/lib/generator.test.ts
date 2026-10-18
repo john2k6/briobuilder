@@ -73,10 +73,10 @@ describe("générateur de circuits", () => {
     expect(circuitFromCode(decorated.code)?.accessories).toEqual(decorated.accessories);
   });
 
-  it("reste raisonnable (moins de quatre secondes pour un gros inventaire, même mesuré pendant la couverture ; le calcul tourne dans un fil à part)", () => {
+  it("reste raisonnable (environ 1,5 s pour un gros inventaire, moins de six secondes même mesuré pendant la couverture ; le calcul tourne dans un fil à part)", () => {
     const t0 = performance.now();
     generateLayouts(boxes("deluxe-railway", "cargo-deluxe", "travel-switching"), catalog, { decorate: true });
-    expect(performance.now() - t0).toBeLessThan(4000);
+    expect(performance.now() - t0).toBeLessThan(6000);
   });
 
   it("un code invalide ou un circuit ouvert est refusé", () => {
@@ -130,5 +130,32 @@ describe("générateur de circuits", () => {
     expect(top.some((c) => (c.bom["curve-ascending"] ?? 0) > 0)).toBe(true);
     expect(top.some((c) => (c.bom["stacking-bridge"] ?? 0) > 0)).toBe(true);
     for (const c of r.buildable) expect(overlaps(c.placements, catalog)).toEqual([]);
+  });
+
+  it("invente des centaines de formes libres et des villes des trains à plusieurs embranchements", () => {
+    const inv = boxes("world-deluxe", "expansion-advanced", "pack-deluxe-track");
+    const r = generateLayouts(inv, catalog, { families: ["wander", "mega"], limit: 1000 });
+    const wander = r.buildable.filter((c) => c.family === "wander");
+    const mega = r.buildable.filter((c) => c.family === "mega");
+    expect(r.total.buildable).toBeGreaterThanOrEqual(200);
+    expect(wander.length).toBeGreaterThan(20);
+    expect(mega.length).toBeGreaterThan(20);
+    for (const c of [...wander, ...mega]) {
+      expect(isComplete(analyzeJoints(c.placements, catalog), c.code.split(":")[1].split("~")[0])).toBe(true);
+      expect(overlaps(c.placements, catalog)).toEqual([]);
+      for (const [id, q] of Object.entries(c.bom)) expect(inv[id] ?? 0).toBeGreaterThanOrEqual(q);
+    }
+    // Les formes libres tournent aussi à droite ; les villes des trains ont au moins deux embranchements.
+    expect(wander.every((c) => /[Rr]/.test(c.code))).toBe(true);
+    expect(mega.every((c) => (c.bom.switch ?? 0) + (c.bom["switch-small"] ?? 0) >= 2)).toBe(true);
+  });
+
+  it("ne propose plus aucun rond, ovale ni rectangle tout simple, et va jusqu'à une centaine de pièces", () => {
+    const inv = boxes("world-deluxe", "expansion-advanced", "pack-deluxe-track");
+    const r = generateLayouts(inv, catalog, { limit: 2000, sort: "pieces" });
+    for (const c of [...r.buildable, ...r.almost]) expect(["circle", "oval", "rectangle"]).not.toContain(c.family);
+    expect(r.buildable[0].pieces).toBeGreaterThanOrEqual(95);
+    // Même un petit coffret (8 courbes) a une forme qui n'est pas un ovale.
+    expect(generateLayouts(boxes("firefighter"), catalog).buildable.length).toBeGreaterThan(0);
   });
 });

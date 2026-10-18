@@ -8,7 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { catalog, setList } from "@/lib/catalog";
 import { circuitHref } from "@/lib/circuits";
 import { officialImage } from "@/lib/official";
-import { addSet, FAMILIES, generateLayouts, type Inventory, type TrackSet } from "@/lib/track-engine";
+import { addSet, generateLayouts, PROPOSED_FAMILIES, type Inventory, type TrackSet } from "@/lib/track-engine";
 
 // Calculés une fois au moment du build.
 const byRef = (ref: string) => setList.find((s) => s.ref === ref)!;
@@ -20,10 +20,10 @@ const deluxe = byRef("33052");
 const mix: Inventory = [deluxe, byRef("33307"), byRef("33772")].reduce<Inventory>((inv, s) => addSet(inv, s), {});
 const deluxeResult = generateLayouts(addSet({}, deluxe), catalog, { decorate: true, limit: 40 });
 const mixTotal = generateLayouts(mix, catalog, { limit: 1 }).total.buildable;
-const showcase = ["network", "hill", "terminus", "bean"]
+const showcase = ["wander", "network", "hill", "bean"]
   .map((f) => deluxeResult.buildable.find((c) => c.family === f))
   .filter((c) => c !== undefined);
-const simple = deluxeResult.buildable.find((c) => c.family === "oval") ?? deluxeResult.buildable[0];
+const simple = [...deluxeResult.buildable].sort((a, b) => a.pieces - b.pieces)[0];
 const productCount = setList.filter((s) => s.ref).length;
 
 function ProductCard({ set, className = "" }: { set: TrackSet; className?: string }) {
@@ -100,7 +100,7 @@ export default function HomePage({ params }: PageProps<"/[locale]">) {
       <section className="grid gap-4 sm:grid-cols-3">
         {[
           { value: String(productCount), label: t("statProducts") },
-          { value: String(FAMILIES.length), label: t("statFamilies") },
+          { value: String(PROPOSED_FAMILIES.length), label: t("statFamilies") },
           { value: `${mixTotal}+`, label: t("statCircuits") },
         ].map((s) => (
           <div key={s.label} className={`${blob} bg-soft p-6`}>
@@ -108,6 +108,25 @@ export default function HomePage({ params }: PageProps<"/[locale]">) {
             <p className="mt-2 font-bold text-ink">{s.label}</p>
           </div>
         ))}
+      </section>
+
+      {/* Notre idée : inspirer, pas imposer */}
+      <section className={`${blob} grid gap-8 border-2 border-green bg-surface p-6 md:grid-cols-[1.2fr_1fr] md:p-10`}>
+        <div className="space-y-4">
+          <p className="text-sm font-extrabold uppercase tracking-widest text-green">{t("inspireEyebrow")}</p>
+          <SectionTitle>{t("inspireTitle")}</SectionTitle>
+          <p className="text-lg leading-relaxed text-muted">{t("inspireText")}</p>
+        </div>
+        <ul className="space-y-4 self-center">
+          {(["inspire1", "inspire2", "inspire3"] as const).map((key) => (
+            <li key={key} className="flex items-start gap-3 font-bold text-ink">
+              <span className="mt-1 text-green">
+                <Check className="size-5" />
+              </span>
+              {t(key)}
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* Coffrets populaires */}

@@ -81,7 +81,7 @@ test("la version anglaise affiche les mêmes écrans", async ({ page }) => {
   await expect(page.getByText("1 set · 11 tracks")).toBeVisible();
   await page.goto("/en/circuits");
   await expect(page.getByText("Every layout has been checked by the engine.")).toBeVisible();
-  await expect(page.getByRole("heading", { name: /The race track/ }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /The big wander/ }).first()).toBeVisible();
   await snap(page, "6-en-generator");
 });
 

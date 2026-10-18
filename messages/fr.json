@@ -17,6 +17,12 @@
     "collection": "Ma collection"
   },
   "home": {
+    "inspireEyebrow": "Notre idée",
+    "inspireTitle": "Des idées, pas des règles",
+    "inspireText": "On ne veut surtout pas freiner la créativité de votre enfant. Le site est là pour donner des idées et de l'inspiration : des circuits nouveaux, qui partent dans tous les sens et tirent le meilleur de toutes les pièces de votre collection. Ensuite, place à l'imagination : on modifie, on agrandit, on invente.",
+    "inspire1": "Des centaines de circuits différents, jamais deux fois le même",
+    "inspire2": "Le plus possible de vos rails, gares, ponts et décors utilisés",
+    "inspire3": "Un point de départ : chacun le transforme à sa façon",
     "eyebrow": "Pour les rails en bois compatibles",
     "title": "Fini le <hl>même ovale</hl> tous les dimanches.",
     "subtitle": "Ajoutez vos coffrets, mélangez-les : l'app invente les circuits que vous pouvez construire dès maintenant, avec ponts, aiguillages et tunnels, puis guide votre enfant pas à pas.",
@@ -495,17 +501,18 @@
     "bridge": "Un pont",
     "switches": "Un aiguillage",
     "crossing": "Un croisement",
+    "stations": "Des gares au bout des voies",
     "decorate": "Des décors",
     "loading": "Le moteur cherche des circuits…",
     "checked": "Chaque circuit a été vérifié par le moteur.",
     "type": "Type de circuit",
     "allTypes": "Tous",
     "groups": {
-      "loops": "Boucles",
+      "loops": "Formes au hasard",
       "eights": "Huit",
-      "shapes": "Formes",
+      "shapes": "Formes en L, U, triangle…",
       "branches": "Embranchements et gares",
-      "networks": "Ponts et grands réseaux"
+      "networks": "Villes des trains, ponts et étages"
     },
     "sortTitle": "Ordre",
     "sort": {
@@ -539,7 +546,9 @@
     "spiral": "Le tire-bouchon",
     "lift": "L'ascenseur magique",
     "theta": "La boucle à raccourci",
-    "serpent": "Le serpent"
+    "serpent": "Le serpent",
+    "wander": "La grande balade",
+    "mega": "La ville des trains"
   },
   "sizes": {
     "small": "petit",

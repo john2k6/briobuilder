@@ -35,6 +35,8 @@ export interface GeneratorPrefs {
   bridge: boolean;
   switches: boolean;
   crossing: boolean;
+  /** Des voies sans issue qui finissent en gare. */
+  stations: boolean;
   decorate: boolean;
   /** Types de circuits voulus (tous si vide). */
   groups: CircuitGroup[];
@@ -82,6 +84,7 @@ const initial: AppState = {
     bridge: false,
     switches: false,
     crossing: false,
+    stations: false,
     decorate: true,
     groups: [],
     sort: "max",

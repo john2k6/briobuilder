@@ -36,6 +36,7 @@ export const icons = {
   switch: "M4 20V4M4 12c6 0 10-4 16-8M4 12c6 0 10 2 16 8",
   cross: "M4 4l16 16M20 4L4 20",
   cart: "M3 4h2l2.5 11h11L21 7H6.5M9 20a1 1 0 100-2 1 1 0 000 2zM18 20a1 1 0 100-2 1 1 0 000 2z",
+  flag: "M5 21V4M5 4h11l-2 4 2 4H5",
 };
 
 export function Check({ className = "size-4" }: { className?: string }) {

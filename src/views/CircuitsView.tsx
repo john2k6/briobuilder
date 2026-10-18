@@ -12,11 +12,11 @@ import { totalPieces, type Family, type GeneratedLayout, type Size } from "@/lib
 
 /** Types de circuits proposés dans les filtres. */
 const GROUPS: Record<CircuitGroup, Family[]> = {
-  loops: ["circle", "oval", "rectangle", "serpent"],
+  loops: ["wander", "serpent"],
   eights: ["eight-crossing", "eight-bridge"],
   shapes: ["l-shape", "u-shape", "bean", "triangle", "house", "octagon"],
   branches: ["siding", "passing-loop", "terminus", "fork", "yard", "line", "theta"],
-  networks: ["hill", "network", "spiral", "lift"],
+  networks: ["mega", "hill", "network", "spiral", "lift"],
 };
 const PAGE = 12;
 
@@ -66,7 +66,12 @@ export function CircuitsView() {
     let cancelled = false;
     void generateAsync(inventory, {
       sizes: prefs.sizes,
-      require: { bridge: prefs.bridge, switches: prefs.switches, crossing: prefs.crossing },
+      require: {
+        bridge: prefs.bridge,
+        switches: prefs.switches,
+        crossing: prefs.crossing,
+        stations: prefs.stations,
+      },
       decorate: prefs.decorate,
       families: (prefs.groups ?? []).flatMap((g) => GROUPS[g]),
       sort: prefs.sort,
@@ -164,6 +169,9 @@ export function CircuitsView() {
             </Toggle>
             <Toggle pressed={prefs.crossing} onClick={() => setPrefs({ crossing: !prefs.crossing })} icon={icons.cross}>
               {t("generator.crossing")}
+            </Toggle>
+            <Toggle pressed={prefs.stations} onClick={() => setPrefs({ stations: !prefs.stations })} icon={icons.flag}>
+              {t("generator.stations")}
             </Toggle>
             <Toggle
               pressed={prefs.decorate}
