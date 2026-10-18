@@ -40,7 +40,7 @@
     "id": "straight-medium",
     "ref": "33335",
     "category": "straight",
-    "verified": false,
+    "verified": true,
     "lengthMm": 144,
     "connectors": [
       {
@@ -111,11 +111,11 @@
     ]
   },
   {
-    "id": "curve-large",
-    "ref": "33342",
-    "category": "curve",
-    "verified": false,
-    "lengthMm": 142.94,
+    "id": "straight-mini",
+    "ref": null,
+    "category": "straight",
+    "verified": true,
+    "lengthMm": 54,
     "connectors": [
       {
         "x": 0,
@@ -125,8 +125,45 @@
         "level": 0
       },
       {
-        "x": 128.69,
-        "y": 53.31,
+        "x": 54,
+        "y": 0,
+        "angle": 0,
+        "gender": "male",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          54,
+          0,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "curve-large",
+    "ref": "33342",
+    "category": "curve",
+    "verified": true,
+    "lengthMm": 158.65,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 142.84,
+        "y": 59.16,
         "angle": 45,
         "gender": "male",
         "level": 0
@@ -140,48 +177,48 @@
           0
         ],
         [
-          15.86,
-          0.69,
+          17.61,
+          0.77,
           0
         ],
         [
-          31.6,
-          2.76,
+          35.08,
+          3.07,
           0
         ],
         [
-          47.11,
-          6.2,
+          52.28,
+          6.88,
           0
         ],
         [
-          62.25,
-          10.98,
+          69.09,
+          12.18,
           0
         ],
         [
-          76.92,
-          17.05,
+          85.37,
+          18.93,
           0
         ],
         [
-          91,
-          24.38,
+          101,
+          27.06,
           0
         ],
         [
-          104.39,
-          32.91,
+          115.86,
+          36.53,
           0
         ],
         [
-          116.99,
-          42.58,
+          129.84,
+          47.26,
           0
         ],
         [
-          128.69,
-          53.31,
+          142.84,
+          59.16,
           0
         ]
       ]
@@ -191,8 +228,8 @@
     "id": "curve-small",
     "ref": "33337",
     "category": "curve",
-    "verified": false,
-    "lengthMm": 70.69,
+    "verified": true,
+    "lengthMm": 86.39,
     "connectors": [
       {
         "x": 0,
@@ -202,8 +239,8 @@
         "level": 0
       },
       {
-        "x": 63.64,
-        "y": 26.36,
+        "x": 77.78,
+        "y": 32.22,
         "angle": 45,
         "gender": "male",
         "level": 0
@@ -217,48 +254,48 @@
           0
         ],
         [
-          7.84,
-          0.34,
+          9.59,
+          0.42,
           0
         ],
         [
-          15.63,
-          1.37,
+          19.1,
+          1.67,
           0
         ],
         [
-          23.29,
-          3.07,
+          28.47,
+          3.75,
           0
         ],
         [
-          30.78,
-          5.43,
+          37.62,
+          6.63,
           0
         ],
         [
-          38.04,
-          8.43,
+          46.49,
+          10.31,
           0
         ],
         [
-          45,
-          12.06,
+          55,
+          14.74,
           0
         ],
         [
-          51.62,
-          16.28,
+          63.09,
+          19.89,
           0
         ],
         [
-          57.85,
-          21.06,
+          70.71,
+          25.74,
           0
         ],
         [
-          63.64,
-          26.36,
+          77.78,
+          32.22,
           0
         ]
       ]
@@ -269,7 +306,7 @@
     "ref": "33344",
     "category": "switch",
     "verified": false,
-    "lengthMm": 145,
+    "lengthMm": 144,
     "connectors": [
       {
         "x": 0,
@@ -279,15 +316,15 @@
         "level": 0
       },
       {
-        "x": 145,
+        "x": 144,
         "y": 0,
         "angle": 0,
         "gender": "male",
         "level": 0
       },
       {
-        "x": 128.69,
-        "y": 53.31,
+        "x": 142.84,
+        "y": 59.16,
         "angle": 45,
         "gender": "male",
         "level": 0
@@ -301,7 +338,7 @@
           0
         ],
         [
-          145,
+          144,
           0,
           0
         ]
@@ -313,48 +350,244 @@
           0
         ],
         [
-          15.86,
-          0.69,
+          17.61,
+          0.77,
           0
         ],
         [
-          31.6,
-          2.76,
+          35.08,
+          3.07,
           0
         ],
         [
-          47.11,
-          6.2,
+          52.28,
+          6.88,
           0
         ],
         [
-          62.25,
-          10.98,
+          69.09,
+          12.18,
           0
         ],
         [
-          76.92,
-          17.05,
+          85.37,
+          18.93,
           0
         ],
         [
-          91,
-          24.38,
+          101,
+          27.06,
           0
         ],
         [
-          104.39,
-          32.91,
+          115.86,
+          36.53,
           0
         ],
         [
-          116.99,
-          42.58,
+          129.84,
+          47.26,
           0
         ],
         [
-          128.69,
-          53.31,
+          142.84,
+          59.16,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "switch-reverse",
+    "ref": "33344",
+    "category": "switch",
+    "verified": false,
+    "lengthMm": 144,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "male",
+        "level": 0
+      },
+      {
+        "x": 144,
+        "y": 0,
+        "angle": 0,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 142.84,
+        "y": 59.16,
+        "angle": 45,
+        "gender": "female",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          144,
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          17.61,
+          0.77,
+          0
+        ],
+        [
+          35.08,
+          3.07,
+          0
+        ],
+        [
+          52.28,
+          6.88,
+          0
+        ],
+        [
+          69.09,
+          12.18,
+          0
+        ],
+        [
+          85.37,
+          18.93,
+          0
+        ],
+        [
+          101,
+          27.06,
+          0
+        ],
+        [
+          115.86,
+          36.53,
+          0
+        ],
+        [
+          129.84,
+          47.26,
+          0
+        ],
+        [
+          142.84,
+          59.16,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "crossing",
+    "ref": null,
+    "category": "crossing",
+    "verified": false,
+    "lengthMm": 216,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 216,
+        "y": 0,
+        "angle": 0,
+        "gender": "male",
+        "level": 0
+      },
+      {
+        "x": 108,
+        "y": -108,
+        "angle": 270,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 108,
+        "y": 108,
+        "angle": 90,
+        "gender": "male",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          216,
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          108,
+          -108,
+          0
+        ],
+        [
+          108,
+          108,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "level-crossing",
+    "ref": "33388",
+    "category": "crossing",
+    "verified": false,
+    "lengthMm": 144,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 144,
+        "y": 0,
+        "angle": 0,
+        "gender": "male",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          144,
+          0,
           0
         ]
       ]
@@ -364,7 +597,7 @@
     "id": "ramp",
     "ref": "33332",
     "category": "ramp",
-    "verified": true,
+    "verified": false,
     "lengthMm": 216,
     "connectors": [
       {
@@ -398,11 +631,48 @@
     ]
   },
   {
-    "id": "crossing",
-    "ref": "33388",
-    "category": "crossing",
+    "id": "ramp-reverse",
+    "ref": "33332",
+    "category": "ramp",
     "verified": false,
-    "lengthMm": 144,
+    "lengthMm": 216,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "male",
+        "level": 0
+      },
+      {
+        "x": 216,
+        "y": 0,
+        "angle": 0,
+        "gender": "female",
+        "level": 1
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          216,
+          0,
+          1
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "suspension-bridge",
+    "ref": null,
+    "category": "bridge",
+    "verified": false,
+    "lengthMm": 216,
     "connectors": [
       {
         "x": 0,
@@ -412,23 +682,9 @@
         "level": 0
       },
       {
-        "x": 144,
+        "x": 216,
         "y": 0,
         "angle": 0,
-        "gender": "male",
-        "level": 0
-      },
-      {
-        "x": 72,
-        "y": -72,
-        "angle": 270,
-        "gender": "female",
-        "level": 0
-      },
-      {
-        "x": 72,
-        "y": 72,
-        "angle": 90,
         "gender": "male",
         "level": 0
       }
@@ -441,20 +697,38 @@
           0
         ],
         [
-          144,
+          216,
           0,
           0
         ]
-      ],
+      ]
+    ]
+  },
+  {
+    "id": "buffer-stop",
+    "ref": null,
+    "category": "buffer",
+    "verified": false,
+    "lengthMm": 40,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      }
+    ],
+    "tracks": [
       [
         [
-          72,
-          -72,
+          0,
+          0,
           0
         ],
         [
-          72,
-          72,
+          40,
+          0,
           0
         ]
       ]
@@ -533,5 +807,59 @@
         ]
       ]
     ]
+  },
+  {
+    "id": "support",
+    "ref": null,
+    "category": "accessory",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "tunnel",
+    "ref": null,
+    "category": "accessory",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "station",
+    "ref": null,
+    "category": "accessory",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "signal",
+    "ref": null,
+    "category": "accessory",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "crane",
+    "ref": null,
+    "category": "accessory",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "tree",
+    "ref": null,
+    "category": "accessory",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
   }
 ]

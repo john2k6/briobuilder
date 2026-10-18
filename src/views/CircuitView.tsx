@@ -1,27 +1,52 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { ChildPicker } from "@/components/ChildPicker";
+import { FeatureBadges, useCircuitName } from "@/components/CircuitCard";
+import { circuitHref } from "@/lib/circuits";
+import { PieceThumb } from "@/components/PieceThumb";
 import { TrackPlan } from "@/components/TrackPlan";
 import { buttonPrimary, buttonSecondary, card, Check, Icon, icons, Stars } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { catalog } from "@/lib/catalog";
-import { layoutById } from "@/lib/layouts";
+import { circuitFromCode } from "@/lib/circuits";
 import { actions, useAppState } from "@/lib/store";
 
-export function CircuitView({ id }: { id: string }) {
+export function CircuitView() {
   const t = useTranslations();
-  const layout = layoutById[id];
+  const code = useSearchParams().get("c") ?? "";
+  const circuit = circuitFromCode(code);
+  const nameOf = useCircuitName();
   const { inventory, activeChildId, favorites, ready } = useAppState();
   const [checked, setChecked] = useState<Set<string>>(new Set());
 
-  const name = t(`layouts.${id}`);
-  const entries = Object.entries(layout.bom);
+  const back = (
+    <Link
+      href="/circuits"
+      className="inline-flex min-h-11 items-center gap-1 font-bold text-muted hover:text-ink print:hidden"
+    >
+      <Icon d={icons.left} className="size-5" />
+      {t("common.back")}
+    </Link>
+  );
+
+  if (!circuit) {
+    return (
+      <div className="space-y-6">
+        {back}
+        <p className={`${card} p-6 text-lg`}>{t("circuit.notFound")}</p>
+      </div>
+    );
+  }
+
+  const name = nameOf(circuit);
+  const entries = Object.entries(circuit.bom);
   const missingCount = ready
     ? entries.reduce((sum, [pid, need]) => sum + Math.max(0, need - (inventory[pid] ?? 0)), 0)
     : 0;
-  const favorite = favorites.some((f) => f.childId === activeChildId && f.layoutId === id);
+  const favorite = favorites.some((f) => f.childId === activeChildId && f.layoutId === code);
 
   const toggle = (pid: string) =>
     setChecked((prev) => {
@@ -33,31 +58,27 @@ export function CircuitView({ id }: { id: string }) {
 
   return (
     <div className="space-y-8">
-      <Link
-        href="/circuits"
-        className="inline-flex min-h-11 items-center gap-1 font-semibold text-muted hover:text-foreground print:hidden"
-      >
-        <Icon d={icons.left} className="size-5" />
-        {t("common.back")}
-      </Link>
+      {back}
 
       <header className="flex flex-wrap items-end justify-between gap-4">
-        <div className="space-y-2">
-          <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl">{name}</h1>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-medium text-muted">
-            <Stars level={layout.difficulty} label={t("common.difficulty", { level: layout.difficulty })} />
-            <span>{t("common.pieces", { count: layout.placements.length })}</span>
-            <span>{t("common.minutes", { count: layout.minutes })}</span>
-            <span>{t("common.age", { age: layout.ageMin })}</span>
-            <span>{t(`themes.${layout.theme}`)}</span>
+        <div className="space-y-3">
+          <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">{name}</h1>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-semibold text-muted">
+            <Stars level={circuit.difficulty} label={t("common.difficulty", { level: circuit.difficulty })} />
+            <span>{t("common.pieces", { count: circuit.pieces })}</span>
+            <span>{t("common.minutes", { count: circuit.minutes })}</span>
+            <FeatureBadges circuit={circuit} />
           </div>
+          <p className="text-sm text-muted">
+            {circuit.gap < 0.5 ? t("circuit.exact") : t("circuit.play", { gap: Math.ceil(circuit.gap) })}
+          </p>
         </div>
         <div className="flex flex-wrap gap-2 print:hidden">
           {activeChildId && (
             <button
               type="button"
               aria-pressed={favorite}
-              onClick={() => actions.toggleFavorite(activeChildId, id)}
+              onClick={() => actions.toggleFavorite(activeChildId, code)}
               className={`${buttonSecondary} aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-accent-ink`}
             >
               <svg
@@ -82,13 +103,20 @@ export function CircuitView({ id }: { id: string }) {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
-        <figure className="wood-floor rounded-[2rem] border-4 border-header p-4 sm:p-8 print:border-2">
-          <TrackPlan placements={layout.placements} catalog={catalog} title={t("circuit.plan")} className="w-full" />
+        <figure className="wood-floor self-start overflow-hidden rounded-tl-[2.5rem] rounded-br-[2.5rem] rounded-tr-xl rounded-bl-xl border border-border p-4 sm:p-8">
+          <TrackPlan
+            placements={circuit.placements}
+            catalog={catalog}
+            title={t("circuit.plan")}
+            accessories={circuit.accessories}
+            train
+            className="w-full"
+          />
         </figure>
 
         <section className="space-y-4">
           <div>
-            <h2 className="font-display text-2xl font-bold">{t("circuit.bom")}</h2>
+            <h2 className="text-2xl font-extrabold text-ink">{t("circuit.bom")}</h2>
             <p className="text-muted">
               {t("circuit.bomHint")} · {t("circuit.checked", { done: checked.size, total: entries.length })}
             </p>
@@ -112,40 +140,41 @@ export function CircuitView({ id }: { id: string }) {
                     >
                       {isChecked && <Check />}
                     </span>
-                    <span className="wood-floor w-16 shrink-0 rounded-xl p-1">
-                      <TrackPlan
-                        placements={[{ id: pid, pieceTypeId: pid, x: 0, y: 0, rotation: 0, flipped: false }]}
-                        catalog={catalog}
-                        title=""
-                        frame={{ width: 280, height: 200 }}
-                        showConnectors={false}
-                        className="w-full"
-                      />
+                    <span className="wood-floor w-16 shrink-0 rounded-lg p-1">
+                      <PieceThumb id={pid} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className={`block font-semibold ${isChecked ? "line-through" : ""}`}>
+                      <span className={`block font-bold ${isChecked ? "line-through" : ""}`}>
                         {t(`pieceNames.${pid}`)}
                       </span>
                       {ready && (
-                        <span className={`block text-sm ${lacking ? "font-semibold text-accent" : "text-muted"}`}>
+                        <span className={`block text-sm ${lacking ? "font-bold text-accent" : "text-muted"}`}>
                           {t("circuit.have", { count: have })}
                         </span>
                       )}
                     </span>
-                    <span className="font-mono text-2xl font-bold">×{need}</span>
+                    <span className="font-mono text-2xl font-extrabold text-ink">×{need}</span>
                   </button>
                 </li>
               );
             })}
           </ul>
 
+          {circuit.accessories.length > 0 && (
+            <p className="text-sm text-muted">
+              {t("circuit.decor", {
+                list: [...new Set(circuit.accessories.map((a) => t(`pieceNames.${a.kind}`)))].join(", "),
+              })}
+            </p>
+          )}
+
           {missingCount > 0 && (
-            <p className="rounded-2xl bg-accent/10 p-4 font-semibold text-accent">
+            <p className="rounded-xl bg-accent/10 p-4 font-bold text-accent">
               {t("circuit.missingCount", { count: missingCount })}
             </p>
           )}
 
-          <Link href={`/circuits/${id}/build`} className={`${buttonPrimary} w-full text-lg print:hidden`}>
+          <Link href={circuitHref(code, true)} className={`${buttonPrimary} w-full text-lg print:hidden`}>
             {t("circuit.build")}
             <Icon d={icons.right} className="size-5" />
           </Link>

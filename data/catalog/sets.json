@@ -1,34 +1,558 @@
 [
   {
-    "id": "starter",
-    "ref": null,
+    "id": "travel-switching",
+    "ref": "33512",
+    "kind": "set",
+    "theme": "travel",
+    "pieceCount": 42,
     "verified": false,
     "contents": [
-      { "pieceTypeId": "curve-large", "quantity": 8 },
-      { "pieceTypeId": "straight-long", "quantity": 4 },
-      { "pieceTypeId": "straight-short", "quantity": 2 }
+      {
+        "pieceTypeId": "curve-large",
+        "quantity": 8
+      },
+      {
+        "pieceTypeId": "straight-long",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "straight-medium",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "straight-short",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "switch",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "switch-reverse",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "ramp",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "ramp-reverse",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "suspension-bridge",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "support",
+        "quantity": 5
+      },
+      {
+        "pieceTypeId": "station",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "signal",
+        "quantity": 1
+      }
     ]
   },
   {
-    "id": "expansion-switches",
-    "ref": null,
+    "id": "firefighter",
+    "ref": "33815",
+    "kind": "set",
+    "theme": "fire",
+    "pieceCount": 18,
     "verified": false,
     "contents": [
-      { "pieceTypeId": "switch", "quantity": 2 },
-      { "pieceTypeId": "straight-medium", "quantity": 4 },
-      { "pieceTypeId": "curve-small", "quantity": 4 },
-      { "pieceTypeId": "adapter-male-male", "quantity": 1 },
-      { "pieceTypeId": "adapter-female-female", "quantity": 1 }
+      {
+        "pieceTypeId": "curve-large",
+        "quantity": 8
+      },
+      {
+        "pieceTypeId": "straight-short",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "level-crossing",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "station",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "tree",
+        "quantity": 1
+      }
     ]
   },
   {
-    "id": "expansion-bridge",
-    "ref": null,
+    "id": "deluxe-railway",
+    "ref": "33052",
+    "kind": "set",
+    "theme": "city",
+    "pieceCount": 87,
     "verified": false,
     "contents": [
-      { "pieceTypeId": "ramp", "quantity": 2 },
-      { "pieceTypeId": "straight-long", "quantity": 2 },
-      { "pieceTypeId": "crossing", "quantity": 1 }
+      {
+        "pieceTypeId": "curve-large",
+        "quantity": 12
+      },
+      {
+        "pieceTypeId": "straight-long",
+        "quantity": 6
+      },
+      {
+        "pieceTypeId": "straight-medium",
+        "quantity": 4
+      },
+      {
+        "pieceTypeId": "straight-short",
+        "quantity": 4
+      },
+      {
+        "pieceTypeId": "switch",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "switch-reverse",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "ramp",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "ramp-reverse",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "suspension-bridge",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "level-crossing",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "crossing",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "buffer-stop",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "support",
+        "quantity": 7
+      },
+      {
+        "pieceTypeId": "station",
+        "quantity": 3
+      },
+      {
+        "pieceTypeId": "tunnel",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "crane",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "signal",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "cargo-deluxe",
+    "ref": "33097",
+    "kind": "set",
+    "theme": "cargo",
+    "pieceCount": 54,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "curve-large",
+        "quantity": 10
+      },
+      {
+        "pieceTypeId": "curve-small",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "straight-long",
+        "quantity": 4
+      },
+      {
+        "pieceTypeId": "straight-medium",
+        "quantity": 4
+      },
+      {
+        "pieceTypeId": "straight-short",
+        "quantity": 4
+      },
+      {
+        "pieceTypeId": "switch",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "switch-reverse",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "ramp",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "ramp-reverse",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "suspension-bridge",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "buffer-stop",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "support",
+        "quantity": 7
+      },
+      {
+        "pieceTypeId": "signal",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "crane",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "classic-figure-8",
+    "ref": "33028",
+    "kind": "set",
+    "theme": "classic",
+    "pieceCount": 22,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "curve-large",
+        "quantity": 12
+      },
+      {
+        "pieceTypeId": "straight-long",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "ramp",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "ramp-reverse",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "support",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "station",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "tree",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "id": "railway-starter",
+    "ref": "33773",
+    "kind": "set",
+    "theme": "classic",
+    "pieceCount": 26,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "curve-large",
+        "quantity": 8
+      },
+      {
+        "pieceTypeId": "straight-long",
+        "quantity": 4
+      },
+      {
+        "pieceTypeId": "straight-short",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "tunnel",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "tree",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "id": "expansion-beginner",
+    "ref": "33401",
+    "kind": "expansion",
+    "theme": "track",
+    "pieceCount": 11,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "straight-long",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "straight-medium",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "straight-short",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "curve-large",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "curve-small",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "straight-mini",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "expansion-intermediate",
+    "ref": "33402",
+    "kind": "expansion",
+    "theme": "track",
+    "pieceCount": 16,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "curve-large",
+        "quantity": 4
+      },
+      {
+        "pieceTypeId": "curve-small",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "straight-medium",
+        "quantity": 4
+      },
+      {
+        "pieceTypeId": "straight-short",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "straight-mini",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "switch",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "switch-reverse",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "expansion-advanced",
+    "ref": "33307",
+    "kind": "expansion",
+    "theme": "track",
+    "pieceCount": 11,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "crossing",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "switch",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "switch-reverse",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "buffer-stop",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "ramp",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "ramp-reverse",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "straight-short",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "curve-small",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "straight-mini",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "pack-switches",
+    "ref": "33344",
+    "kind": "pack",
+    "theme": "track",
+    "pieceCount": 2,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "switch",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "switch-reverse",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "pack-ascending",
+    "ref": "33332",
+    "kind": "pack",
+    "theme": "track",
+    "pieceCount": 2,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "ramp",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "ramp-reverse",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "pack-long-curves",
+    "ref": "33342",
+    "kind": "pack",
+    "theme": "track",
+    "pieceCount": 2,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "curve-large",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "id": "pack-short-curves",
+    "ref": "33337",
+    "kind": "pack",
+    "theme": "track",
+    "pieceCount": 4,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "curve-small",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "id": "pack-long-straights",
+    "ref": "33341",
+    "kind": "pack",
+    "theme": "track",
+    "pieceCount": 2,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "straight-long",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "id": "pack-medium-straights",
+    "ref": "33335",
+    "kind": "pack",
+    "theme": "track",
+    "pieceCount": 4,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "straight-medium",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "id": "pack-short-straights",
+    "ref": "33334",
+    "kind": "pack",
+    "theme": "track",
+    "pieceCount": 4,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "straight-short",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "id": "pack-adapters",
+    "ref": "33393",
+    "kind": "pack",
+    "theme": "track",
+    "pieceCount": 4,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "adapter-male-male",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "adapter-female-female",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "id": "pack-supports",
+    "ref": null,
+    "kind": "pack",
+    "theme": "track",
+    "pieceCount": 4,
+    "verified": false,
+    "contents": [
+      {
+        "pieceTypeId": "support",
+        "quantity": 4
+      }
     ]
   }
 ]

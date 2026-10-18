@@ -1,6 +1,6 @@
 // Service worker : l'app reste utilisable hors ligne pour les pages déjà ouvertes (ENF-05).
 // Pages : réseau d'abord, copie locale en secours. Fichiers statiques : copie locale d'abord.
-const VERSION = "v1";
+const VERSION = "v2";
 const PAGES = `pages-${VERSION}`;
 const STATIC = `static-${VERSION}`;
 
@@ -29,7 +29,8 @@ async function networkFirst(request) {
     if (response.ok) cache.put(request, response.clone());
     return response;
   } catch {
-    const cached = await cache.match(request);
+    // La fiche d'un circuit est la même page pour tous les circuits (?c=…) : on ignore la requête.
+    const cached = (await cache.match(request)) ?? (await cache.match(request, { ignoreSearch: true }));
     if (cached) return cached;
     if (request.mode === "navigate") {
       const lang = new URL(request.url).pathname.startsWith("/en") ? "/en" : "/fr";

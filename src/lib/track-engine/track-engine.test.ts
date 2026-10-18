@@ -8,6 +8,10 @@ import {
   billOfMaterials,
   chain,
   connect,
+  flexTolerance,
+  fullBillOfMaterials,
+  supportsNeeded,
+  tokensToSteps,
   isClosed,
   matchInventory,
   overlaps,
@@ -37,17 +41,22 @@ const ovalSteps: ChainStep[] = [
 ];
 
 describe("catalogue", () => {
-  it("contient 10 pièces et 3 coffrets cohérents", () => {
-    expect(pieceList).toHaveLength(10);
-    expect(setList).toHaveLength(3);
+  it("contient les pièces et des coffrets cohérents", () => {
+    expect(pieceList.length).toBeGreaterThanOrEqual(20);
+    expect(setList.length).toBeGreaterThanOrEqual(15);
+    expect(new Set(setList.map((s) => s.id)).size).toBe(setList.length);
     for (const set of setList) {
       for (const item of set.contents) expect(catalog[item.pieceTypeId]).toBeDefined();
     }
   });
 
-  it("chaque pièce a de 2 à 4 connecteurs et au moins un tracé", () => {
+  it("chaque rail a de 1 à 4 connecteurs et au moins un tracé ; les accessoires aucun", () => {
     for (const piece of pieceList) {
-      expect(piece.connectors.length).toBeGreaterThanOrEqual(2);
+      if (piece.category === "accessory") {
+        expect(piece.connectors).toHaveLength(0);
+        continue;
+      }
+      expect(piece.connectors.length).toBeGreaterThanOrEqual(1);
       expect(piece.connectors.length).toBeLessThanOrEqual(4);
       expect(piece.tracks.length).toBeGreaterThan(0);
     }
@@ -151,12 +160,43 @@ describe("fermeture (critères du lot 0)", () => {
     expect(report.joints).toHaveLength(2);
   });
 
-  it("une rampe change de niveau", () => {
+  it("une rampe monte d'un niveau, et les pièces suivantes restent en hauteur", () => {
     const placements = chain([{ pieceTypeId: "ramp" }, straight], catalog);
+    expect(placements[1].level).toBe(1);
     const ends = transform(placements[1], catalog["straight-long"]);
-    expect(ends[1].level).toBe(0);
-    // La droite posée au sol ne se raccorde pas au haut de la rampe.
-    expect(analyzeJoints(placements, catalog).errors[0]?.reason).toBe("level");
+    expect(ends[1].level).toBe(1);
+    expect(analyzeJoints(placements, catalog).errors).toEqual([]);
+    expect(supportsNeeded(placements, catalog)).toBe(2);
+    expect(fullBillOfMaterials(placements, catalog).support).toBe(2);
+  });
+
+  it("une droite posée au sol ne se raccorde pas au haut d'une rampe", () => {
+    const ramp: Placement = { id: "a", pieceTypeId: "ramp", x: 0, y: 0, rotation: 0, flipped: false };
+    const ground: Placement = { id: "b", pieceTypeId: "straight-long", x: 216, y: 0, rotation: 0, flipped: false };
+    expect(analyzeJoints([ramp, ground], catalog).errors[0]?.reason).toBe("level");
+  });
+
+  it("une colline (montée, pont, descente) revient au sol", () => {
+    const placements = chain(
+      [
+        { pieceTypeId: "ramp" },
+        { pieceTypeId: "suspension-bridge" },
+        { pieceTypeId: "ramp-reverse", inConnector: 1, outConnector: 0 },
+        straight,
+      ],
+      catalog,
+    );
+    expect(placements.map((p) => p.level ?? 0)).toEqual([0, 1, 0, 0]);
+    expect(analyzeJoints(placements, catalog).errors).toEqual([]);
+  });
+
+  it("le jeu des rails absorbe un petit écart à la fermeture d'une grande boucle", () => {
+    // Huit avec croisement et petites courbes : se referme à moins de 3 mm.
+    const eight = chain(tokensToSteps("Xrrrrrr@1.3cccccc"), catalog);
+    const report = analyzeJoints(eight, catalog);
+    expect(report.closed).toBe(true);
+    expect(report.maxGap).toBeGreaterThan(0);
+    expect(report.maxGap).toBeLessThan(flexTolerance(eight.length).position);
   });
 
   it("un aiguillage laisse une branche libre", () => {
@@ -172,8 +212,8 @@ describe("chain", () => {
       catalog,
     );
     const [inC] = transform(placements[1], catalog["straight-short"]);
-    expect(inC.x).toBeCloseTo(72);
-    expect(inC.y).toBeCloseTo(72);
+    expect(inC.x).toBeCloseTo(108);
+    expect(inC.y).toBeCloseTo(108);
   });
 
   it("signale une pièce de départ absente", () => {
@@ -218,10 +258,10 @@ describe("inventaire", () => {
   });
 
   it("ajouter un coffret ajoute toutes ses pièces", () => {
-    const starter = setList.find((s) => s.id === "starter")!;
-    const inv = addSet({ "curve-large": 1 }, starter, 2);
+    const set = setList.find((s) => s.id === "firefighter")!;
+    const inv = addSet({ "curve-large": 1 }, set, 2);
     expect(inv["curve-large"]).toBe(17);
-    expect(totalPieces(addSet({}, starter))).toBe(14);
+    expect(totalPieces(addSet({}, set))).toBe(set.contents.reduce((s, c) => s + c.quantity, 0));
   });
 
   it("classe les circuits réalisables et presque réalisables", () => {

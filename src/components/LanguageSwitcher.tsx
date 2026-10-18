@@ -10,7 +10,7 @@ export function LanguageSwitcher() {
   const pathname = usePathname();
 
   return (
-    <nav aria-label={t("language")} className="flex gap-1">
+    <nav aria-label={t("language")} className="flex gap-1 rounded-full border border-border p-0.5">
       {routing.locales.map((locale) => {
         // Nom de la langue dans sa propre langue : rien à traduire quand on en ajoute une.
         const name = new Intl.DisplayNames([locale], { type: "language" }).of(locale) ?? locale;
@@ -20,9 +20,11 @@ export function LanguageSwitcher() {
             href={pathname}
             locale={locale}
             aria-current={locale === current ? "true" : undefined}
-            className="min-h-11 rounded-lg px-3 py-2 text-sm capitalize text-header-muted hover:text-header-ink aria-[current]:bg-accent aria-[current]:font-semibold aria-[current]:text-accent-ink"
+            aria-label={name}
+            title={name}
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-3 text-sm font-bold uppercase text-muted hover:text-ink aria-[current]:bg-soft aria-[current]:text-ink"
           >
-            {name}
+            {locale}
           </Link>
         );
       })}

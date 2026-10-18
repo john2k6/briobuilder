@@ -1,73 +1,91 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChildPicker } from "@/components/ChildPicker";
-import { LayoutCard } from "@/components/LayoutCard";
+import { CircuitCard } from "@/components/CircuitCard";
 import { buttonPrimary, card, Icon, icons, PageHeader } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
-import { pieceList } from "@/lib/catalog";
-import { layoutById, layouts, type Layout } from "@/lib/layouts";
-import { AGE_OF_BAND, useAppState } from "@/lib/store";
-import { matchInventory, relevance, suggestPurchases, totalPieces, type MatchResult } from "@/lib/track-engine";
+import { generate } from "@/lib/circuits";
+import { actions, useAppState, type GeneratorPrefs } from "@/lib/store";
+import { totalPieces, type GeneratedLayout, type Size } from "@/lib/track-engine";
 
 type Tab = "buildable" | "almost";
-type Sort = "relevance" | "usage" | "new" | "never";
+const SIZES: Size[] = ["small", "medium", "large"];
 
-const NEW_DAYS = 30;
+function Toggle({
+  pressed,
+  onClick,
+  icon,
+  children,
+}: {
+  pressed: boolean;
+  onClick: () => void;
+  icon?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={pressed}
+      onClick={onClick}
+      className="inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-border bg-surface px-4 font-bold text-ink transition-colors aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-accent-ink"
+    >
+      {icon && <Icon d={icon} className="size-5" />}
+      {children}
+    </button>
+  );
+}
 
 export function CircuitsView() {
   const t = useTranslations();
-  const { inventory, children, activeChildId, builds, favorites, ready } = useAppState();
+  const { inventory, prefs, activeChildId, builds, favorites, ready } = useAppState();
   const [tab, setTab] = useState<Tab>("buildable");
-  const [difficulty, setDifficulty] = useState<number | null>(null);
-  const [sort, setSort] = useState<Sort>("relevance");
-  const [now] = useState(() => Date.now());
-
-  const child = children.find((c) => c.id === activeChildId);
-  const builtCount = (id: string) => builds.filter((b) => b.childId === activeChildId && b.layoutId === id).length;
-  const isFavorite = (id: string) => favorites.some((f) => f.childId === activeChildId && f.layoutId === id);
-
-  const { buildable, almost } = useMemo(() => matchInventory(inventory, layouts), [inventory]);
-  const suggestions = useMemo(
-    () =>
-      suggestPurchases(
-        inventory,
-        layouts,
-        pieceList.map((p) => p.id),
-      ).slice(0, 3),
-    [inventory],
+  const [result, setResult] = useState<{ key: string; buildable: GeneratedLayout[]; almost: GeneratedLayout[] } | null>(
+    null,
   );
 
-  const sorted = (list: MatchResult<Layout>[]) => {
-    const ctx = {
-      inventory,
-      childAge: child ? AGE_OF_BAND[child.ageBand] : undefined,
-      builtIds: new Set(builds.filter((b) => b.childId === activeChildId).map((b) => b.layoutId)),
-      favoriteThemes: new Set(
-        favorites.filter((f) => f.childId === activeChildId).map((f) => layoutById[f.layoutId]?.theme),
-      ),
-      newIds: new Set(layouts.filter((l) => now - Date.parse(l.addedAt) < NEW_DAYS * 86_400_000).map((l) => l.id)),
-    };
-    const score: Record<Sort, (l: Layout) => number> = {
-      relevance: (l) => relevance(l, ctx),
-      usage: (l) => l.placements.length,
-      new: (l) => Date.parse(l.addedAt),
-      never: (l) => (ctx.builtIds.has(l.id) ? 0 : 1) + relevance(l, ctx) / 100,
-    };
-    return list
-      .filter((m) => difficulty === null || m.layout.difficulty === difficulty)
-      .sort((a, b) => a.missingCount - b.missingCount || score[sort](b.layout) - score[sort](a.layout));
-  };
+  const key = useMemo(() => JSON.stringify({ inventory, prefs }), [inventory, prefs]);
+  const loading = ready && result?.key !== key;
 
-  const list = sorted(tab === "buildable" ? buildable : almost);
+  // Le calcul prend quelques centaines de millisecondes : on laisse d'abord l'écran s'afficher.
+  useEffect(() => {
+    if (!ready || totalPieces(inventory) === 0) return;
+    const timer = window.setTimeout(() => {
+      const r = generate(inventory, {
+        sizes: prefs.sizes,
+        require: { bridge: prefs.bridge, switches: prefs.switches, crossing: prefs.crossing },
+        decorate: prefs.decorate,
+        limit: 18,
+      });
+      setResult({ key, ...r });
+    }, 30);
+    return () => window.clearTimeout(timer);
+  }, [key, ready, inventory, prefs]);
+
+  const builtCount = (code: string) => builds.filter((b) => b.childId === activeChildId && b.layoutId === code).length;
+  const isFavorite = (code: string) => favorites.some((f) => f.childId === activeChildId && f.layoutId === code);
+  const setPrefs = (patch: Partial<GeneratorPrefs>) => actions.setPrefs(patch);
+
+  // « Quelle pièce acheter ? » : les pièces qui, seules, débloquent le plus de circuits presque réalisables.
+  const suggestions = useMemo(() => {
+    const byPiece = new Map<string, { quantity: number; circuits: number }>();
+    for (const r of result?.almost ?? []) {
+      const entries = Object.entries(r.missing);
+      if (entries.length !== 1) continue;
+      const [id, qty] = entries[0];
+      const s = byPiece.get(id) ?? { quantity: 0, circuits: 0 };
+      byPiece.set(id, { quantity: Math.max(s.quantity, qty), circuits: s.circuits + 1 });
+    }
+    return [...byPiece.entries()].sort((a, b) => b[1].circuits - a[1].circuits).slice(0, 3);
+  }, [result]);
 
   if (ready && totalPieces(inventory) === 0) {
     return (
       <div className="space-y-8">
-        <PageHeader title={t("circuits.title")} />
+        <PageHeader title={t("generator.title")} />
         <div className={`${card} flex flex-col items-start gap-5 p-8`}>
-          <span className="flex size-14 items-center justify-center rounded-2xl bg-wood text-header">
+          <span className="flex size-14 items-center justify-center rounded-2xl bg-soft text-accent">
             <Icon d={icons.box} className="size-7" />
           </span>
           <p className="max-w-lg text-lg">{t("circuits.emptyBox")}</p>
@@ -79,110 +97,137 @@ export function CircuitsView() {
     );
   }
 
-  const tabs: { id: Tab; count: number }[] = [
-    { id: "buildable", count: buildable.length },
-    { id: "almost", count: almost.length },
-  ];
+  const list = (tab === "buildable" ? result?.buildable : result?.almost) ?? [];
 
   return (
-    <div className="space-y-8">
-      <PageHeader title={t("circuits.title")} intro={t("circuits.intro")} />
+    <div className="space-y-10">
+      <PageHeader title={t("generator.title")} intro={t("generator.intro")} />
+
+      {/* Configuration */}
+      <section className="space-y-6 rounded-tl-[2.5rem] rounded-br-[2.5rem] rounded-tr-xl rounded-bl-xl bg-soft p-6 md:p-8">
+        <div className="space-y-3">
+          <h2 className="text-xl font-extrabold text-ink">{t("generator.size")}</h2>
+          <div className="flex flex-wrap gap-2">
+            <Toggle pressed={prefs.sizes.length === 0} onClick={() => setPrefs({ sizes: [] })}>
+              {t("generator.allSizes")}
+            </Toggle>
+            {SIZES.map((size) => (
+              <Toggle
+                key={size}
+                pressed={prefs.sizes.includes(size)}
+                onClick={() =>
+                  setPrefs({
+                    sizes: prefs.sizes.includes(size) ? prefs.sizes.filter((s) => s !== size) : [...prefs.sizes, size],
+                  })
+                }
+              >
+                {t(`sizes.${size}`)}
+                <span className="text-xs font-semibold opacity-80">{t(`generator.sizeHint.${size}`)}</span>
+              </Toggle>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-3">
+          <h2 className="text-xl font-extrabold text-ink">{t("generator.want")}</h2>
+          <div className="flex flex-wrap gap-2">
+            <Toggle pressed={prefs.bridge} onClick={() => setPrefs({ bridge: !prefs.bridge })} icon={icons.bridge}>
+              {t("generator.bridge")}
+            </Toggle>
+            <Toggle
+              pressed={prefs.switches}
+              onClick={() => setPrefs({ switches: !prefs.switches })}
+              icon={icons.switch}
+            >
+              {t("generator.switches")}
+            </Toggle>
+            <Toggle pressed={prefs.crossing} onClick={() => setPrefs({ crossing: !prefs.crossing })} icon={icons.cross}>
+              {t("generator.crossing")}
+            </Toggle>
+            <Toggle
+              pressed={prefs.decorate}
+              onClick={() => setPrefs({ decorate: !prefs.decorate })}
+              icon={icons.sparkle}
+            >
+              {t("generator.decorate")}
+            </Toggle>
+          </div>
+        </div>
+      </section>
+
       <ChildPicker />
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div role="tablist" className="inline-flex rounded-full bg-border p-1">
-          {tabs.map(({ id, count }) => (
+        <div role="tablist" className="inline-flex rounded-full bg-soft p-1">
+          {(["buildable", "almost"] as const).map((id) => (
             <button
               key={id}
               role="tab"
               type="button"
               aria-selected={tab === id}
               onClick={() => setTab(id)}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full px-5 font-semibold text-muted aria-selected:bg-surface aria-selected:text-foreground aria-selected:shadow"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full px-5 font-bold text-muted aria-selected:bg-surface aria-selected:text-ink aria-selected:shadow"
             >
               {t(id === "buildable" ? "circuits.tabBuildable" : "circuits.tabAlmost")}
               <span
                 className={`rounded-full px-2 text-sm ${id === "buildable" ? "bg-green text-green-ink" : "bg-accent text-accent-ink"}`}
               >
-                {ready ? count : "–"}
+                {result && !loading ? (id === "buildable" ? result.buildable.length : result.almost.length) : "–"}
               </span>
             </button>
           ))}
         </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <div role="group" aria-label={t("circuits.filterDifficulty")} className="flex gap-1">
-            {[null, 1, 2, 3].map((d) => (
-              <button
-                key={d ?? "all"}
-                type="button"
-                aria-pressed={difficulty === d}
-                onClick={() => setDifficulty(d)}
-                className="min-h-11 rounded-full border-2 border-border px-3 text-sm font-semibold aria-pressed:border-header aria-pressed:bg-header aria-pressed:text-header-ink"
-              >
-                {d === null ? t("circuits.all") : "★".repeat(d)}
-              </button>
-            ))}
-          </div>
-          <label className="flex items-center gap-2 text-sm font-medium">
-            {t("circuits.sort")}
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as Sort)}
-              className="min-h-11 rounded-full border-2 border-border bg-surface px-3"
-            >
-              <option value="relevance">{t("circuits.sortRelevance")}</option>
-              <option value="usage">{t("circuits.sortUsage")}</option>
-              <option value="new">{t("circuits.sortNew")}</option>
-              <option value="never">{t("circuits.sortNever")}</option>
-            </select>
-          </label>
-        </div>
+        <p className="text-sm text-muted" aria-live="polite">
+          {loading ? t("generator.loading") : t("generator.checked")}
+        </p>
       </div>
 
-      {!ready ? (
-        <p className="text-muted">{t("common.loading")}</p>
+      {!ready || loading ? (
+        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+          {[0, 1, 2].map((i) => (
+            <li
+              key={i}
+              className="aspect-[4/5] animate-pulse rounded-tl-[2.5rem] rounded-br-[2.5rem] rounded-tr-xl rounded-bl-xl bg-soft"
+            />
+          ))}
+        </ul>
       ) : list.length === 0 ? (
         <p className={`${card} p-6 text-muted`}>
           {tab === "buildable" ? t("circuits.noneBuildable") : t("circuits.noneAlmost")}
         </p>
       ) : (
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((m) => (
-            <li key={m.layout.id}>
-              <LayoutCard
-                layout={m.layout}
-                missing={tab === "almost" ? m.missing : undefined}
-                favorite={isFavorite(m.layout.id)}
-                builtCount={builtCount(m.layout.id)}
+          {list.map((c) => (
+            <li key={c.code}>
+              <CircuitCard
+                circuit={c}
+                missing={tab === "almost" ? c.missing : undefined}
+                favorite={isFavorite(c.code)}
+                builtCount={builtCount(c.code)}
               />
             </li>
           ))}
         </ul>
       )}
 
-      {/* Parcours secondaire : idée cadeau (EF-25) */}
-      {ready && suggestions.length > 0 && (
-        <section className="space-y-4 rounded-3xl bg-header p-6 text-header-ink md:p-8">
+      {/* Idée cadeau (EF-25) */}
+      {!loading && suggestions.length > 0 && (
+        <section className="space-y-4 rounded-tl-[2.5rem] rounded-br-[2.5rem] rounded-tr-xl rounded-bl-xl bg-green p-6 text-green-ink md:p-8">
           <div className="flex items-center gap-3">
-            <span className="flex size-11 items-center justify-center rounded-2xl bg-accent">
+            <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15">
               <Icon d={icons.cart} />
             </span>
             <div>
-              <h2 className="font-display text-2xl font-bold">{t("circuits.buy")}</h2>
-              <p className="text-header-muted">{t("circuits.buyIntro")}</p>
+              <h2 className="text-2xl font-extrabold">{t("circuits.buy")}</h2>
+              <p className="opacity-90">{t("circuits.buyIntro")}</p>
             </div>
           </div>
           <ul className="grid gap-3 md:grid-cols-3">
-            {suggestions.map((s) => (
-              <li key={s.pieceTypeId} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
-                <p className="font-semibold">
-                  <span className="font-mono text-accent">+{s.quantity}</span> {t(`pieceNames.${s.pieceTypeId}`)}
+            {suggestions.map(([id, s]) => (
+              <li key={id} className="rounded-2xl bg-white/10 p-4 ring-1 ring-white/20">
+                <p className="font-extrabold">
+                  +{s.quantity} {t(`pieceNames.${id}`)}
                 </p>
-                <p className="text-sm font-semibold text-header-muted">
-                  {t("circuits.buyUnlocks", { count: s.unlocks.length })}
-                </p>
-                <p className="text-sm text-header-muted">{s.unlocks.map((id) => t(`layouts.${id}`)).join(", ")}</p>
+                <p className="text-sm opacity-90">{t("circuits.buyUnlocks", { count: s.circuits })}</p>
               </li>
             ))}
           </ul>

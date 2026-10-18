@@ -1,92 +1,61 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import { use, type ReactNode } from "react";
+import { use } from "react";
+import { circuitHref } from "@/lib/circuits";
 import { TrackPlan, type StepState } from "@/components/TrackPlan";
+import { blob, buttonPrimary, buttonSecondary, Check, Icon, icons, SectionTitle, Stars } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
-import { catalog } from "@/lib/catalog";
-import { demoOval, starterMatches } from "@/lib/demo";
-import { isClosed } from "@/lib/track-engine";
-import { buttonPrimary, Check, Stars } from "@/components/ui";
+import { catalog, setList } from "@/lib/catalog";
+import { addSet, generateLayouts } from "@/lib/track-engine";
 
-const icon = "size-6 fill-none stroke-current stroke-2 [stroke-linecap:round] [stroke-linejoin:round]";
-
-const stepIcons: Record<1 | 2 | 3, ReactNode> = {
-  1: (
-    <svg viewBox="0 0 24 24" className={icon} aria-hidden="true">
-      <path d="M3 8l9-4 9 4-9 4-9-4z" />
-      <path d="M3 8v8l9 4 9-4V8M12 12v8" />
-    </svg>
-  ),
-  2: (
-    <svg viewBox="0 0 24 24" className={icon} aria-hidden="true">
-      <rect x="4" y="6" width="16" height="12" rx="6" />
-      <path d="M9 12l2 2 4-4" />
-    </svg>
-  ),
-  3: (
-    <svg viewBox="0 0 24 24" className={icon} aria-hidden="true">
-      <path d="M5 12h14M13 6l6 6-6 6" />
-    </svg>
-  ),
-};
+// Calculés une fois au moment du build : ce que permet une seule boîte.
+const travel = setList.find((s) => s.id === "travel-switching")!;
+const travelResult = generateLayouts(addSet({}, travel), catalog, { decorate: true, limit: 60 });
+const travelCircuits = travelResult.buildable;
+const hero = travelCircuits.find((c) => c.family === "hill") ?? travelCircuits[0];
+const showcase = travelCircuits.filter((c) => c.code !== hero.code).slice(0, 4);
+const simple = travelCircuits.find((c) => c.family === "oval") ?? travelCircuits[0];
 
 export default function HomePage({ params }: PageProps<"/[locale]">) {
   const { locale } = use(params);
   setRequestLocale(locale);
   const t = useTranslations("home");
-  const tl = useTranslations("layouts");
-  const tc = useTranslations("common");
-  const closed = isClosed(demoOval, catalog);
-  const buildable = starterMatches.buildable.map((m) => m.layout);
+  const tr = useTranslations();
+  const name = (c: (typeof travelCircuits)[number]) => `${tr(`families.${c.family}`)} · ${tr(`sizes.${c.size}`)}`;
 
   // Aperçu du mode enfant : 3 pièces posées, la 4e à poser, le reste à venir.
   const current = 3;
   const kidSteps: Record<string, StepState> = Object.fromEntries(
-    demoOval.map((p, i) => [p.id, i < current ? "done" : i === current ? "current" : "todo"]),
+    simple.placements.map((p, i) => [p.id, i < current ? "done" : i === current ? "current" : "todo"]),
   );
 
+  const tiles = [
+    { href: "/box", title: t("tileBoxes"), icon: icons.box },
+    { href: "/circuits", title: t("tileCreate"), icon: icons.sparkle },
+    { href: "/kids", title: t("tileKids"), icon: icons.star },
+    { href: "/pieces", title: t("tilePieces"), icon: icons.bridge },
+  ] as const;
+
   return (
-    <div className="space-y-24 pb-8">
+    <div className="space-y-20 pb-8">
       {/* Accroche */}
-      <section className="grid items-center gap-10 pt-4 lg:grid-cols-[1.05fr_1fr]">
-        <div className="space-y-7">
-          <p className="text-sm font-semibold uppercase tracking-widest text-green">{t("eyebrow")}</p>
-          <h1 className="font-display text-5xl font-bold leading-[1.1] tracking-tight md:text-6xl">
-            {t.rich("title", {
-              hl: (chunks) => (
-                <span className="relative whitespace-nowrap text-accent">
-                  {chunks}
-                  <svg
-                    viewBox="0 0 200 12"
-                    preserveAspectRatio="none"
-                    className="absolute -bottom-1 left-0 h-2.5 w-full"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M2 9 Q 50 2 100 7 T 198 5"
-                      fill="none"
-                      stroke="var(--wood)"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
-              ),
-            })}
+      <section className="grid items-center gap-10 pt-2 lg:grid-cols-[1fr_1.05fr]">
+        <div className="space-y-6">
+          <p className="text-sm font-extrabold uppercase tracking-widest text-green">{t("eyebrow")}</p>
+          <h1 className="text-5xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
+            {t.rich("title", { hl: (chunks) => <span className="font-extrabold text-accent">{chunks}</span> })}
           </h1>
           <p className="max-w-xl text-lg leading-relaxed text-muted">{t("subtitle")}</p>
           <div className="flex flex-wrap gap-3">
             <Link href="/box" className={buttonPrimary}>
-              {t("soon")}
+              {t("start")}
+              <Icon d={icons.right} className="size-5" />
             </Link>
-            <Link
-              href="/pieces"
-              className="inline-flex min-h-12 items-center rounded-full border-2 border-header px-6 font-semibold transition-colors hover:bg-header hover:text-header-ink"
-            >
-              {t("seePieces")}
+            <Link href="/circuits" className={buttonSecondary}>
+              {t("tryGenerator")}
             </Link>
           </div>
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium">
+          <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-ink">
             {(["trustAds", "trustAge", "trustEu"] as const).map((key) => (
               <li key={key} className="flex items-center gap-2">
                 <span className="text-green">
@@ -98,90 +67,100 @@ export default function HomePage({ params }: PageProps<"/[locale]">) {
           </ul>
         </div>
 
-        <figure className="relative">
-          <div className="wood-floor rounded-[2rem] border-4 border-header p-4 sm:p-6">
+        <figure className={`${blob} relative border border-border`}>
+          <div className="wood-floor p-4 sm:p-6">
             <TrackPlan
-              placements={demoOval}
+              placements={hero.placements}
               catalog={catalog}
-              title={t("planTitle")}
+              accessories={hero.accessories}
+              title={name(hero)}
               train
               showConnectors={false}
               className="w-full"
             />
           </div>
-          <figcaption className="absolute -bottom-5 left-6 flex items-center gap-2 rounded-full bg-green px-4 py-2 text-sm font-semibold text-green-ink shadow-lg">
-            <Check />
-            {closed ? t("closed") : t("open")} · {t("checked")}
+          <figcaption className="flex flex-wrap items-center justify-between gap-2 bg-accent px-6 py-4 text-accent-ink">
+            <span className="text-lg font-extrabold">{name(hero)}</span>
+            <span className="flex items-center gap-1 text-sm font-bold">
+              <Check />
+              {t("checked")}
+            </span>
           </figcaption>
         </figure>
       </section>
 
-      {/* Le problème */}
-      <section className="relative left-1/2 w-screen -translate-x-1/2 bg-header text-header-ink">
-        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-14 md:grid-cols-[1.4fr_1fr] md:items-center">
-          <p className="font-display text-3xl font-bold leading-tight md:text-4xl">{t("problem")}</p>
-          <p className="text-lg leading-relaxed text-header-muted">{t("problemText")}</p>
-        </div>
-      </section>
-
-      {/* Circuits réalisables avec un coffret de démarrage */}
-      <section className="space-y-8">
-        <div className="max-w-2xl space-y-3">
-          <h2 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
-            {t("showcaseTitle", { count: buildable.length })}
-          </h2>
-          <p className="text-lg text-muted">{t("showcaseText")}</p>
-        </div>
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-          {buildable.map((layout) => (
-            <li key={layout.id}>
+      {/* Rubriques */}
+      <section>
+        <ul className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {tiles.map((tile, i) => (
+            <li key={tile.href}>
               <Link
-                href={`/circuits/${layout.id}`}
-                className="group flex flex-col overflow-hidden rounded-3xl border-2 border-border bg-surface transition-transform hover:-translate-y-1"
+                href={tile.href}
+                className={`${i % 2 === 0 ? "rounded-tl-[2.5rem]" : "rounded-br-[2.5rem]"} flex h-full flex-col overflow-hidden rounded-xl transition-transform hover:-translate-y-1`}
               >
-                <div className="wood-floor relative border-b-2 border-border p-5">
-                  <TrackPlan
-                    placements={layout.placements}
-                    catalog={catalog}
-                    title={tl(layout.id)}
-                    frame={{ width: 900, height: 620 }}
-                    showConnectors={false}
-                    className="aspect-[3/2] w-full"
-                  />
-                  <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-green px-3 py-1 text-xs font-bold uppercase tracking-wide text-green-ink">
-                    <Check />
-                    {t("buildable")}
-                  </span>
-                </div>
-                <div className="flex flex-1 flex-col gap-3 p-5">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-display text-xl font-bold">{tl(layout.id)}</h3>
-                    <Stars level={layout.difficulty} label={tc("difficulty", { level: layout.difficulty })} />
-                  </div>
-                  <p className="flex gap-4 text-sm font-medium text-muted">
-                    <span>{tc("pieces", { count: layout.placements.length })}</span>
-                    <span>{tc("minutes", { count: layout.minutes })}</span>
-                  </p>
-                </div>
+                <span className="flex aspect-[5/3] items-center justify-center bg-soft text-accent">
+                  <Icon d={tile.icon} className="size-14" />
+                </span>
+                <span className="flex flex-1 items-center justify-center bg-accent px-4 py-5 text-center text-lg font-bold leading-tight text-accent-ink md:text-2xl">
+                  {tile.title}
+                </span>
               </Link>
             </li>
           ))}
         </ul>
       </section>
 
+      {/* Ce que permet une seule boîte */}
+      <section className="relative left-1/2 w-screen -translate-x-1/2 bg-green text-green-ink">
+        <div className="mx-auto max-w-6xl space-y-8 px-4 py-16">
+          <div className="max-w-3xl space-y-3">
+            <h2 className="text-3xl font-semibold leading-tight md:text-5xl">
+              {t("showcaseTitle", { count: travelResult.total.buildable, set: tr(`setNames.${travel.id}`) })}
+            </h2>
+            <p className="text-lg opacity-90">{t("showcaseText")}</p>
+          </div>
+          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {showcase.map((c) => (
+              <li key={c.code}>
+                <Link
+                  href={circuitHref(c.code)}
+                  className={`${blob} flex h-full flex-col bg-surface text-foreground transition-transform hover:-translate-y-1`}
+                >
+                  <div className="wood-floor p-3">
+                    <TrackPlan
+                      placements={c.placements}
+                      catalog={catalog}
+                      accessories={c.accessories}
+                      title={name(c)}
+                      frame={{ width: 1500, height: 1050 }}
+                      showConnectors={false}
+                      className="aspect-[10/7] w-full"
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col gap-1 p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-extrabold leading-tight text-ink">{name(c)}</h3>
+                      <Stars level={c.difficulty} label={tr("common.difficulty", { level: c.difficulty })} />
+                    </div>
+                    <p className="text-sm font-semibold text-muted">{tr("common.pieces", { count: c.pieces })}</p>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {/* Comment ça marche */}
       <section className="space-y-8">
-        <h2 className="font-display text-3xl font-bold tracking-tight md:text-4xl">{t("stepsTitle")}</h2>
+        <SectionTitle>{t("stepsTitle")}</SectionTitle>
         <ol className="grid gap-5 md:grid-cols-3">
           {([1, 2, 3] as const).map((n) => (
-            <li key={n} className="relative space-y-3 rounded-3xl bg-surface p-6 ring-2 ring-border">
-              <div className="flex items-center justify-between">
-                <span className="inline-flex size-12 items-center justify-center rounded-2xl bg-accent text-accent-ink">
-                  {stepIcons[n]}
-                </span>
-                <span className="font-display text-5xl font-bold text-border">{n}</span>
-              </div>
-              <h3 className="font-display text-xl font-bold">{t(`step${n}Title`)}</h3>
+            <li key={n} className={`${blob} space-y-3 border border-border bg-surface p-6`}>
+              <span className="flex size-12 items-center justify-center rounded-full bg-accent text-xl font-extrabold text-accent-ink">
+                {n}
+              </span>
+              <h3 className="text-xl font-extrabold text-ink">{t(`step${n}Title`)}</h3>
               <p className="leading-relaxed text-muted">{t(`step${n}Text`)}</p>
             </li>
           ))}
@@ -190,24 +169,19 @@ export default function HomePage({ params }: PageProps<"/[locale]">) {
 
       {/* Mode enfant */}
       <section className="grid items-center gap-10 lg:grid-cols-2">
-        <div className="order-2 space-y-5 lg:order-1">
-          <div
-            className="overflow-hidden rounded-[2rem] border-[10px] border-header bg-surface shadow-xl"
-            aria-hidden="true"
-          >
+        <div className="order-2 lg:order-1">
+          <div className={`${blob} border-[10px] border-ink bg-surface shadow-xl`} aria-hidden="true">
             <div className="flex items-center justify-between gap-3 bg-background px-5 py-3">
-              <span className="font-display text-lg font-bold uppercase">
-                {t("kidStep", { step: current + 1, total: demoOval.length })}
+              <span className="text-lg font-extrabold uppercase text-ink">
+                {t("kidStep", { step: current + 1, total: simple.placements.length })}
               </span>
               <span className="flex size-12 items-center justify-center rounded-full bg-green text-green-ink">
-                <svg viewBox="0 0 24 24" className={icon}>
-                  <path d="M4 9v6h4l5 4V5L8 9H4zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11" />
-                </svg>
+                <Icon d={icons.sound} />
               </span>
             </div>
             <div className="wood-floor px-6 py-4">
               <TrackPlan
-                placements={demoOval}
+                placements={simple.placements}
                 catalog={catalog}
                 title=""
                 steps={kidSteps}
@@ -215,22 +189,22 @@ export default function HomePage({ params }: PageProps<"/[locale]">) {
                 className="mx-auto max-h-56 w-full"
               />
             </div>
-            <p className="bg-background px-5 pt-4 text-center font-display text-xl font-bold uppercase">
+            <p className="bg-background px-5 pt-4 text-center text-xl font-extrabold uppercase text-ink">
               {t("kidInstruction")}
             </p>
             <div className="grid grid-cols-2 gap-3 bg-background p-5">
-              <span className="flex min-h-16 items-center justify-center rounded-2xl bg-border text-lg font-bold uppercase">
+              <span className="flex min-h-16 items-center justify-center rounded-2xl bg-soft text-lg font-extrabold uppercase text-ink">
                 {t("kidPrev")}
               </span>
-              <span className="flex min-h-16 items-center justify-center rounded-2xl bg-accent text-lg font-bold uppercase text-accent-ink shadow-[0_5px_0_0_var(--accent-dark)]">
+              <span className="flex min-h-16 items-center justify-center rounded-2xl bg-accent text-lg font-extrabold uppercase text-accent-ink">
                 {t("kidNext")}
               </span>
             </div>
           </div>
         </div>
         <div className="order-1 space-y-5 lg:order-2">
-          <p className="text-sm font-semibold uppercase tracking-widest text-green">{t("kidEyebrow")}</p>
-          <h2 className="font-display text-4xl font-bold tracking-tight">{t("kidTitle")}</h2>
+          <p className="text-sm font-extrabold uppercase tracking-widest text-green">{t("kidEyebrow")}</p>
+          <SectionTitle>{t("kidTitle")}</SectionTitle>
           <p className="text-lg text-muted">{t("kidText")}</p>
           <ul className="space-y-3">
             {(["kidPoint1", "kidPoint2", "kidPoint3", "kidPoint4"] as const).map((key) => (

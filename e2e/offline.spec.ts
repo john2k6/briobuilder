@@ -1,20 +1,21 @@
 import { expect, test } from "@playwright/test";
 
+const code = encodeURIComponent("eight-crossing:Xrrrrrr@1.3cccccc");
+
 test("un circuit déjà ouvert se rouvre sans réseau (PWA)", async ({ page, context }) => {
-  await page.goto("/fr/circuits/figure-eight");
-  await expect(page.getByRole("heading", { name: "Le huit" })).toBeVisible();
-  // Attendre que le service worker contrôle la page, puis recharger pour remplir le cache.
+  await page.goto(`/fr/circuit?c=${code}`);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Le huit");
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
   });
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Le huit" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Le huit");
 
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Le huit" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Le huit");
   await page.getByRole("link", { name: "On construit !" }).click();
-  await expect(page.getByText("Étape 1 sur 17")).toBeVisible();
+  await expect(page.getByText("Étape 1 sur 13")).toBeVisible();
   await context.setOffline(false);
 });
 

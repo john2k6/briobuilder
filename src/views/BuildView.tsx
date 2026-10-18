@@ -6,7 +6,10 @@ import { TrackPlan, type StepState } from "@/components/TrackPlan";
 import { Avatar, Icon, icons } from "@/components/ui";
 import { Link, useRouter } from "@/i18n/navigation";
 import { catalog } from "@/lib/catalog";
-import { layoutById } from "@/lib/layouts";
+import { circuitFromCode, circuitHref } from "@/lib/circuits";
+import { useCircuitName } from "@/components/CircuitCard";
+import { useSearchParams } from "next/navigation";
+import type { Placement } from "@/lib/track-engine";
 import { actions, badgesFor, useAppState, type BadgeId } from "@/lib/store";
 
 const EXIT_HOLD_MS = 3000;
@@ -96,23 +99,42 @@ function Confetti() {
   );
 }
 
-export function BuildView({ id }: { id: string }) {
+const EMPTY: Placement[] = [];
+
+export function BuildView() {
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
-  const layout = layoutById[id];
+  const code = useSearchParams().get("c") ?? "";
+  const circuit = circuitFromCode(code);
+  const nameOf = useCircuitName();
+  const placements = circuit?.placements ?? EMPTY;
   const { children, activeChildId, builds, ready } = useAppState();
-  const total = layout.placements.length;
+  const total = Math.max(1, placements.length);
   const [step, setStep] = useState(0);
   const [finished, setFinished] = useState(false);
   const [logged, setLogged] = useState<BadgeId[] | null>(null);
   const [sound, setSound] = useState(true);
 
   const child = children.find((c) => c.id === activeChildId);
-  const placement = layout.placements[Math.min(step, total - 1)];
-  const pieceName = t(`pieceNames.${placement.pieceTypeId}`);
-  const instruction = t("build.place", { piece: pieceName });
-  const flipHint = placement.flipped ? t("build.flip") : null;
+  /** Consigne et précision (retourner la pièce, la poser en hauteur, redescendre…). */
+  const describe = (p: Placement | undefined) => {
+    if (!p) return { text: "", hint: null as string | null };
+    const text = t("build.place", { piece: t(`pieceNames.${p.pieceTypeId}`) });
+    const hint =
+      p.pieceTypeId === "ramp-reverse"
+        ? t("build.down")
+        : p.pieceTypeId === "ramp"
+          ? t("build.up")
+          : (p.level ?? 0) > 0
+            ? t("build.elevated")
+            : p.flipped
+              ? t("build.flip")
+              : null;
+    return { text, hint };
+  };
+  const placement = placements[Math.min(step, total - 1)];
+  const { text: instruction, hint: flipHint } = describe(placement);
 
   // Bloque le défilement de la page derrière le mode enfant.
   useEffect(() => {
@@ -139,9 +161,8 @@ export function BuildView({ id }: { id: string }) {
     }
     const target = Math.max(0, next);
     setStep(target);
-    const p = layout.placements[target];
-    const text = t("build.place", { piece: t(`pieceNames.${p.pieceTypeId}`) });
-    say(p.flipped ? `${text}. ${t("build.flip")}` : text);
+    const { text, hint } = describe(placements[target]);
+    say(hint ? `${text}. ${hint}` : text);
   };
 
   // Flèches du clavier pour l'adulte qui accompagne.
@@ -165,24 +186,31 @@ export function BuildView({ id }: { id: string }) {
         .filter((b) => b.earned)
         .map((b) => b.id),
     );
-    actions.logBuild(child.id, id);
-    const after = badgesFor([...builds, { childId: child.id, layoutId: id, date: "" }], child.id);
+    actions.logBuild(child.id, code);
+    const after = badgesFor([...builds, { childId: child.id, layoutId: code, date: "" }], child.id);
     setLogged(after.filter((b) => b.earned && !before.has(b.id)).map((b) => b.id));
   };
 
   const steps: Record<string, StepState> = Object.fromEntries(
-    layout.placements.map((p, i) => [p.id, finished || i < step ? "done" : i === step ? "current" : "todo"]),
+    placements.map((p, i) => [p.id, finished || i < step ? "done" : i === step ? "current" : "todo"]),
   );
 
+  if (!circuit || !placement) {
+    return (
+      <div className="space-y-6">
+        <p className="rounded-2xl border border-border p-6 text-lg">{t("circuit.notFound")}</p>
+        <Link href="/circuits" className="font-bold text-accent">
+          {t("common.back")}
+        </Link>
+      </div>
+    );
+  }
+  const name = nameOf(circuit);
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex flex-col bg-background"
-      role="dialog"
-      aria-modal="true"
-      aria-label={t(`layouts.${id}`)}
-    >
+    <div className="fixed inset-0 z-50 flex flex-col bg-background" role="dialog" aria-modal="true" aria-label={name}>
       <div className="flex items-center justify-between gap-3 px-4 py-3">
-        <ExitButton onExit={() => router.push(`/circuits/${id}`)} label={t("build.exit")} hint={t("build.exitHint")} />
+        <ExitButton onExit={() => router.push(circuitHref(code))} label={t("build.exit")} hint={t("build.exitHint")} />
         <p className="text-center font-display text-xl font-bold uppercase sm:text-2xl" aria-live="polite">
           {finished ? t("build.done") : t("build.step", { step: step + 1, total })}
         </p>
@@ -206,9 +234,10 @@ export function BuildView({ id }: { id: string }) {
 
       <div className="wood-floor flex min-h-0 flex-1 items-center justify-center p-4 sm:p-8">
         <TrackPlan
-          placements={layout.placements}
+          placements={placements}
           catalog={catalog}
-          title={t(`layouts.${id}`)}
+          title={name}
+          accessories={finished ? circuit.accessories : []}
           steps={steps}
           train={finished}
           showConnectors={!finished}

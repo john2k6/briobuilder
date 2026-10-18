@@ -16,33 +16,24 @@ node scripts/generate-icons.mjs  # régénère les icônes de l'application
 ```
 
 ## Organisation
-- `src/lib/track-engine/` : moteur géométrique en TypeScript pur — `transform()`, `connect()`,
-  `isClosed()`, `overlaps()`, `billOfMaterials()`, `matchInventory()`, `chain()`.
-- `data/catalog/` : pièces (générées par `scripts/generate-catalog.mjs`) et coffrets, en JSON.
-  `verified: false` = dimensions ou contenu à mesurer sur de vraies pièces.
-- `data/layouts/layouts.json` : circuits modèles, une lettre par pièce (`C` grande courbe, `R` grande courbe
-  retournée, `c`/`r` petite courbe, `L`/`M`/`S` droites longue/moyenne/courte). Chaque circuit est vérifié
-  automatiquement par un test : il doit se refermer sans chevauchement.
-- `src/lib/store.ts` : caisse, profils enfants, favoris et badges, enregistrés dans le navigateur
-  (version sans compte, remplacée par Supabase au lot 1).
+- `src/lib/track-engine/` : moteur géométrique et générateur de circuits, en TypeScript pur.
+- `data/catalog/` : pièces (générées par `scripts/generate-catalog.mjs`) et coffrets réels (contenu indicatif).
+- `src/lib/store.ts` : coffrets, corrections, profils, badges (dans le navigateur, en attendant Supabase).
 - `src/app/[locale]/` : pages Next.js, une URL par langue (`/fr`, `/en`) ; `src/views/` : écrans interactifs.
 - `messages/` : tous les textes, un fichier par langue.
+- Voir `CLAUDE.md` pour les règles et la géométrie.
 
 ## Ajouter une langue
 1. Copier `messages/en.json` en `messages/de.json` (par ex.) et traduire.
 2. Ajouter `"de"` dans `src/i18n/routing.ts`.
 3. `npm test` vérifie que le nouveau fichier a exactement les mêmes clés.
 
-## Avancement — version 0.2 (sans compte)
-- [x] Lot 0 — moteur géométrique + 10 pièces + 3 coffrets (critères validés par les tests)
-- [x] Socle bilingue français / anglais
-- [x] Ma caisse : ajout par coffret, compteurs +/−, recherche, annuler (EF-10 à 13, EF-15)
-- [x] Idées de circuits : Réalisables / Presque, filtres, tri, « Quelle pièce acheter ? » (EF-20 à 23, EF-25)
-- [x] Fiche circuit : plan, nomenclature cochable, favoris, impression (EF-30, 31, 35, 37)
-- [x] Mode enfant pas à pas : boutons géants, lecture audio, sortie protégée, badges (EF-06, 32 à 34)
-- [x] Profils enfants (6 max, surnom seulement), export JSON et suppression des données (EF-03, EF-05)
+## Avancement — version 0.3 (sans compte)
+- [x] Moteur : raccords tenon/trou, niveaux et piliers, jeu des rails, chevauchements
+- [x] 18 coffrets réels (contenu indicatif) et 22 pièces : rails, aiguillages, croisement, rampes, pont, butoir, décors
+- [x] Mes coffrets : catalogue, recherche, quantités, photo de sa boîte, corrections pièce par pièce
+- [x] Générateur : taille, pont, aiguillage, croisement, décors ; 8 familles de circuits vérifiés
+- [x] Fiche, mode enfant pas à pas, profils, badges, export/suppression, PWA hors ligne
+- [ ] Vérifier le contenu des coffrets sur de vraies boîtes
 - [ ] Lot 1 — comptes parents et sauvegarde en ligne (Supabase, région UE)
-- [x] Bibliothèque de 20 circuits, dont un 8 avec croisement (12 réalisables avec un coffret de démarrage + 1 extension)
-- [x] PWA : installable sur tablette, circuits déjà ouverts disponibles hors ligne (ENF-05)
-- [ ] Mesurer les vraies pièces (dimensions marquées « À mesurer »), circuits avec aiguillages et ponts
 - [ ] Back-office (EF-40 à 42), affiliation (EF-50), premium (EF-52 à 55)

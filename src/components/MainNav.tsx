@@ -14,15 +14,18 @@ export function MainNav() {
   const t = useTranslations("nav");
   const pathname = usePathname();
   return (
-    <nav aria-label={t("menu")} className="-mx-1 flex gap-1 overflow-x-auto">
+    <nav aria-label={t("menu")} className="-mx-2 flex gap-1 overflow-x-auto">
       {items.map(({ href, key }) => {
-        const active = pathname === href || pathname.startsWith(`${href}/`);
+        const active =
+          pathname === href ||
+          pathname.startsWith(`${href}/`) ||
+          (href === "/circuits" && pathname.startsWith("/circuit"));
         return (
           <Link
             key={href}
             href={href}
             aria-current={active ? "page" : undefined}
-            className="inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 text-sm font-medium text-header-muted hover:text-header-ink aria-[current=page]:bg-white/10 aria-[current=page]:text-header-ink"
+            className="relative inline-flex min-h-12 shrink-0 items-center px-3 font-bold text-ink after:absolute after:inset-x-3 after:bottom-1 after:h-[3px] after:rounded-full after:bg-accent after:opacity-0 hover:text-accent aria-[current=page]:text-accent aria-[current=page]:after:opacity-100"
           >
             {t(key)}
           </Link>

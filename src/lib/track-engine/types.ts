@@ -9,10 +9,10 @@ export type PieceCategory =
   | "switch"
   | "crossing"
   | "ramp"
+  | "bridge"
   | "adapter"
-  | "tunnel"
-  | "building"
-  | "train";
+  | "buffer"
+  | "accessory";
 
 /** Extrémité d'une pièce, dans le repère de la pièce. */
 export interface Connector {
@@ -49,6 +49,8 @@ export interface Placement {
   rotation: number;
   /** Pièce retournée (miroir sur l'axe x de la pièce, avant rotation). */
   flipped: boolean;
+  /** Hauteur de pose : 0 au sol, 1 sur des piliers… (s'ajoute au niveau des connecteurs). */
+  level?: number;
 }
 
 /** Connecteur placé dans le plan. */
@@ -64,8 +66,17 @@ export interface SetContent {
 
 export interface TrackSet {
   id: string;
+  /** Référence du coffret compatible (ex. « 33512 »), pour la recherche. */
   ref: string | null;
+  /** Coffret complet, coffret d'évolution ou sachet de pièces. */
+  kind: "set" | "expansion" | "pack";
+  /** Univers du coffret, pour la couleur de son illustration. */
+  theme: string;
+  /** Nombre de pièces annoncé sur la boîte (trains et figurines compris). */
+  pieceCount: number;
+  /** Rails et accessoires utiles aux circuits. */
   contents: SetContent[];
+  /** false = contenu indicatif, à vérifier sur une vraie boîte. */
   verified: boolean;
 }
 

@@ -1,11 +1,11 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const shots = process.env.SHOTS_DIR;
-const snap = async (page: import("@playwright/test").Page, name: string) => {
+const snap = async (page: Page, name: string) => {
   if (shots) await page.screenshot({ path: `${shots}/${name}.png`, fullPage: true });
 };
 
-test("parcours principal : profil, caisse, circuit, construction, badge", async ({ page }) => {
+test("parcours principal : profil, coffrets, générateur, construction, badge", async ({ page }) => {
   // 1. Profil enfant
   await page.goto("/fr/kids");
   await page.getByRole("button", { name: "Ajouter un enfant" }).click();
@@ -14,56 +14,56 @@ test("parcours principal : profil, caisse, circuit, construction, badge", async 
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await expect(page.getByRole("heading", { name: "Lou" })).toBeVisible();
 
-  // 2. Caisse : un coffret de démarrage, puis +2 rails droits longs
+  // 2. Coffrets : deux boîtes réelles, mélangées
   await page.goto("/fr/box");
-  await page.getByRole("button", { name: "Ajouter" }).first().click();
-  await expect(page.getByText("14 pièces au total")).toBeVisible();
-  await page.getByRole("button", { name: "Ajouter une pièce : Rail droit long" }).click();
-  await page.getByRole("button", { name: "Ajouter une pièce : Rail droit long" }).click();
-  await expect(page.getByText("16 pièces au total")).toBeVisible();
+  await page.getByPlaceholder("Rechercher un coffret").fill("33512");
+  await page.getByRole("button", { name: "Ajouter", exact: true }).click();
+  await expect(page.getByText("Circuit Plateforme Voyageurs ajouté")).toBeVisible();
+  await page.getByPlaceholder("Rechercher un coffret").fill("pompier");
+  await page.getByRole("button", { name: "Ajouter", exact: true }).click();
+  await expect(page.getByText("2 coffrets · 30 rails")).toBeVisible();
   await page.getByRole("button", { name: "Annuler la dernière action" }).click();
-  await expect(page.getByText("15 pièces au total")).toBeVisible();
+  await expect(page.getByText("1 coffret · 19 rails")).toBeVisible();
+  await page.getByPlaceholder("Rechercher un coffret").fill("pompier");
+  await page.getByRole("button", { name: "Ajouter", exact: true }).click();
   await snap(page, "1-box");
 
-  // 3. Idées de circuits
-  await page.getByRole("link", { name: "Voir mes circuits" }).click();
-  await expect(page.getByRole("tab", { name: /Réalisables/ })).toContainText("5");
-  await snap(page, "2-circuits");
+  // 3. Générateur : un circuit avec un pont
+  await page.getByRole("link", { name: "Créer un circuit" }).last().click();
+  await expect(page.getByText("Chaque circuit a été vérifié par le moteur.")).toBeVisible();
+  await page.getByRole("button", { name: "Un pont" }).click();
+  await expect(page.getByText("Chaque circuit a été vérifié par le moteur.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /La colline/ }).first()).toBeVisible();
+  await snap(page, "2-generator");
   await page.getByRole("tab", { name: /Presque/ }).click();
   await expect(page.getByText("Il manque").first()).toBeVisible();
-  await snap(page, "3-almost");
   await page.getByRole("tab", { name: /Réalisables/ }).click();
 
-  // 4. Fiche circuit
-  await page.getByRole("link", { name: /Le rond/ }).click();
-  await expect(page.getByRole("heading", { name: "Le rond" })).toBeVisible();
+  // 4. Fiche du circuit
+  await page
+    .getByRole("link", { name: /La colline/ })
+    .first()
+    .click();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("La colline");
+  await expect(page.getByText("Pilier")).toBeVisible();
   await page.getByRole("button", { name: "Ajouter aux favoris" }).click();
-  await page.getByRole("checkbox").first().click();
-  await expect(page.getByText("1 sur 1")).toBeVisible();
-  await snap(page, "4-circuit");
+  await snap(page, "3-circuit");
 
   // 5. Construction pas à pas (mode enfant)
   await page.getByRole("link", { name: "On construit !" }).click();
-  await expect(page.getByText("Étape 1 sur 8")).toBeVisible();
+  await expect(page.getByText(/Étape 1 sur \d+/)).toBeVisible();
+  const total = Number((await page.getByText(/Étape 1 sur \d+/).textContent())!.match(/sur (\d+)/)![1]);
+  for (let i = 1; i < total; i++) await page.getByRole("button", { name: "Suivant" }).click();
+  await snap(page, "4-build");
   await page.getByRole("button", { name: "Suivant" }).click();
-  await page.getByRole("button", { name: "Suivant" }).click();
-  await page.getByRole("button", { name: "Suivant" }).click();
-  await expect(page.getByText("Étape 4 sur 8")).toBeVisible();
-  await snap(page, "5-build");
-  for (let i = 0; i < 5; i++) await page.getByRole("button", { name: "Suivant" }).click();
   await expect(page.getByText("Bravo !")).toBeVisible();
   await page.getByRole("button", { name: /Je l'ai construit/ }).click();
   await expect(page.getByText("Nouveau badge !")).toBeVisible();
-  await snap(page, "6-done");
+  await snap(page, "5-done");
 
-  // 6. Badge et compteur sur le profil
-  await page.getByRole("link", { name: "Choisir un autre circuit" }).click();
-  await expect(page.getByText("Construit 1 fois")).toBeVisible();
+  // 6. Badge sur le profil, données gardées après rechargement, puis suppression
   await page.goto("/fr/kids");
   await expect(page.getByText("1 circuit construit")).toBeVisible();
-  await snap(page, "7-kids");
-
-  // 7. Données conservées après rechargement, puis suppression
   await page.reload();
   await expect(page.getByText("1 circuit construit")).toBeVisible();
   await page.goto("/fr/settings");
@@ -76,9 +76,16 @@ test("parcours principal : profil, caisse, circuit, construction, badge", async 
 
 test("la version anglaise affiche les mêmes écrans", async ({ page }) => {
   await page.goto("/en/box");
-  await page.getByRole("button", { name: "Add", exact: true }).first().click();
-  await expect(page.getByText("14 pieces in total")).toBeVisible();
+  await page.getByPlaceholder("Search for a set").fill("33815");
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+  await expect(page.getByText("1 set · 11 tracks")).toBeVisible();
   await page.goto("/en/circuits");
-  await expect(page.getByRole("tab", { name: /Buildable/ })).toContainText("5");
-  await snap(page, "8-en-circuits");
+  await expect(page.getByText("Every layout has been checked by the engine.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /The oval/ }).first()).toBeVisible();
+  await snap(page, "6-en-generator");
+});
+
+test("un code de circuit invalide affiche un message clair", async ({ page }) => {
+  await page.goto("/fr/circuit?c=oval:CCCCL");
+  await expect(page.getByText("Ce circuit est introuvable ou ne se referme pas.")).toBeVisible();
 });

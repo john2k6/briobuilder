@@ -5,6 +5,17 @@ export const POSITION_TOLERANCE = 3;
 /** Écart d'angle toléré (degrés). */
 export const ANGLE_TOLERANCE = 1;
 
+/**
+ * Jeu des rails en bois : chaque raccord peut s'étirer de 2 à 3 mm et plier de quelques degrés.
+ * Une boucle de n pièces absorbe donc un petit écart à la fermeture (plafonné pour rester réaliste).
+ */
+export function flexTolerance(pieces: number): { position: number; angle: number } {
+  return {
+    position: POSITION_TOLERANCE + Math.min(5, 0.25 * pieces),
+    angle: ANGLE_TOLERANCE + Math.min(3, 0.15 * pieces),
+  };
+}
+
 export function normalizeAngle(angle: number): number {
   const a = angle % 360;
   return a < 0 ? a + 360 : a;
@@ -33,11 +44,17 @@ export function transformPoint(
 
 export function transformConnector(
   connector: Connector,
-  placement: Pick<Placement, "x" | "y" | "rotation" | "flipped">,
+  placement: Pick<Placement, "x" | "y" | "rotation" | "flipped" | "level">,
 ): Connector {
   const [x, y] = transformPoint(connector.x, connector.y, placement);
   const local = placement.flipped ? -connector.angle : connector.angle;
-  return { ...connector, x, y, angle: normalizeAngle(local + placement.rotation) };
+  return {
+    ...connector,
+    x,
+    y,
+    angle: normalizeAngle(local + placement.rotation),
+    level: connector.level + (placement.level ?? 0),
+  };
 }
 
 /** Connecteurs d'une pièce placée, dans le plan. */
@@ -51,7 +68,7 @@ export function transform(placement: Placement, piece: PieceType): WorldConnecto
 
 export function transformTracks(placement: Placement, piece: PieceType): TrackPoint[][] {
   return piece.tracks.map((track) =>
-    track.map(([x, y, level]) => [...transformPoint(x, y, placement), level] as TrackPoint),
+    track.map(([x, y, level]) => [...transformPoint(x, y, placement), level + (placement.level ?? 0)] as TrackPoint),
   );
 }
 
@@ -77,6 +94,7 @@ export function attach(
   const localAngle = flipped ? -c.angle : c.angle;
   const rotation = normalizeAngle(target.angle + 180 - localAngle);
   const [ox, oy] = transformPoint(c.x, c.y, { x: 0, y: 0, rotation, flipped });
+  const level = target.level - c.level;
   return {
     id: options.id,
     pieceTypeId: piece.id,
@@ -84,5 +102,6 @@ export function attach(
     y: target.y - oy,
     rotation,
     flipped,
+    ...(level !== 0 ? { level } : {}),
   };
 }

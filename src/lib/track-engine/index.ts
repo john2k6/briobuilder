@@ -5,4 +5,4 @@ export * from "./connect";
 export * from "./overlaps";
 export * from "./inventory";
 export * from "./chain";
-export * from "./ranking";
+export * from "./generator";

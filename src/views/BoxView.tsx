@@ -1,39 +1,138 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
-import { TrackPlan } from "@/components/TrackPlan";
-import { buttonPrimary, buttonSecondary, card, Icon, icons, PageHeader } from "@/components/ui";
+import { useRef, useState } from "react";
+import { PieceThumb } from "@/components/PieceThumb";
+import { SetArt } from "@/components/SetArt";
+import { blob, buttonPrimary, buttonSecondary, card, Icon, icons, PageHeader, SectionTitle } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
-import { catalog, pieceList, setList } from "@/lib/catalog";
-import { layouts } from "@/lib/layouts";
+import { pieceList, setList } from "@/lib/catalog";
 import { actions, useAppState } from "@/lib/store";
-import { addSet, matchInventory, totalPieces, type PieceCategory } from "@/lib/track-engine";
+import { totalPieces, type PieceCategory, type TrackSet } from "@/lib/track-engine";
 
 const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
-export function BoxView() {
-  const t = useTranslations();
-  const { inventory, history, ready } = useAppState();
-  const [query, setQuery] = useState("");
-  const [toast, setToast] = useState<string | null>(null);
+type Kind = "all" | TrackSet["kind"];
 
-  const total = totalPieces(inventory);
-  const buildable = useMemo(() => matchInventory(inventory, layouts).buildable.length, [inventory]);
-  const categories = [...new Set(pieceList.map((p) => p.category))] as PieceCategory[];
-  const q = normalize(query.trim());
-  const visible = pieceList.filter(
-    (p) => !q || normalize(t(`pieceNames.${p.id}`)).includes(q) || (p.ref ?? "").includes(q),
+/** Réduit une photo à 480 px de large (JPEG) pour la garder sur l'appareil sans l'alourdir. */
+async function shrinkPhoto(file: File): Promise<string> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+    const scale = Math.min(1, 480 / img.width);
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 0.75);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function Stepper({
+  value,
+  onChange,
+  label,
+  disabled,
+}: {
+  value: number;
+  onChange: (n: number) => void;
+  label: string;
+  disabled?: boolean;
+}) {
+  const t = useTranslations("box");
+  return (
+    <div className="flex items-center gap-1">
+      <button
+        type="button"
+        aria-label={t("less", { name: label })}
+        onClick={() => onChange(value - 1)}
+        disabled={disabled || value === 0}
+        className="flex size-11 items-center justify-center rounded-full bg-soft text-ink disabled:opacity-30"
+      >
+        <Icon d={icons.minus} className="size-5" />
+      </button>
+      <input
+        type="number"
+        inputMode="numeric"
+        min={0}
+        max={999}
+        aria-label={t("quantity", { name: label })}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        disabled={disabled}
+        className="h-11 w-14 rounded-xl border border-border bg-surface text-center font-mono text-lg font-bold [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+      />
+      <button
+        type="button"
+        aria-label={t("more", { name: label })}
+        onClick={() => onChange(value + 1)}
+        disabled={disabled}
+        className="flex size-11 items-center justify-center rounded-full bg-accent text-accent-ink"
+      >
+        <Icon d={icons.plus} className="size-5" />
+      </button>
+    </div>
   );
+}
 
-  const onAddSet = (id: string) => {
+function SetContents({ set }: { set: TrackSet }) {
+  const t = useTranslations();
+  return (
+    <ul className="space-y-1 text-sm">
+      {set.contents.map((c) => (
+        <li key={c.pieceTypeId} className="flex items-center gap-2">
+          <span className="w-10 shrink-0">
+            <PieceThumb id={c.pieceTypeId} />
+          </span>
+          <span className="flex-1">{t(`pieceNames.${c.pieceTypeId}`)}</span>
+          <span className="font-mono font-bold">× {c.quantity}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export function BoxView({ previews }: { previews: Record<string, string | null> }) {
+  const t = useTranslations();
+  const { inventory, sets, adjustments, photos, history, ready } = useAppState();
+  const [query, setQuery] = useState("");
+  const [kind, setKind] = useState<Kind>("all");
+  const [open, setOpen] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [photoFor, setPhotoFor] = useState<string | null>(null);
+
+  const owned = setList.filter((s) => (sets[s.id] ?? 0) > 0);
+  const q = normalize(query.trim());
+  const catalogue = setList.filter(
+    (s) =>
+      (kind === "all" || s.kind === kind) &&
+      (!q || normalize(t(`setNames.${s.id}`)).includes(q) || (s.ref ?? "").includes(q)),
+  );
+  const tracks = Object.entries(inventory)
+    .filter(([id]) => pieceList.find((p) => p.id === id)?.category !== "accessory")
+    .reduce((s, [, n]) => s + n, 0);
+
+  const onAdd = (id: string) => {
     actions.addSet(id);
     setToast(t("box.added", { name: t(`setNames.${id}`) }));
     window.setTimeout(() => setToast(null), 2500);
   };
 
+  const onPhoto = async (file: File | undefined) => {
+    if (!file || !photoFor) return;
+    actions.setPhoto(photoFor, await shrinkPhoto(file));
+    setPhotoFor(null);
+  };
+
+  const categories = [...new Set(pieceList.map((p) => p.category))] as PieceCategory[];
+
   return (
-    <div className="space-y-10 pb-28">
+    <div className="space-y-14 pb-32">
       <PageHeader title={t("box.title")} intro={t("box.intro")}>
         <div className="flex flex-wrap gap-2">
           <button
@@ -48,7 +147,7 @@ export function BoxView() {
           <button
             type="button"
             className={buttonSecondary}
-            disabled={!ready || total === 0}
+            disabled={!ready || totalPieces(inventory) === 0}
             onClick={() => window.confirm(t("box.clearConfirm")) && actions.clearInventory()}
           >
             <Icon d={icons.trash} className="size-5" />
@@ -57,130 +156,195 @@ export function BoxView() {
         </div>
       </PageHeader>
 
-      {/* Ajout par coffret (EF-12) */}
-      <section className="space-y-4">
-        <h2 className="font-display text-2xl font-bold">{t("box.addSet")}</h2>
-        <ul className="grid gap-4 sm:grid-cols-3">
-          {setList.map((set) => (
-            <li key={set.id} className={`${card} flex flex-col gap-3 p-5`}>
-              <div className="flex items-center gap-3">
-                <span className="flex size-11 items-center justify-center rounded-2xl bg-wood text-header">
-                  <Icon d={icons.box} />
-                </span>
-                <div>
-                  <h3 className="font-semibold">{t(`setNames.${set.id}`)}</h3>
-                  <p className="text-sm text-muted">{t("common.pieces", { count: totalPieces(addSet({}, set)) })}</p>
-                </div>
-              </div>
+      <input
+        ref={fileInput}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          void onPhoto(e.target.files?.[0]);
+          e.target.value = "";
+        }}
+      />
+
+      {/* Mes coffrets */}
+      {ready && owned.length > 0 && (
+        <section className="space-y-5">
+          <SectionTitle>{t("box.mine")}</SectionTitle>
+          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {owned.map((set) => {
+              const name = t(`setNames.${set.id}`);
+              return (
+                <li key={set.id} className={`${blob} flex flex-col border border-border bg-surface`}>
+                  <SetArt set={set} previewCode={previews[set.id]} photo={photos[set.id]} />
+                  <div className="flex flex-1 flex-col gap-3 p-5">
+                    <div>
+                      <h3 className="text-lg font-extrabold leading-tight text-ink">{name}</h3>
+                      <p className="font-mono text-sm text-muted">
+                        {set.ref ? t("box.ref", { ref: set.ref }) : t("box.noRef")}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <Stepper
+                        value={sets[set.id] ?? 0}
+                        onChange={(n) => actions.setSetCount(set.id, n)}
+                        label={name}
+                      />
+                      <button
+                        type="button"
+                        className="inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-bold text-ink hover:bg-soft"
+                        onClick={() => {
+                          if (photos[set.id]) actions.setPhoto(set.id, null);
+                          else {
+                            setPhotoFor(set.id);
+                            fileInput.current?.click();
+                          }
+                        }}
+                      >
+                        <Icon d={icons.camera} className="size-5" />
+                        {photos[set.id] ? t("box.removePhoto") : t("box.addPhoto")}
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      aria-expanded={open === set.id}
+                      onClick={() => setOpen(open === set.id ? null : set.id)}
+                      className="inline-flex min-h-11 items-center gap-1 self-start text-sm font-bold text-accent"
+                    >
+                      {t("box.contents")}
+                      <Icon d={open === set.id ? icons.up : icons.down} className="size-4" />
+                    </button>
+                    {open === set.id && (
+                      <div className="space-y-2">
+                        <SetContents set={set} />
+                        {!set.verified && <p className="text-xs text-muted">{t("box.indicative")}</p>}
+                      </div>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
+      {/* Catalogue des coffrets */}
+      <section className="space-y-6">
+        <div className="space-y-2">
+          <SectionTitle>{t("box.addSet")}</SectionTitle>
+          <p className="max-w-2xl text-muted">{t("box.addSetIntro")}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="relative block min-w-0 flex-1 basis-72">
+            <span className="sr-only">{t("box.search")}</span>
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted">
+              <Icon d={icons.search} className="size-5" />
+            </span>
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t("box.search")}
+              className="min-h-12 w-full rounded-full border-2 border-accent bg-surface pl-12 pr-4 outline-none"
+            />
+          </label>
+          <div role="group" aria-label={t("box.kind")} className="flex flex-wrap gap-1">
+            {(["all", "set", "expansion", "pack"] as const).map((k) => (
               <button
+                key={k}
                 type="button"
-                className={`${buttonPrimary} mt-auto`}
-                onClick={() => onAddSet(set.id)}
-                disabled={!ready}
+                aria-pressed={kind === k}
+                onClick={() => setKind(k)}
+                className="min-h-11 rounded-full border border-border px-4 text-sm font-bold text-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-background"
               >
-                <Icon d={icons.plus} className="size-5" />
-                {t("box.addSetButton")}
+                {t(`box.kinds.${k}`)}
               </button>
-            </li>
-          ))}
+            ))}
+          </div>
+        </div>
+        {catalogue.length === 0 && <p className="text-muted">{t("box.noResult")}</p>}
+        <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+          {catalogue.map((set) => {
+            const name = t(`setNames.${set.id}`);
+            const count = sets[set.id] ?? 0;
+            return (
+              <li key={set.id} className={`${blob} flex flex-col border border-border bg-surface`}>
+                <SetArt set={set} previewCode={previews[set.id]} />
+                <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
+                  <h3 className="font-extrabold leading-tight text-ink">{name}</h3>
+                  <p className="text-sm text-muted">
+                    {set.ref ? `${t("box.ref", { ref: set.ref })} · ` : ""}
+                    {t("common.pieces", { count: set.pieceCount })}
+                  </p>
+                  <button
+                    type="button"
+                    className={`${buttonPrimary} mt-auto w-full px-3 text-sm sm:text-base`}
+                    onClick={() => onAdd(set.id)}
+                    disabled={!ready}
+                  >
+                    <Icon d={icons.plus} className="size-5" />
+                    {ready && count > 0 ? t("box.addAnother", { count }) : t("box.addSetButton")}
+                  </button>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </section>
 
-      {/* Inventaire pièce par pièce (EF-10, EF-11, EF-13) */}
-      <section className="space-y-6">
-        <label className="relative block max-w-xl">
-          <span className="sr-only">{t("box.search")}</span>
-          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted">
-            <Icon d={icons.search} className="size-5" />
+      {/* Détail et corrections pièce par pièce */}
+      <details className={`${card} group p-5`}>
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3">
+          <span>
+            <span className="block text-xl font-extrabold text-ink">{t("box.detail")}</span>
+            <span className="text-sm text-muted">{t("box.detailIntro")}</span>
           </span>
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t("box.search")}
-            className="min-h-12 w-full rounded-full border-2 border-border bg-surface pl-12 pr-4 outline-none focus:border-header"
-          />
-        </label>
-
-        {visible.length === 0 && <p className="text-muted">{t("box.noResult")}</p>}
-
-        {categories.map((category) => {
-          const pieces = visible.filter((p) => p.category === category);
-          if (pieces.length === 0) return null;
-          return (
+          <Icon d={icons.down} className="size-6 transition group-open:rotate-180" />
+        </summary>
+        <div className="mt-6 space-y-6">
+          {categories.map((category) => (
             <div key={category} className="space-y-3">
-              <h2 className="font-display text-xl font-bold">{t(`categories.${category}`)}</h2>
+              <h3 className="font-extrabold text-ink">{t(`categories.${category}`)}</h3>
               <ul className="grid gap-3 md:grid-cols-2">
-                {pieces.map((piece) => {
-                  const name = t(`pieceNames.${piece.id}`);
-                  const qty = inventory[piece.id] ?? 0;
-                  return (
-                    <li
-                      key={piece.id}
-                      className={`${card} flex items-center gap-3 p-3 ${qty > 0 ? "border-wood-dark" : ""}`}
-                    >
-                      <div className="wood-floor w-20 shrink-0 rounded-2xl p-1.5">
-                        <TrackPlan
-                          placements={[
-                            { id: piece.id, pieceTypeId: piece.id, x: 0, y: 0, rotation: 0, flipped: false },
-                          ]}
-                          catalog={catalog}
-                          title=""
-                          frame={{ width: 280, height: 200 }}
-                          showConnectors={false}
-                          className="w-full"
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-semibold leading-tight">{name}</p>
-                        {piece.ref && <p className="font-mono text-xs text-muted">{piece.ref}</p>}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          aria-label={t("box.less", { name })}
-                          onClick={() => actions.setQuantity(piece.id, qty - 1)}
-                          disabled={!ready || qty === 0}
-                          className="flex size-11 items-center justify-center rounded-full bg-background text-foreground disabled:opacity-30"
-                        >
-                          <Icon d={icons.minus} className="size-5" />
-                        </button>
-                        <input
-                          type="number"
-                          inputMode="numeric"
-                          min={0}
-                          max={999}
-                          aria-label={t("box.quantity", { name })}
-                          value={ready ? qty : 0}
-                          onChange={(e) => actions.setQuantity(piece.id, Number(e.target.value))}
-                          className="h-11 w-14 rounded-xl border-2 border-border bg-surface text-center font-mono text-lg font-semibold [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
-                        />
-                        <button
-                          type="button"
-                          aria-label={t("box.more", { name })}
-                          onClick={() => actions.setQuantity(piece.id, qty + 1)}
+                {pieceList
+                  .filter((p) => p.category === category)
+                  .map((piece) => {
+                    const name = t(`pieceNames.${piece.id}`);
+                    const qty = ready ? (inventory[piece.id] ?? 0) : 0;
+                    const corrected = (adjustments[piece.id] ?? 0) !== 0;
+                    return (
+                      <li key={piece.id} className="flex items-center gap-3 rounded-xl border border-border p-2">
+                        <span className="wood-floor w-16 shrink-0 rounded-lg p-1">
+                          <PieceThumb id={piece.id} />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block font-bold leading-tight">{name}</span>
+                          {corrected && <span className="text-xs text-warn">{t("box.corrected")}</span>}
+                        </span>
+                        <Stepper
+                          value={qty}
+                          onChange={(n) => actions.setQuantity(piece.id, n)}
+                          label={name}
                           disabled={!ready}
-                          className="flex size-11 items-center justify-center rounded-full bg-header text-header-ink"
-                        >
-                          <Icon d={icons.plus} className="size-5" />
-                        </button>
-                      </div>
-                    </li>
-                  );
-                })}
+                        />
+                      </li>
+                    );
+                  })}
               </ul>
             </div>
-          );
-        })}
-      </section>
+          ))}
+        </div>
+      </details>
 
       {/* Barre récapitulative */}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t-2 border-border bg-surface/95 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur print:hidden">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-          <div aria-live="polite">
-            <p className="font-display text-lg font-bold">{t("box.total", { count: ready ? total : 0 })}</p>
-            <p className="text-sm text-muted">{t("box.buildableCount", { count: ready ? buildable : 0 })}</p>
-          </div>
+          <p aria-live="polite" className="font-extrabold text-ink">
+            {t("box.summary", {
+              sets: ready ? owned.reduce((s, x) => s + (sets[x.id] ?? 0), 0) : 0,
+              tracks: ready ? tracks : 0,
+            })}
+          </p>
           <Link href="/circuits" className={buttonPrimary}>
             {t("box.seeCircuits")}
             <Icon d={icons.right} className="size-5" />
@@ -191,7 +355,7 @@ export function BoxView() {
       {toast && (
         <p
           role="status"
-          className="fixed left-1/2 top-24 z-30 -translate-x-1/2 rounded-full bg-green px-5 py-3 font-semibold text-green-ink shadow-lg"
+          className="fixed left-1/2 top-24 z-40 -translate-x-1/2 rounded-full bg-green px-5 py-3 font-bold text-green-ink shadow-lg"
         >
           {toast}
         </p>
