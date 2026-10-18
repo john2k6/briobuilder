@@ -1,7 +1,9 @@
 {
   "app": {
     "name": "Rail Builder",
-    "description": "Ajoutez vos coffrets de rails en bois : l'app invente les circuits que vous pouvez construire, ponts et aiguillages compris, et guide votre enfant pas à pas."
+    "description": "Ajoutez vos coffrets de rails en bois : l'app invente les circuits que vous pouvez construire, ponts et aiguillages compris, et guide votre enfant pas à pas.",
+    "beta": "bêta",
+    "ages": "Pour les 3 à 99 ans"
   },
   "nav": {
     "home": "Accueil",
@@ -21,7 +23,7 @@
     "start": "Ajouter mes coffrets",
     "tryGenerator": "Créer un circuit",
     "trustAds": "Sans publicité",
-    "trustAge": "Pour les 3–8 ans",
+    "trustAge": "Pour les 3 à 99 ans",
     "trustEu": "Sans inscription pour commencer",
     "checked": "Vérifié par le moteur",
     "tileBoxes": "Mes coffrets",

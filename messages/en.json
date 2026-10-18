@@ -1,7 +1,9 @@
 {
   "app": {
     "name": "Rail Builder",
-    "description": "Add your wooden railway sets: the app invents the layouts you can build, bridges and switches included, and guides your child step by step."
+    "description": "Add your wooden railway sets: the app invents the layouts you can build, bridges and switches included, and guides your child step by step.",
+    "beta": "beta",
+    "ages": "For ages 3 to 99"
   },
   "nav": {
     "home": "Home",
@@ -21,7 +23,7 @@
     "start": "Add my sets",
     "tryGenerator": "Create a layout",
     "trustAds": "No ads",
-    "trustAge": "For ages 3–8",
+    "trustAge": "For ages 3 to 99",
     "trustEu": "No sign-up to get started",
     "checked": "Checked by the engine",
     "tileBoxes": "My sets",

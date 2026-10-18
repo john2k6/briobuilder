@@ -50,7 +50,15 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
                 className="flex min-h-12 items-center gap-2 text-xl font-extrabold tracking-tight text-ink"
               >
                 <Logo className="size-9" />
-                {t("app.name")}
+                <span className="flex flex-col leading-none">
+                  <span className="flex items-center gap-1.5">
+                    {t("app.name")}
+                    <span className="rounded-full bg-green px-2 py-0.5 text-[0.65rem] font-extrabold uppercase tracking-wider text-green-ink">
+                      {t("app.beta")}
+                    </span>
+                  </span>
+                  <span className="text-xs font-bold text-muted">{t("app.ages")}</span>
+                </span>
               </Link>
               <div className="order-3 w-full md:order-2 md:w-auto md:flex-1">
                 <MainNav />
