@@ -370,8 +370,8 @@
   "circuits": {
     "title": "Idées de circuits",
     "intro": "Calculées à partir de votre caisse. Chaque circuit a été vérifié : il se referme.",
-    "tabBuildable": "Réalisables",
-    "tabAlmost": "Presque",
+    "tabBuildable": "Je peux le construire",
+    "tabAlmost": "Avec 1 à 3 pièces en plus",
     "emptyBox": "Votre caisse est vide. Ajoutez vos coffrets pour voir ce que vous pouvez construire.",
     "fillBox": "Ajouter mes coffrets",
     "noneBuildable": "Aucun circuit réalisable avec ces réglages. Essayez une autre taille ou retirez une option.",
@@ -390,7 +390,9 @@
     "buyIntro": "Les pièces qui débloqueraient le plus de nouveaux circuits : une idée de cadeau.",
     "buyUnlocks": "{count, plural, one {débloque # circuit} other {débloque # circuits}}",
     "favorite": "Favori",
-    "buildableBadge": "Réalisable"
+    "buildableBadge": "Réalisable",
+    "hintBuildable": "Tu as toutes les pièces : tu peux construire ces circuits tout de suite.",
+    "hintAlmost": "Il te manque seulement 1 à 3 pièces : la liste dit lesquelles. Bonne idée de cadeau !"
   },
   "circuit": {
     "plan": "Plan du circuit",

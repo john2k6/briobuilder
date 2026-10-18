@@ -35,9 +35,9 @@ test("parcours principal : profil, coffrets, générateur, construction, badge",
   await expect(page.getByText("Chaque circuit a été vérifié par le moteur.")).toBeVisible();
   await expect(page.getByRole("heading", { name: /La colline/ }).first()).toBeVisible();
   await snap(page, "2-generator");
-  await page.getByRole("tab", { name: /Presque/ }).click();
+  await page.getByRole("tab", { name: /pièces en plus/ }).click();
   await expect(page.getByText("Il manque").first()).toBeVisible();
-  await page.getByRole("tab", { name: /Réalisables/ }).click();
+  await page.getByRole("tab", { name: /Je peux le construire/ }).click();
 
   // 4. Fiche du circuit
   await page

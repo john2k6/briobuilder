@@ -370,8 +370,8 @@
   "circuits": {
     "title": "Layout ideas",
     "intro": "Worked out from your box. Every layout has been checked: it closes.",
-    "tabBuildable": "Buildable",
-    "tabAlmost": "Almost",
+    "tabBuildable": "I can build it",
+    "tabAlmost": "With 1 to 3 more pieces",
     "emptyBox": "Your box is empty. Add your sets to see what you can build.",
     "fillBox": "Add my sets",
     "noneBuildable": "No buildable layout with these settings. Try another size or remove an option.",
@@ -390,7 +390,9 @@
     "buyIntro": "The pieces that would unlock the most new layouts: a gift idea.",
     "buyUnlocks": "{count, plural, one {unlocks # layout} other {unlocks # layouts}}",
     "favorite": "Favourite",
-    "buildableBadge": "Buildable"
+    "buildableBadge": "Buildable",
+    "hintBuildable": "You have every piece: you can build these layouts right now.",
+    "hintAlmost": "You only need 1 to 3 more pieces: the list says which ones. A good gift idea!"
   },
   "circuit": {
     "plan": "Layout plan",

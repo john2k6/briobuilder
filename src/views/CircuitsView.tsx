@@ -230,6 +230,8 @@ export function CircuitsView() {
         </p>
       </div>
 
+      <p className="-mt-6 text-muted">{t(tab === "buildable" ? "circuits.hintBuildable" : "circuits.hintAlmost")}</p>
+
       {!ready || loading ? (
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
           {[0, 1, 2].map((i) => (
