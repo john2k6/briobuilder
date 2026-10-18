@@ -72,8 +72,8 @@ export interface TrackSet {
   id: string;
   /** Référence du coffret compatible (ex. « 33512 »), pour la recherche. */
   ref: string | null;
-  /** Coffret complet, coffret d'évolution ou sachet de pièces. */
-  kind: "set" | "expansion" | "pack";
+  /** Coffret complet, coffret d'évolution, sachet de pièces, bâtiment ou décor, train. */
+  kind: "set" | "expansion" | "pack" | "building" | "vehicle";
   /** Univers du coffret, pour la couleur de son illustration. */
   theme: string;
   /** Nombre de pièces annoncé sur la boîte (trains et figurines compris). */

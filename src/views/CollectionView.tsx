@@ -30,14 +30,15 @@ export function CollectionView() {
   const { inventory, sets, ready } = useAppState();
 
   const owned = pieceList.filter((p) => (inventory[p.id] ?? 0) > 0);
-  const ownedSets = setList.filter((s) => (sets[s.id] ?? 0) > 0);
+  const ownedSets = setList.filter((s) => (sets[s.id] ?? 0) > 0 && s.kind !== "vehicle");
+  const trains = setList.filter((s) => (sets[s.id] ?? 0) > 0 && s.kind === "vehicle");
   const qty = (ids: string[]) => ids.reduce((sum, id) => sum + (inventory[id] ?? 0), 0);
   const ofCategory = (...categories: PieceCategory[]) =>
     owned.filter((p) => categories.includes(p.category)).map((p) => p.id);
   const tracks = owned.filter((p) => p.lengthMm > 0 && !["building", "accessory", "vehicle"].includes(p.category));
   const meters = tracks.reduce((sum, p) => sum + p.lengthMm * (inventory[p.id] ?? 0), 0) / 1000;
 
-  if (ready && owned.length === 0) {
+  if (ready && owned.length === 0 && trains.length === 0) {
     return (
       <div className="space-y-8">
         <PageHeader title={t("collection.title")} intro={t("collection.intro")} />
@@ -58,7 +59,7 @@ export function CollectionView() {
     { label: t("collection.switches"), value: qty(ofCategory("switch")) },
     { label: t("collection.bridges"), value: qty(ofCategory("bridge", "ramp")) },
     { label: t("collection.buildings"), value: qty(ofCategory("building")) },
-    { label: t("collection.vehicles"), value: qty(ofCategory("vehicle")) },
+    { label: t("collection.vehicles"), value: trains.reduce((s, set) => s + (sets[set.id] ?? 0), 0) },
   ];
 
   return (
@@ -127,6 +128,26 @@ export function CollectionView() {
           </section>
         );
       })}
+
+      {trains.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="flex items-baseline gap-3 text-2xl font-extrabold text-ink">
+            {t("categories.vehicle")}
+            <span className="font-mono text-lg text-muted">{trains.length}</span>
+          </h2>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {trains.map((set) => (
+              <li key={set.id} className={`${card} flex flex-col overflow-hidden`}>
+                <SetArt set={set} />
+                <span className="flex items-start justify-between gap-2 p-3">
+                  <span className="text-sm font-bold leading-tight">{t(`setNames.${set.id}`)}</span>
+                  {(sets[set.id] ?? 0) > 1 && <span className="font-mono font-extrabold">×{sets[set.id]}</span>}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <Link href="/circuits" className={`${buttonPrimary} text-lg`}>
         {t("collection.create")}

@@ -252,7 +252,7 @@ export function BoxView({ previews }: { previews: Record<string, string | null> 
             />
           </label>
           <div role="group" aria-label={t("box.kind")} className="flex flex-wrap gap-1">
-            {(["all", "set", "expansion", "pack"] as const).map((k) => (
+            {(["all", "set", "expansion", "pack", "building", "vehicle"] as const).map((k) => (
               <button
                 key={k}
                 type="button"

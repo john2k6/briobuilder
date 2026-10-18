@@ -8,7 +8,7 @@ import { BoxView } from "@/views/BoxView";
 const previews: Record<string, string | null> = Object.fromEntries(
   setList.map((set) => [
     set.id,
-    set.kind === "pack"
+    set.kind !== "set" && set.kind !== "expansion"
       ? null
       : (generateLayouts(addSet({}, set), catalog, { decorate: true, limit: 1 }).buildable[0]?.code ?? null),
   ]),

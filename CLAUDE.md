@@ -29,7 +29,7 @@ Le **générateur** invente les circuits selon la configuration (taille, pont, a
   - `analyzeJoints` : passage strict ±3 mm puis jeu des rails (`flexTolerance`) ; `maxGap` est affiché à l'utilisateur.
   - `generator.ts` : 18 familles. Boucles (rond, ovale, rectangle, colline, huit à croisement, huit à pont), formes libres refermées par calcul (`shape` : L, U, haricot, triangle, maison, octogone), embranchements (voie de garage, voie d'évitement, terminus, fourche avec aiguillage en Y, gare de triage) et ligne d'une gare à l'autre. Codes `famille:jetons~accessoires` (ex. `oval:CCCCLSCCCCMM~T5`) ; `|` = voie sans issue laissée ouverte (pas de butoir), `isComplete` l'accepte. Gares et plaque tournante placées au bout des voies sans issue. Au plus 40 circuits par famille (rapidité).
 - Géométrie compatible : droites 54/108/144/216 mm, courbes E (r 202) et E1 (r 110) de 45° (certaines sources donnent r 182 / 90 : à mesurer), aiguillages longueur A (144), croisement sur D (216), rampes de 216 mm.
-- `data/catalog/pieces.json` : généré par `npm run catalog`. `data/catalog/sets.json` : 55 coffrets, extensions, sachets et ponts réels, **contenu indicatif** (`verified: false`) à confirmer sur de vraies boîtes.
+- `data/catalog/pieces.json` : généré par `npm run catalog`. `data/catalog/sets.json` : 202 produits officiels (coffrets, extensions, sachets, ponts, bâtiments et décors, trains ; liste tirée des sitemaps brio.fr et brio.co.uk), **contenu indicatif** (`verified: false`) à confirmer sur de vraies boîtes.
 - `src/lib/store.ts` : coffrets, corrections, photos, profils, badges, réglages du générateur (localStorage, clé v2, reprise de la v1).
 - `src/lib/circuits.ts` : décodage d'un code de circuit (adresse `/circuit?c=…`, favoris, historique).
 - `src/views/` : écrans interactifs ; `src/app/[locale]/` : routes.
@@ -41,6 +41,6 @@ Le **générateur** invente les circuits selon la configuration (taille, pont, a
 (en environnement cloud : `CHROMIUM_PATH=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome | head -1) npm run e2e`).
 
 ## Avancement (18 octobre 2026)
-- Fait : moteur (niveaux, piliers, jeu des rails), 29 pièces, 55 coffrets/extensions/sachets réels, liens et crédits des images officielles, générateur configurable (18 familles, voies sans issue, gares au terminus), caisse par coffrets + photos, fiche, mode enfant pas à pas, profils, badges, export/suppression, PWA hors ligne, design rouge/vert/blanc.
+- Fait : moteur (niveaux, piliers, jeu des rails), 37 pièces (dont 8 gares et bâtiments différenciés), 202 produits officiels, page Ma collection, liens et crédits des images officielles, générateur configurable (18 familles, voies sans issue, gares au terminus), caisse par coffrets + photos, fiche, mode enfant pas à pas, profils, badges, export/suppression, PWA hors ligne, design rouge/vert/blanc.
 - À faire : renseigner les adresses des images officielles (réseau de l'environnement à ouvrir vers brio.fr / brio.co.uk / ravensburger.fr), vérifier le contenu des coffrets sur de vraies boîtes (notices `<EAN>_PINFO_<ref>_layout.pdf` sur brio.co.nl), lot 1 (comptes Supabase), back-office (EF-40 à 42), affiliation (EF-50, images officielles via un programme d'affiliation), premium (EF-52 à 55).
 - Questions ouvertes : nom du site et domaine, qui mesure les pièces, programmes d'affiliation, prix du premium.

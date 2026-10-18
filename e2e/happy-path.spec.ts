@@ -19,12 +19,12 @@ test("parcours principal : profil, coffrets, générateur, construction, badge",
   await page.getByPlaceholder("Rechercher un coffret").fill("33512");
   await page.getByRole("button", { name: "Ajouter", exact: true }).click();
   await expect(page.getByText("Circuit Plateforme Voyageurs ajouté")).toBeVisible();
-  await page.getByPlaceholder("Rechercher un coffret").fill("pompier");
+  await page.getByPlaceholder("Rechercher un coffret").fill("33815");
   await page.getByRole("button", { name: "Ajouter", exact: true }).click();
   await expect(page.getByText("2 coffrets · 30 rails")).toBeVisible();
   await page.getByRole("button", { name: "Annuler la dernière action" }).click();
   await expect(page.getByText("1 coffret · 19 rails")).toBeVisible();
-  await page.getByPlaceholder("Rechercher un coffret").fill("pompier");
+  await page.getByPlaceholder("Rechercher un coffret").fill("33815");
   await page.getByRole("button", { name: "Ajouter", exact: true }).click();
   await snap(page, "1-box");
 

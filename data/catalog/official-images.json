@@ -268,5 +268,755 @@
     "image": "https://ravensburger.cloud/images/produktseiten/520x445/63611400.webp",
     "fr": false,
     "en": true
+  },
+  "33042": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63304200.webp",
+    "fr": true,
+    "en": true
+  },
+  "33130": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63313000.webp",
+    "fr": true,
+    "en": true
+  },
+  "33204": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63320400.webp",
+    "fr": true,
+    "en": true
+  },
+  "33213": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63321300.webp",
+    "fr": true,
+    "en": true
+  },
+  "33214": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63321400.webp",
+    "fr": true,
+    "en": true
+  },
+  "33253": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63325300.webp",
+    "fr": true,
+    "en": true
+  },
+  "33254": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63325400.webp",
+    "fr": true,
+    "en": false
+  },
+  "33280": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63328000.webp",
+    "fr": true,
+    "en": true
+  },
+  "33306": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63330600.webp",
+    "fr": false,
+    "en": true
+  },
+  "33319": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63331900.webp",
+    "fr": true,
+    "en": true
+  },
+  "33322": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63332200.webp",
+    "fr": false,
+    "en": true
+  },
+  "33351": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63335100.webp",
+    "fr": true,
+    "en": true
+  },
+  "33356": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63335600.webp",
+    "fr": false,
+    "en": true
+  },
+  "33359": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63335900.webp",
+    "fr": false,
+    "en": true
+  },
+  "33385": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63338500.webp",
+    "fr": true,
+    "en": false
+  },
+  "33391": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63339100.webp",
+    "fr": true,
+    "en": true
+  },
+  "33404": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63340400.webp",
+    "fr": true,
+    "en": true
+  },
+  "33406": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63340600.webp",
+    "fr": true,
+    "en": false
+  },
+  "33436": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63343600.webp",
+    "fr": false,
+    "en": true
+  },
+  "33476": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63347600.webp",
+    "fr": true,
+    "en": true
+  },
+  "33481": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63348100.webp",
+    "fr": true,
+    "en": true
+  },
+  "33505": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63350500.webp",
+    "fr": true,
+    "en": true
+  },
+  "33506": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63350600.webp",
+    "fr": true,
+    "en": true
+  },
+  "33510": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63351000.webp",
+    "fr": true,
+    "en": true
+  },
+  "33528": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63352800.webp",
+    "fr": false,
+    "en": true
+  },
+  "33534": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63353400.webp",
+    "fr": false,
+    "en": true
+  },
+  "33557": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63355700.webp",
+    "fr": false,
+    "en": true
+  },
+  "33569": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63356900.webp",
+    "fr": true,
+    "en": true
+  },
+  "33573": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63357300.webp",
+    "fr": false,
+    "en": true
+  },
+  "33574": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63357400.webp",
+    "fr": true,
+    "en": true
+  },
+  "33577": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63357700.webp",
+    "fr": true,
+    "en": true
+  },
+  "33578": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63357800.webp",
+    "fr": true,
+    "en": true
+  },
+  "33592": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63359200.webp",
+    "fr": true,
+    "en": true
+  },
+  "33593": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63359300.webp",
+    "fr": true,
+    "en": true
+  },
+  "33594": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63359400.webp",
+    "fr": true,
+    "en": true
+  },
+  "33595": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63359500.webp",
+    "fr": true,
+    "en": true
+  },
+  "33599": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63359900.webp",
+    "fr": true,
+    "en": true
+  },
+  "33617": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63361700.webp",
+    "fr": true,
+    "en": true
+  },
+  "33630": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63363000.webp",
+    "fr": true,
+    "en": true
+  },
+  "33649": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63364900.webp",
+    "fr": true,
+    "en": true
+  },
+  "33657": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63365700.webp",
+    "fr": true,
+    "en": true
+  },
+  "33658": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63365800.webp",
+    "fr": true,
+    "en": true
+  },
+  "33674": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63367400.webp",
+    "fr": true,
+    "en": true
+  },
+  "33696": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63369600.webp",
+    "fr": true,
+    "en": true
+  },
+  "33697": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63369700.webp",
+    "fr": true,
+    "en": true
+  },
+  "33698": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63369800.webp",
+    "fr": true,
+    "en": true
+  },
+  "33709": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63370900.webp",
+    "fr": true,
+    "en": true
+  },
+  "33710": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63371000.webp",
+    "fr": true,
+    "en": true
+  },
+  "33722": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63372200.webp",
+    "fr": true,
+    "en": true
+  },
+  "33724": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63372400.webp",
+    "fr": true,
+    "en": true
+  },
+  "33727": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63372700.webp",
+    "fr": true,
+    "en": true
+  },
+  "33735": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63373500.webp",
+    "fr": false,
+    "en": true
+  },
+  "33736": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63373600.webp",
+    "fr": true,
+    "en": true
+  },
+  "33743": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63374300.webp",
+    "fr": true,
+    "en": true
+  },
+  "33746": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63374600.webp",
+    "fr": true,
+    "en": true
+  },
+  "33748": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63374800.webp",
+    "fr": false,
+    "en": true
+  },
+  "33750": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63375000.webp",
+    "fr": true,
+    "en": true
+  },
+  "33754": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63375400.webp",
+    "fr": true,
+    "en": true
+  },
+  "33797": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63379700.webp",
+    "fr": false,
+    "en": true
+  },
+  "33799": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63379900.webp",
+    "fr": true,
+    "en": true
+  },
+  "33811": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63381100.webp",
+    "fr": true,
+    "en": true
+  },
+  "33813": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63381300.webp",
+    "fr": false,
+    "en": true
+  },
+  "33825": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63382500.webp",
+    "fr": true,
+    "en": true
+  },
+  "33833": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63383300.webp",
+    "fr": true,
+    "en": true
+  },
+  "33835": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63383500.webp",
+    "fr": true,
+    "en": true
+  },
+  "33836": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63383600.webp",
+    "fr": true,
+    "en": false
+  },
+  "33844": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63384400.webp",
+    "fr": true,
+    "en": true
+  },
+  "33845": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63384500.webp",
+    "fr": false,
+    "en": true
+  },
+  "33862": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63386200.webp",
+    "fr": true,
+    "en": false
+  },
+  "33884": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63388400.webp",
+    "fr": true,
+    "en": true
+  },
+  "33886": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63388600.webp",
+    "fr": false,
+    "en": true
+  },
+  "33889": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63388900.webp",
+    "fr": false,
+    "en": true
+  },
+  "33892": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63389200.webp",
+    "fr": true,
+    "en": false
+  },
+  "33896": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63389600.webp",
+    "fr": true,
+    "en": false
+  },
+  "33934": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63393400.webp",
+    "fr": false,
+    "en": true
+  },
+  "33965": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63396500.webp",
+    "fr": false,
+    "en": true
+  },
+  "33969": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63396900.webp",
+    "fr": false,
+    "en": true
+  },
+  "33970": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63397000.webp",
+    "fr": true,
+    "en": true
+  },
+  "33971": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63397100.webp",
+    "fr": true,
+    "en": true
+  },
+  "33973": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63397300.webp",
+    "fr": false,
+    "en": true
+  },
+  "33982": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63398200.webp",
+    "fr": false,
+    "en": true
+  },
+  "33984": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63398400.webp",
+    "fr": true,
+    "en": true
+  },
+  "33996": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63399600.webp",
+    "fr": true,
+    "en": true
+  },
+  "36003": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63600300.webp",
+    "fr": true,
+    "en": true
+  },
+  "36011": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63601100.webp",
+    "fr": false,
+    "en": true
+  },
+  "36012": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63601200.webp",
+    "fr": false,
+    "en": true
+  },
+  "36018": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63601800.webp",
+    "fr": true,
+    "en": true
+  },
+  "36019": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63601900.webp",
+    "fr": true,
+    "en": true
+  },
+  "36020": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63602000.webp",
+    "fr": false,
+    "en": true
+  },
+  "36022": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63602200.webp",
+    "fr": false,
+    "en": true
+  },
+  "36028": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63602800.webp",
+    "fr": true,
+    "en": true
+  },
+  "36029": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63602900.webp",
+    "fr": true,
+    "en": false
+  },
+  "36035": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63603500.webp",
+    "fr": true,
+    "en": true
+  },
+  "36044": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63604400.webp",
+    "fr": false,
+    "en": true
+  },
+  "36049": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63604900.webp",
+    "fr": false,
+    "en": true
+  },
+  "36050": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63605000.webp",
+    "fr": false,
+    "en": true
+  },
+  "36051": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63605100.webp",
+    "fr": false,
+    "en": true
+  },
+  "36052": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63605200.webp",
+    "fr": false,
+    "en": true
+  },
+  "36053": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63605300.webp",
+    "fr": false,
+    "en": true
+  },
+  "36054": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63605400.webp",
+    "fr": false,
+    "en": true
+  },
+  "36055": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63605500.webp",
+    "fr": false,
+    "en": true
+  },
+  "36056": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63605600.webp",
+    "fr": false,
+    "en": true
+  },
+  "36057": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63605700.webp",
+    "fr": false,
+    "en": true
+  },
+  "36058": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63605800.webp",
+    "fr": false,
+    "en": true
+  },
+  "36059": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63605900.webp",
+    "fr": false,
+    "en": true
+  },
+  "36060": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63606000.webp",
+    "fr": false,
+    "en": true
+  },
+  "36061": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63606100.webp",
+    "fr": false,
+    "en": true
+  },
+  "36062": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63606200.webp",
+    "fr": false,
+    "en": true
+  },
+  "36063": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63606300.webp",
+    "fr": false,
+    "en": true
+  },
+  "36064": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63606400.webp",
+    "fr": false,
+    "en": true
+  },
+  "36065": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63606500.webp",
+    "fr": false,
+    "en": true
+  },
+  "36066": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63606600.webp",
+    "fr": false,
+    "en": true
+  },
+  "36067": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63606700.webp",
+    "fr": false,
+    "en": true
+  },
+  "36068": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63606800.webp",
+    "fr": false,
+    "en": true
+  },
+  "36069": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63606900.webp",
+    "fr": false,
+    "en": true
+  },
+  "36070": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63607000.webp",
+    "fr": false,
+    "en": true
+  },
+  "36071": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63607100.webp",
+    "fr": false,
+    "en": true
+  },
+  "36072": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63607200.webp",
+    "fr": false,
+    "en": true
+  },
+  "36073": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63607300.webp",
+    "fr": false,
+    "en": true
+  },
+  "36074": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63607400.webp",
+    "fr": false,
+    "en": true
+  },
+  "36075": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63607500.webp",
+    "fr": false,
+    "en": true
+  },
+  "36076": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63607600.webp",
+    "fr": false,
+    "en": true
+  },
+  "36077": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63607700.webp",
+    "fr": false,
+    "en": true
+  },
+  "36082": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63608200.webp",
+    "fr": true,
+    "en": true
+  },
+  "36085": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63608500.webp",
+    "fr": false,
+    "en": true
+  },
+  "36086": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63608600.webp",
+    "fr": true,
+    "en": true
+  },
+  "36087": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63608700.webp",
+    "fr": true,
+    "en": true
+  },
+  "36088": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63608800.webp",
+    "fr": true,
+    "en": true
+  },
+  "36089": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63608900.webp",
+    "fr": false,
+    "en": true
+  },
+  "36092": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63609200.webp",
+    "fr": true,
+    "en": true
+  },
+  "36094": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63609400.webp",
+    "fr": true,
+    "en": true
+  },
+  "36096": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63609600.webp",
+    "fr": true,
+    "en": true
+  },
+  "36098": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63609800.webp",
+    "fr": true,
+    "en": true
+  },
+  "36104": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63610400.webp",
+    "fr": false,
+    "en": true
+  },
+  "36107": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63610700.webp",
+    "fr": true,
+    "en": true
+  },
+  "36111": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63611100.webp",
+    "fr": false,
+    "en": true
+  },
+  "36120": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63612000.webp",
+    "fr": false,
+    "en": true
+  },
+  "36123": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63612300.webp",
+    "fr": true,
+    "en": true
+  },
+  "36127": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63612700.webp",
+    "fr": true,
+    "en": true
+  },
+  "36130": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63613000.webp",
+    "fr": false,
+    "en": true
+  },
+  "36133": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63613300.webp",
+    "fr": false,
+    "en": true
+  },
+  "36140": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63614000.webp",
+    "fr": true,
+    "en": true
+  },
+  "36144": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63614400.webp",
+    "fr": true,
+    "en": true
+  },
+  "36147": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63614700.webp",
+    "fr": true,
+    "en": true
+  },
+  "36150": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63615000.webp",
+    "fr": true,
+    "en": true
+  },
+  "36153": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63615300.webp",
+    "fr": true,
+    "en": true
+  },
+  "36155": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63615500.webp",
+    "fr": true,
+    "en": true
+  },
+  "36157": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63615700.webp",
+    "fr": true,
+    "en": false
+  },
+  "36160": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63616000.webp",
+    "fr": true,
+    "en": true
+  },
+  "36165": {
+    "image": "https://ravensburger.cloud/images/produktseiten/520x445/63616500.webp",
+    "fr": true,
+    "en": true
   }
 }

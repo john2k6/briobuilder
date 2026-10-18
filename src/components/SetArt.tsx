@@ -17,6 +17,8 @@ export const THEME_COLORS: Record<string, string> = {
   track: "var(--wood-dark)",
   animals: "#6a9a2a",
   smart: "#1f6fb8",
+  dino: "#6a9a2a",
+  space: "#1b2a4a",
 };
 
 /**
