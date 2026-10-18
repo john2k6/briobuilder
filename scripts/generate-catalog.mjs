@@ -19,15 +19,28 @@ function arc(radius, degrees, level = 0) {
 }
 
 const straight = (id, ref, length, verified, category = "straight") => ({
-  id, ref, category, verified, lengthMm: length,
+  id,
+  ref,
+  category,
+  verified,
+  lengthMm: length,
   connectors: [con(0, 0, 180, "female"), con(length, 0, 0, "male")],
-  tracks: [[[0, 0, 0], [length, 0, 0]]],
+  tracks: [
+    [
+      [0, 0, 0],
+      [length, 0, 0],
+    ],
+  ],
 });
 
 const curve = (id, ref, radius, verified) => {
   const end = arc(radius, 45).at(-1);
   return {
-    id, ref, category: "curve", verified, lengthMm: r2(rad(45) * radius),
+    id,
+    ref,
+    category: "curve",
+    verified,
+    lengthMm: r2(rad(45) * radius),
     connectors: [con(0, 0, 180, "female"), con(end[0], end[1], 45, "male")],
     tracks: [arc(radius, 45)],
   };
@@ -39,57 +52,194 @@ const branch = arc(E, 45).at(-1);
 
 /** Aiguillage : entrée, sortie droite (A, 144 mm) et sortie déviée (courbe E). */
 const switchPiece = (id, ref, entry) => ({
-  id, ref, category: "switch", verified: false, lengthMm: 144,
+  id,
+  ref,
+  category: "switch",
+  verified: false,
+  lengthMm: 144,
   connectors: [con(0, 0, 180, entry), con(144, 0, 0, flip(entry)), con(branch[0], branch[1], 45, flip(entry))],
-  tracks: [[[0, 0, 0], [144, 0, 0]], arc(E, 45)],
+  tracks: [
+    [
+      [0, 0, 0],
+      [144, 0, 0],
+    ],
+    arc(E, 45),
+  ],
 });
 
 /** Rail montant : passe du sol (niveau 0) au niveau 1 sur 216 mm. */
 const ramp = (id, ref, low) => ({
-  id, ref, category: "ramp", verified: false, lengthMm: 216,
+  id,
+  ref,
+  category: "ramp",
+  verified: false,
+  lengthMm: 216,
   connectors: [con(0, 0, 180, low, 0), con(216, 0, 0, flip(low), 1)],
-  tracks: [[[0, 0, 0], [216, 0, 1]]],
+  tracks: [
+    [
+      [0, 0, 0],
+      [216, 0, 1],
+    ],
+  ],
 });
 
+/** Aiguillage court (O1/P1) : sortie droite A1 (108 mm) et sortie déviée en petite courbe E1. */
+const smallBranch = arc(E1, 45).at(-1);
+const smallSwitch = {
+  id: "switch-small",
+  ref: null,
+  category: "switch",
+  verified: false,
+  lengthMm: 108,
+  connectors: [con(0, 0, 180, "female"), con(108, 0, 0, "male"), con(smallBranch[0], smallBranch[1], 45, "male")],
+  tracks: [
+    [
+      [0, 0, 0],
+      [108, 0, 0],
+    ],
+    arc(E1, 45),
+  ],
+};
+
+/** Aiguillage en T (en Y) : une entrée, une courbe E à gauche et une à droite. */
+const mirror = (pts) => pts.map(([x, y, l]) => [x, -y, l]);
+const tSwitch = {
+  id: "switch-t",
+  ref: null,
+  category: "switch",
+  verified: false,
+  lengthMm: r2(rad(45) * E),
+  connectors: [
+    con(0, 0, 180, "female"),
+    con(branch[0], branch[1], 45, "male"),
+    con(branch[0], -branch[1], 315, "male"),
+  ],
+  tracks: [arc(E, 45), mirror(arc(E, 45))],
+};
+
+/** Croisement courbe (H3) : deux courbes E qui se croisent en X, pour relier deux boucles. */
+const curvedCrossing = {
+  id: "crossing-curved",
+  ref: null,
+  category: "crossing",
+  verified: false,
+  lengthMm: r2(rad(45) * E),
+  connectors: [
+    con(0, 0, 180, "female"),
+    con(branch[0], branch[1], 45, "male"),
+    con(0, branch[1], 180, "female"),
+    con(branch[0], 0, 315, "male"),
+  ],
+  tracks: [arc(E, 45), arc(E, 45).map(([x, y, l]) => [x, r2(branch[1] - y), l])],
+};
+
+/** Courbe montante (plastique) : une courbe E qui passe du sol au niveau 1. */
+const ascendingCurve = {
+  id: "curve-ascending",
+  ref: "33995",
+  category: "ramp",
+  verified: false,
+  lengthMm: r2(rad(45) * E),
+  connectors: [con(0, 0, 180, "female", 0), con(branch[0], branch[1], 45, "male", 1)],
+  tracks: [arc(E, 45).map(([x, y], i, all) => [x, y, r2(i / (all.length - 1))])],
+};
+
+/** Pont courbe : une grande courbe E portée en hauteur. */
+const curvedBridge = { ...curve("curved-bridge", "33699", E, false), category: "bridge" };
+
 const accessory = (id, ref = null) => ({
-  id, ref, category: "accessory", verified: true, lengthMm: 0, connectors: [], tracks: [],
+  id,
+  ref,
+  category: "accessory",
+  verified: true,
+  lengthMm: 0,
+  connectors: [],
+  tracks: [],
 });
 
 const pieces = [
   straight("straight-long", "33341", 216, true),
   straight("straight-medium", "33335", 144, true),
   straight("straight-short", "33334", 108, true),
-  straight("straight-mini", null, 54, true),
+  straight("straight-mini", "33333", 54, true),
   curve("curve-large", "33342", E, true),
   curve("curve-small", "33337", E1, true),
   switchPiece("switch", "33344", "female"),
   switchPiece("switch-reverse", "33344", "male"),
+  smallSwitch,
+  tSwitch,
   {
-    id: "crossing", ref: null, category: "crossing", verified: false, lengthMm: 216,
+    id: "crossing",
+    ref: null,
+    category: "crossing",
+    verified: false,
+    lengthMm: 216,
     connectors: [
-      con(0, 0, 180, "female"), con(216, 0, 0, "male"),
-      con(108, -108, 270, "female"), con(108, 108, 90, "male"),
+      con(0, 0, 180, "female"),
+      con(216, 0, 0, "male"),
+      con(108, -108, 270, "female"),
+      con(108, 108, 90, "male"),
     ],
-    tracks: [[[0, 0, 0], [216, 0, 0]], [[108, -108, 0], [108, 108, 0]]],
+    tracks: [
+      [
+        [0, 0, 0],
+        [216, 0, 0],
+      ],
+      [
+        [108, -108, 0],
+        [108, 108, 0],
+      ],
+    ],
   },
+  curvedCrossing,
   straight("level-crossing", "33388", 144, false, "crossing"),
   ramp("ramp", "33332", "female"),
   ramp("ramp-reverse", "33332", "male"),
-  straight("suspension-bridge", null, 216, false, "bridge"),
+  ascendingCurve,
+  straight("suspension-bridge", "33683", 216, false, "bridge"),
+  straight("lifting-bridge", "33757", 216, false, "bridge"),
+  curvedBridge,
   {
-    id: "buffer-stop", ref: null, category: "buffer", verified: false, lengthMm: 40,
+    id: "buffer-stop",
+    ref: null,
+    category: "buffer",
+    verified: false,
+    lengthMm: 40,
     connectors: [con(0, 0, 180, "female")],
-    tracks: [[[0, 0, 0], [40, 0, 0]]],
+    tracks: [
+      [
+        [0, 0, 0],
+        [40, 0, 0],
+      ],
+    ],
   },
   {
-    id: "adapter-male-male", ref: "33393", category: "adapter", verified: false, lengthMm: 54,
+    id: "adapter-male-male",
+    ref: "33393",
+    category: "adapter",
+    verified: false,
+    lengthMm: 54,
     connectors: [con(0, 0, 180, "male"), con(54, 0, 0, "male")],
-    tracks: [[[0, 0, 0], [54, 0, 0]]],
+    tracks: [
+      [
+        [0, 0, 0],
+        [54, 0, 0],
+      ],
+    ],
   },
   {
-    id: "adapter-female-female", ref: "33393", category: "adapter", verified: false, lengthMm: 54,
+    id: "adapter-female-female",
+    ref: "33393",
+    category: "adapter",
+    verified: false,
+    lengthMm: 54,
     connectors: [con(0, 0, 180, "female"), con(54, 0, 0, "female")],
-    tracks: [[[0, 0, 0], [54, 0, 0]]],
+    tracks: [
+      [
+        [0, 0, 0],
+        [54, 0, 0],
+      ],
+    ],
   },
   accessory("support"),
   accessory("tunnel"),
@@ -97,6 +247,7 @@ const pieces = [
   accessory("signal"),
   accessory("crane"),
   accessory("tree"),
+  accessory("turntable", "33361"),
 ];
 
 const url = new URL("../data/catalog/pieces.json", import.meta.url);

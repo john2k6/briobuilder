@@ -281,3 +281,15 @@ describe("inventaire", () => {
     expect(result.almost[0].missing).toEqual({ "straight-long": 2 });
   });
 });
+
+describe("catalogue de pièces", () => {
+  it("chaque connecteur est au bout d'un tracé, au bon niveau", () => {
+    for (const piece of Object.values(catalog)) {
+      const ends = piece.tracks.flatMap((t) => [t[0], t.at(-1)!]);
+      for (const c of piece.connectors) {
+        const hit = ends.some(([x, y, level]) => Math.hypot(x - c.x, y - c.y) < 0.5 && level === c.level);
+        expect(hit, `${piece.id} (${c.x}, ${c.y})`).toBe(true);
+      }
+    }
+  });
+});
