@@ -1,27 +1,49 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { use } from "react";
-import { circuitHref } from "@/lib/circuits";
+import { OfficialImage } from "@/components/OfficialImage";
 import { TrackPlan, type StepState } from "@/components/TrackPlan";
 import { blob, buttonPrimary, buttonSecondary, Check, Icon, icons, SectionTitle, Stars } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { catalog, setList } from "@/lib/catalog";
-import { addSet, generateLayouts } from "@/lib/track-engine";
+import { circuitHref } from "@/lib/circuits";
+import { officialImage } from "@/lib/official";
+import { addSet, FAMILIES, generateLayouts, type Inventory, type TrackSet } from "@/lib/track-engine";
 
-// Calculés une fois au moment du build : ce que permet une seule boîte.
-const travel = setList.find((s) => s.id === "travel-switching")!;
-const travelResult = generateLayouts(addSet({}, travel), catalog, { decorate: true, limit: 60 });
-const travelCircuits = travelResult.buildable;
-const hero = travelCircuits.find((c) => c.family === "hill") ?? travelCircuits[0];
-const showcase = travelCircuits.filter((c) => c.code !== hero.code).slice(0, 4);
-const simple = travelCircuits.find((c) => c.family === "oval") ?? travelCircuits[0];
+// Calculés une fois au moment du build.
+const byRef = (ref: string) => setList.find((s) => s.ref === ref)!;
+const HERO = ["33766", "33887", "33512", "36114"].map(byRef);
+const POPULAR = ["33512", "33815", "33052", "33887", "33097", "33028", "36114", "33766", "33773", "33989"].map(byRef);
+const countFor = (set: TrackSet) => generateLayouts(addSet({}, set), catalog, { limit: 1 }).total.buildable;
+const popularCounts = Object.fromEntries(POPULAR.map((s) => [s.id, countFor(s)]));
+const deluxe = byRef("33052");
+const mix: Inventory = [deluxe, byRef("33307"), byRef("33772")].reduce<Inventory>((inv, s) => addSet(inv, s), {});
+const deluxeResult = generateLayouts(addSet({}, deluxe), catalog, { decorate: true, limit: 40 });
+const mixTotal = generateLayouts(mix, catalog, { limit: 1 }).total.buildable;
+const showcase = ["network", "hill", "terminus", "bean"]
+  .map((f) => deluxeResult.buildable.find((c) => c.family === f))
+  .filter((c) => c !== undefined);
+const simple = deluxeResult.buildable.find((c) => c.family === "oval") ?? deluxeResult.buildable[0];
+const productCount = setList.filter((s) => s.ref).length;
+
+function ProductCard({ set, className = "" }: { set: TrackSet; className?: string }) {
+  return (
+    <div className={`overflow-hidden rounded-2xl bg-white p-2 shadow-lg ring-1 ring-black/5 ${className}`}>
+      <OfficialImage
+        src={officialImage(set.ref)}
+        className="aspect-[520/445] w-full object-contain"
+        fallback={<div className="aspect-[520/445] w-full bg-soft" />}
+      />
+    </div>
+  );
+}
 
 export default function HomePage({ params }: PageProps<"/[locale]">) {
   const { locale } = use(params);
   setRequestLocale(locale);
   const t = useTranslations("home");
   const tr = useTranslations();
-  const name = (c: (typeof travelCircuits)[number]) => `${tr(`families.${c.family}`)} · ${tr(`sizes.${c.size}`)}`;
+  const name = (c: (typeof showcase)[number]) => `${tr(`families.${c.family}`)} · ${tr(`sizes.${c.size}`)}`;
 
   // Aperçu du mode enfant : 3 pièces posées, la 4e à poser, le reste à venir.
   const current = 3;
@@ -29,95 +51,119 @@ export default function HomePage({ params }: PageProps<"/[locale]">) {
     simple.placements.map((p, i) => [p.id, i < current ? "done" : i === current ? "current" : "todo"]),
   );
 
-  const tiles = [
-    { href: "/box", title: t("tileBoxes"), icon: icons.box },
-    { href: "/circuits", title: t("tileCreate"), icon: icons.sparkle },
-    { href: "/kids", title: t("tileKids"), icon: icons.star },
-    { href: "/pieces", title: t("tilePieces"), icon: icons.bridge },
-  ] as const;
-
   return (
     <div className="space-y-20 pb-8">
-      {/* Accroche */}
-      <section className="grid items-center gap-10 pt-2 lg:grid-cols-[1fr_1.05fr]">
-        <div className="space-y-6">
-          <p className="text-sm font-extrabold uppercase tracking-widest text-green">{t("eyebrow")}</p>
-          <h1 className="text-5xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
-            {t.rich("title", { hl: (chunks) => <span className="font-extrabold text-accent">{chunks}</span> })}
-          </h1>
-          <p className="max-w-xl text-lg leading-relaxed text-muted">{t("subtitle")}</p>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/box" className={buttonPrimary}>
-              {t("start")}
-              <Icon d={icons.right} className="size-5" />
-            </Link>
-            <Link href="/circuits" className={buttonSecondary}>
-              {t("tryGenerator")}
-            </Link>
+      {/* Accroche : de vrais coffrets */}
+      <section className="relative left-1/2 -mt-10 w-screen -translate-x-1/2 overflow-hidden bg-[linear-gradient(180deg,#fff7ec_0%,#f7f0e4_100%)]">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 lg:grid-cols-[1fr_1.1fr] lg:py-16">
+          <div className="space-y-6">
+            <p className="text-sm font-extrabold uppercase tracking-widest text-green">{t("eyebrow")}</p>
+            <h1 className="text-5xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
+              {t.rich("title", { hl: (chunks) => <span className="font-extrabold text-accent">{chunks}</span> })}
+            </h1>
+            <p className="max-w-xl text-lg leading-relaxed text-muted">{t("subtitle")}</p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/box" className={buttonPrimary}>
+                {t("start")}
+                <Icon d={icons.right} className="size-5" />
+              </Link>
+              <Link href="/circuits" className={buttonSecondary}>
+                {t("tryGenerator")}
+              </Link>
+            </div>
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-ink">
+              {(["trustAds", "trustAge", "trustEu"] as const).map((key) => (
+                <li key={key} className="flex items-center gap-2">
+                  <span className="text-green">
+                    <Check />
+                  </span>
+                  {t(key)}
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-ink">
-            {(["trustAds", "trustAge", "trustEu"] as const).map((key) => (
-              <li key={key} className="flex items-center gap-2">
-                <span className="text-green">
-                  <Check />
-                </span>
-                {t(key)}
-              </li>
-            ))}
-          </ul>
+          <figure className="relative">
+            <div className="grid grid-cols-6 grid-rows-[auto_auto] gap-4">
+              <ProductCard set={HERO[0]} className="col-span-4 -rotate-1" />
+              <div className="col-span-2 flex flex-col justify-end gap-4">
+                <ProductCard set={HERO[1]} className="rotate-2" />
+              </div>
+              <ProductCard set={HERO[2]} className="col-span-3 rotate-1" />
+              <ProductCard set={HERO[3]} className="col-span-3 -rotate-2" />
+            </div>
+            <figcaption className="mt-3 text-right text-xs text-muted">{tr("official.credit")}</figcaption>
+          </figure>
         </div>
-
-        <figure className={`${blob} relative border border-border`}>
-          <div className="wood-floor p-4 sm:p-6">
-            <TrackPlan
-              placements={hero.placements}
-              catalog={catalog}
-              accessories={hero.accessories}
-              title={name(hero)}
-              train
-              showConnectors={false}
-              className="w-full"
-            />
-          </div>
-          <figcaption className="flex flex-wrap items-center justify-between gap-2 bg-accent px-6 py-4 text-accent-ink">
-            <span className="text-lg font-extrabold">{name(hero)}</span>
-            <span className="flex items-center gap-1 text-sm font-bold">
-              <Check />
-              {t("checked")}
-            </span>
-          </figcaption>
-        </figure>
       </section>
 
-      {/* Rubriques */}
-      <section>
-        <ul className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {tiles.map((tile, i) => (
-            <li key={tile.href}>
+      {/* Chiffres */}
+      <section className="grid gap-4 sm:grid-cols-3">
+        {[
+          { value: String(productCount), label: t("statProducts") },
+          { value: String(FAMILIES.length), label: t("statFamilies") },
+          { value: `${mixTotal}+`, label: t("statCircuits") },
+        ].map((s) => (
+          <div key={s.label} className={`${blob} bg-soft p-6`}>
+            <p className="font-mono text-5xl font-extrabold text-accent">{s.value}</p>
+            <p className="mt-2 font-bold text-ink">{s.label}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* Coffrets populaires */}
+      <section className="space-y-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="max-w-2xl space-y-2">
+            <SectionTitle>{t("popularTitle")}</SectionTitle>
+            <p className="text-lg text-muted">{t("popularText")}</p>
+          </div>
+          <Link href="/box" className={buttonSecondary}>
+            {t("seeAll")}
+          </Link>
+        </div>
+        <ul className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-4">
+          {POPULAR.map((set) => (
+            <li key={set.id} className="w-56 shrink-0 snap-start">
               <Link
-                href={tile.href}
-                className={`${i % 2 === 0 ? "rounded-tl-[2.5rem]" : "rounded-br-[2.5rem]"} flex h-full flex-col overflow-hidden rounded-xl transition-transform hover:-translate-y-1`}
+                href="/box"
+                className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-white transition hover:-translate-y-1 hover:shadow-lg"
               >
-                <span className="flex aspect-[5/3] items-center justify-center bg-soft text-accent">
-                  <Icon d={tile.icon} className="size-14" />
-                </span>
-                <span className="flex flex-1 items-center justify-center bg-accent px-4 py-5 text-center text-lg font-bold leading-tight text-accent-ink md:text-2xl">
-                  {tile.title}
+                <OfficialImage
+                  src={officialImage(set.ref)}
+                  className="aspect-[520/445] w-full object-contain p-2"
+                  fallback={<div className="aspect-[520/445] w-full bg-soft" />}
+                />
+                <span className="flex flex-1 flex-col gap-1 border-t border-border p-3">
+                  <span className="font-extrabold leading-tight text-ink">{tr(`setNames.${set.id}`)}</span>
+                  <span className="text-xs text-muted">{tr("box.ref", { ref: set.ref ?? "" })}</span>
+                  <span className="mt-auto pt-2 text-sm font-bold text-green">
+                    {t("circuitsFor", { count: popularCounts[set.id] })}
+                  </span>
                 </span>
               </Link>
             </li>
           ))}
         </ul>
+        <p className="text-xs text-muted">{tr("official.credit")}</p>
       </section>
 
-      {/* Ce que permet une seule boîte */}
+      {/* Ce que le moteur invente */}
       <section className="relative left-1/2 w-screen -translate-x-1/2 bg-green text-green-ink">
         <div className="mx-auto max-w-6xl space-y-8 px-4 py-16">
-          <div className="max-w-3xl space-y-3">
-            <h2 className="text-3xl font-semibold leading-tight md:text-5xl">
-              {t("showcaseTitle", { count: travelResult.total.buildable, set: tr(`setNames.${travel.id}`) })}
-            </h2>
-            <p className="text-lg opacity-90">{t("showcaseText")}</p>
+          <div className="flex flex-wrap items-center gap-6">
+            <div className="w-28 shrink-0 overflow-hidden rounded-2xl bg-white p-1">
+              <OfficialImage
+                src={officialImage(deluxe.ref)}
+                className="aspect-[520/445] w-full object-contain"
+                fallback={<div className="aspect-[520/445] w-full" />}
+              />
+            </div>
+            <div className="max-w-3xl space-y-3">
+              <h2 className="text-3xl font-semibold leading-tight md:text-5xl">
+                {t("showcaseTitle", { count: deluxeResult.total.buildable, set: tr(`setNames.${deluxe.id}`) })}
+              </h2>
+              <p className="text-lg opacity-90">{t("showcaseText")}</p>
+            </div>
           </div>
           <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {showcase.map((c) => (
@@ -132,9 +178,9 @@ export default function HomePage({ params }: PageProps<"/[locale]">) {
                       catalog={catalog}
                       accessories={c.accessories}
                       title={name(c)}
-                      frame={{ width: 1500, height: 1050 }}
+                      frame={{ width: 1800, height: 1300 }}
                       showConnectors={false}
-                      className="aspect-[10/7] w-full"
+                      className="aspect-[18/13] w-full"
                     />
                   </div>
                   <div className="flex flex-1 flex-col gap-1 p-4">
