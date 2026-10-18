@@ -38,7 +38,7 @@ export default function HomePage({ params }: PageProps<"/[locale]">) {
           <figcaption className="space-y-2">
             <div className="flex items-center justify-between gap-2">
               <span className="font-display text-lg font-semibold">{t("demoTitle")}</span>
-              <span className={`rounded-full px-3 py-1 text-sm font-medium ${closed ? "text-ok" : "text-warn"}`}>
+              <span className={`rounded-full px-3 py-1 text-sm font-semibold ${closed ? "bg-green text-green-ink" : "bg-warn text-white"}`}>
                 {closed ? t("demoClosed") : t("demoOpen")}
               </span>
             </div>
@@ -54,7 +54,9 @@ export default function HomePage({ params }: PageProps<"/[locale]">) {
         <ol className="grid gap-4 md:grid-cols-3">
           {steps.map((n) => (
             <li key={n} className="space-y-2 rounded-2xl border border-border bg-surface p-5">
-              <span className="font-display text-3xl text-accent">{n}</span>
+              <span className="inline-flex size-10 items-center justify-center rounded-full bg-green font-display text-xl font-semibold text-green-ink">
+                {n}
+              </span>
               <h3 className="font-semibold">{t(`step${n}Title`)}</h3>
               <p className="text-sm text-muted">{t(`step${n}Text`)}</p>
             </li>

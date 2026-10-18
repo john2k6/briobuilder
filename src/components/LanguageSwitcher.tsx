@@ -20,7 +20,7 @@ export function LanguageSwitcher() {
             href={pathname}
             locale={locale}
             aria-current={locale === current ? "true" : undefined}
-            className="min-h-11 rounded-lg px-3 py-2 text-sm capitalize text-muted hover:text-foreground aria-[current]:bg-surface aria-[current]:font-semibold aria-[current]:text-foreground"
+            className="min-h-11 rounded-lg px-3 py-2 text-sm capitalize text-header-muted hover:text-header-ink aria-[current]:bg-accent aria-[current]:font-semibold aria-[current]:text-accent-ink"
           >
             {name}
           </Link>
