@@ -48,11 +48,11 @@
         "quantity": 5
       },
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "signal",
         "quantity": 1
       },
       {
-        "pieceTypeId": "signal",
+        "pieceTypeId": "station-platform",
         "quantity": 1
       }
     ]
@@ -149,7 +149,7 @@
       },
       {
         "pieceTypeId": "station",
-        "quantity": 3
+        "quantity": 1
       },
       {
         "pieceTypeId": "tunnel",
@@ -166,6 +166,10 @@
       {
         "pieceTypeId": "signal-box",
         "quantity": 1
+      },
+      {
+        "pieceTypeId": "station-platform",
+        "quantity": 2
       }
     ]
   },
@@ -1009,7 +1013,7 @@
       },
       {
         "pieceTypeId": "station",
-        "quantity": 2
+        "quantity": 1
       },
       {
         "pieceTypeId": "tunnel",
@@ -1029,6 +1033,10 @@
       },
       {
         "pieceTypeId": "signal-box",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "station-platform",
         "quantity": 1
       }
     ]
@@ -1076,11 +1084,11 @@
         "quantity": 1
       },
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "station-metro",
         "quantity": 1
       },
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "tunnel-metro",
         "quantity": 1
       }
     ]
@@ -1136,7 +1144,7 @@
         "quantity": 1
       },
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "tunnel-action",
         "quantity": 2
       }
     ]
@@ -1174,12 +1182,12 @@
         "quantity": 1
       },
       {
-        "pieceTypeId": "tunnel",
-        "quantity": 2
+        "pieceTypeId": "station-modern",
+        "quantity": 1
       },
       {
-        "pieceTypeId": "station",
-        "quantity": 1
+        "pieceTypeId": "tunnel-action",
+        "quantity": 2
       }
     ]
   },
@@ -1196,7 +1204,7 @@
         "quantity": 8
       },
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "tunnel-action",
         "quantity": 1
       }
     ]
@@ -1254,12 +1262,8 @@
         "quantity": 6
       },
       {
-        "pieceTypeId": "tunnel",
-        "quantity": 3
-      },
-      {
         "pieceTypeId": "station",
-        "quantity": 2
+        "quantity": 1
       },
       {
         "pieceTypeId": "signal",
@@ -1268,6 +1272,14 @@
       {
         "pieceTypeId": "signal-box",
         "quantity": 1
+      },
+      {
+        "pieceTypeId": "station-modern",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "tunnel-action",
+        "quantity": 3
       }
     ]
   },
@@ -1404,11 +1416,11 @@
         "quantity": 2
       },
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "tree",
         "quantity": 1
       },
       {
-        "pieceTypeId": "tree",
+        "pieceTypeId": "station-platform",
         "quantity": 1
       }
     ]
@@ -1520,11 +1532,11 @@
         "quantity": 2
       },
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "curve-ascending-reverse",
         "quantity": 1
       },
       {
-        "pieceTypeId": "curve-ascending-reverse",
+        "pieceTypeId": "station-central",
         "quantity": 1
       }
     ]
@@ -1596,7 +1608,7 @@
         "quantity": 1
       },
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "station-castle",
         "quantity": 1
       }
     ]
@@ -1722,7 +1734,7 @@
         "quantity": 2
       },
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "station-platform",
         "quantity": 1
       }
     ]
@@ -1752,11 +1764,11 @@
         "quantity": 2
       },
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "tree",
         "quantity": 2
       },
       {
-        "pieceTypeId": "tree",
+        "pieceTypeId": "station-platform",
         "quantity": 2
       }
     ]
@@ -1832,11 +1844,11 @@
         "quantity": 1
       },
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "tree",
         "quantity": 1
       },
       {
-        "pieceTypeId": "tree",
+        "pieceTypeId": "tunnel-mountain",
         "quantity": 1
       }
     ]
@@ -1862,12 +1874,12 @@
         "quantity": 4
       },
       {
-        "pieceTypeId": "station",
-        "quantity": 1
-      },
-      {
         "pieceTypeId": "tree",
         "quantity": 3
+      },
+      {
+        "pieceTypeId": "station-winter",
+        "quantity": 1
       }
     ]
   },
@@ -2167,7 +2179,7 @@
     "verified": false,
     "contents": [
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "tunnel-action",
         "quantity": 1
       }
     ]
@@ -2276,7 +2288,7 @@
     "verified": false,
     "contents": [
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "station-central",
         "quantity": 1
       }
     ]
@@ -2353,7 +2365,7 @@
     "verified": false,
     "contents": [
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "station-central",
         "quantity": 1
       }
     ]
@@ -2705,11 +2717,11 @@
     "verified": false,
     "contents": [
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "crane",
         "quantity": 1
       },
       {
-        "pieceTypeId": "crane",
+        "pieceTypeId": "tunnel-mountain",
         "quantity": 1
       }
     ]
@@ -2814,7 +2826,7 @@
     "verified": false,
     "contents": [
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "tunnel-metro",
         "quantity": 1
       }
     ]
@@ -2841,7 +2853,7 @@
         "quantity": 1
       },
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "tunnel-mountain",
         "quantity": 1
       }
     ]
@@ -2925,11 +2937,11 @@
         "quantity": 1
       },
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "tunnel",
         "quantity": 1
       },
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "station-modern",
         "quantity": 1
       }
     ]
@@ -3058,7 +3070,7 @@
     "verified": false,
     "contents": [
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "tunnel-action",
         "quantity": 1
       }
     ]
@@ -3387,7 +3399,7 @@
     "verified": false,
     "contents": [
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "tunnel-volcano",
         "quantity": 1
       }
     ]
@@ -3421,7 +3433,7 @@
         "quantity": 3
       },
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "tunnel-volcano",
         "quantity": 1
       }
     ]
@@ -3498,7 +3510,7 @@
         "quantity": 3
       },
       {
-        "pieceTypeId": "tunnel",
+        "pieceTypeId": "tunnel-volcano",
         "quantity": 2
       }
     ]
@@ -3666,7 +3678,7 @@
         "quantity": 1
       },
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "station-space",
         "quantity": 1
       }
     ]
@@ -3696,7 +3708,7 @@
         "quantity": 3
       },
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "station-space",
         "quantity": 1
       }
     ]

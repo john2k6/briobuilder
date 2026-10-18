@@ -64,20 +64,22 @@ export function AccessoryShape({ kind }: { kind: AccessoryKind }) {
         </g>
       );
     case "station":
+      // Gare de voyageurs classique : toit rouge à deux pans, fenêtres, porte et lanterne.
       return (
         <g>
-          <rect
-            x={-60}
-            y={-28}
-            width={120}
-            height={56}
-            rx={6}
-            fill="var(--surface)"
-            stroke="var(--ink)"
+          <rect x={-62} y={-10} width={124} height={42} rx={4} fill="#fff4dc" stroke="var(--ink)" strokeWidth={4} />
+          <path
+            d="M-70 -8 L-50 -34 H50 L70 -8 Z"
+            fill="var(--accent)"
+            stroke="#9c0012"
             strokeWidth={4}
+            strokeLinejoin="round"
           />
-          <rect x={-60} y={-28} width={120} height={18} rx={6} fill="var(--accent)" />
-          <rect x={-14} y={2} width={28} height={26} fill="var(--ink)" />
+          <path d="M-50 -34 L-40 -8 M-16 -34 L-12 -8 M16 -34 L12 -8 M50 -34 L40 -8" stroke="#9c0012" strokeWidth={3} />
+          <rect x={-48} y={0} width={18} height={14} fill="#9fd3ff" stroke="var(--ink)" strokeWidth={2} />
+          <rect x={30} y={0} width={18} height={14} fill="#9fd3ff" stroke="var(--ink)" strokeWidth={2} />
+          <path d="M-12 32 V8 A12 12 0 0 1 12 8 V32 Z" fill="var(--wood-dark)" />
+          <circle cx={0} cy={-20} r={8} fill="var(--surface)" stroke="var(--ink)" strokeWidth={3} />
         </g>
       );
     case "signal":
@@ -181,6 +183,184 @@ export function AccessoryShape({ kind }: { kind: AccessoryKind }) {
           <circle cx={0} cy={-21} r={7} fill="var(--accent)" />
           <circle cx={0} cy={0} r={7} fill="#ffd23f" />
           <circle cx={0} cy={21} r={7} fill="var(--green)" />
+        </g>
+      );
+    case "station-platform":
+      // Quai couvert : un long quai gris, un auvent rayé et deux bancs.
+      return (
+        <g>
+          <rect x={-78} y={-24} width={156} height={48} rx={4} fill="#b8c0c8" stroke="#5e6873" strokeWidth={4} />
+          <rect x={-70} y={-24} width={140} height={24} fill="var(--surface)" />
+          {[-70, -42, -14, 14, 42].map((x) => (
+            <rect key={x} x={x} y={-24} width={14} height={24} fill="var(--accent)" />
+          ))}
+          <rect x={-56} y={8} width={30} height={8} rx={2} fill="var(--wood-dark)" />
+          <rect x={26} y={8} width={30} height={8} rx={2} fill="var(--wood-dark)" />
+        </g>
+      );
+    case "station-central":
+      // Gare centrale : grand bâtiment crème, deux ailes bleues et une tour à horloge.
+      return (
+        <g>
+          <rect x={-80} y={-26} width={160} height={58} rx={4} fill="#f3e3c3" stroke="#a9783f" strokeWidth={4} />
+          <rect x={-80} y={-26} width={44} height={58} rx={4} fill="#2f5fa7" />
+          <rect x={36} y={-26} width={44} height={58} rx={4} fill="#2f5fa7" />
+          <rect x={-24} y={-46} width={48} height={60} rx={4} fill="#f3e3c3" stroke="#a9783f" strokeWidth={4} />
+          <circle cx={0} cy={-22} r={15} fill="var(--surface)" stroke="var(--ink)" strokeWidth={4} />
+          <path d="M0 -22 V-32 M0 -22 H8" stroke="var(--ink)" strokeWidth={3} strokeLinecap="round" />
+          <path d="M-14 32 V14 A14 14 0 0 1 14 14 V32 Z" fill="var(--ink)" />
+        </g>
+      );
+    case "station-metro":
+      // Station de métro : escalier qui descend et grand panneau « M ».
+      return (
+        <g>
+          <rect x={-64} y={-30} width={128} height={60} rx={8} fill="#1b2a4a" />
+          {[-14, -2, 10, 22].map((y) => (
+            <rect key={y} x={-48} y={y} width={56} height={7} rx={2} fill="#8b96a3" />
+          ))}
+          <circle cx={36} cy={-6} r={20} fill="#ffd23f" />
+          <path d="M24 6 V-16 L36 -2 L48 -16 V6" stroke="#1b2a4a" strokeWidth={6} fill="none" strokeLinejoin="round" />
+        </g>
+      );
+    case "station-space":
+      // Base spatiale : dôme vitré, fusée sur son pas de tir.
+      return (
+        <g>
+          <rect x={-74} y={-30} width={148} height={60} rx={30} fill="#d9dee6" stroke="#5e6873" strokeWidth={4} />
+          <circle cx={-30} cy={0} r={24} fill="#9fd3ff" stroke="#2f7fc1" strokeWidth={4} />
+          <path d="M-42 -6 A14 14 0 0 1 -24 -18" stroke="var(--surface)" strokeWidth={4} fill="none" />
+          <path
+            d="M28 -28 Q44 -10 44 16 H12 Q12 -10 28 -28 Z"
+            fill="var(--surface)"
+            stroke="var(--ink)"
+            strokeWidth={3}
+          />
+          <circle cx={28} cy={-2} r={6} fill="#2f7fc1" />
+          <path d="M18 16 L28 32 L38 16 Z" fill="#ff8a1f" />
+        </g>
+      );
+    case "station-castle":
+      // Château : remparts crénelés et deux tours rondes à toit pointu.
+      return (
+        <g>
+          <path
+            d="M-56 -20 h12 v-8 h12 v8 h12 v-8 h12 v8 h12 v-8 h12 v8 h12 v-8 h12 v8 h12 V30 H-56 Z"
+            fill="#e9b7d4"
+            stroke="#8e3f72"
+            strokeWidth={4}
+            strokeLinejoin="round"
+          />
+          {[-60, 60].map((x) => (
+            <g key={x}>
+              <circle cx={x} cy={4} r={20} fill="#e9b7d4" stroke="#8e3f72" strokeWidth={4} />
+              <path d={`M${x - 16} 0 L${x} -34 L${x + 16} 0 Z`} fill="#8e5bc9" />
+            </g>
+          ))}
+          <path d="M-14 30 V12 A14 14 0 0 1 14 12 V30 Z" fill="#8e3f72" />
+          <path d="M0 -28 V-48 L14 -42 L0 -36" fill="#ffd23f" stroke="#8e3f72" strokeWidth={2} />
+        </g>
+      );
+    case "station-winter":
+      // Gare enneigée : chalet en bois, toit blanc de neige, sapin.
+      return (
+        <g>
+          <rect x={-60} y={-14} width={92} height={44} rx={3} fill="#a9783f" stroke="#6f4a22" strokeWidth={4} />
+          <path
+            d="M-70 -12 L-14 -40 L42 -12 Z"
+            fill="var(--surface)"
+            stroke="#b9c7d6"
+            strokeWidth={4}
+            strokeLinejoin="round"
+          />
+          <rect x={-26} y={4} width={22} height={26} fill="#6f4a22" />
+          <rect x={6} y={2} width={16} height={14} fill="#ffd23f" />
+          <path d="M62 -34 L82 6 H42 Z M62 -14 L86 30 H38 Z" fill="var(--green-dark)" />
+          <path d="M62 -34 L70 -18 H54 Z" fill="var(--surface)" />
+        </g>
+      );
+    case "station-modern":
+      // Gare moderne : grande verrière turquoise et panneaux solaires.
+      return (
+        <g>
+          <rect x={-72} y={-28} width={144} height={56} rx={28} fill="#5ec6c0" stroke="#1f7f7a" strokeWidth={4} />
+          {[-40, -14, 12, 38].map((x) => (
+            <path key={x} d={`M${x} -28 Q${x + 8} 0 ${x} 28`} stroke="#d8f5f3" strokeWidth={4} fill="none" />
+          ))}
+          <rect x={-58} y={-18} width={24} height={14} fill="#1b2a4a" />
+          <rect x={34} y={4} width={24} height={14} fill="#1b2a4a" />
+        </g>
+      );
+    case "tunnel-mountain":
+      // Montagne rocheuse au sommet enneigé.
+      return (
+        <g>
+          <path
+            d="M-80 40 L-40 -20 L-16 4 L12 -48 L80 40 Z"
+            fill="#8b96a3"
+            stroke="#5e6873"
+            strokeWidth={5}
+            strokeLinejoin="round"
+          />
+          <path d="M12 -48 L26 -24 L14 -18 L4 -28 L-2 -30 Z" fill="var(--surface)" />
+          <path d="M-40 -20 L-32 -8 L-44 -6 Z" fill="var(--surface)" />
+        </g>
+      );
+    case "tunnel-volcano":
+      // Volcan des dinosaures : cône brun et lave orange.
+      return (
+        <g>
+          <path
+            d="M-80 40 L-26 -34 H26 L80 40 Z"
+            fill="#7a4a2a"
+            stroke="#4a2c18"
+            strokeWidth={5}
+            strokeLinejoin="round"
+          />
+          <ellipse cx={0} cy={-34} rx={26} ry={9} fill="#ff5a1f" />
+          <path
+            d="M-8 -30 Q-14 -6 -26 4 M10 -30 Q16 -8 30 6"
+            stroke="#ff8a1f"
+            strokeWidth={7}
+            fill="none"
+            strokeLinecap="round"
+          />
+          <circle cx={-6} cy={-50} r={7} fill="#c9ced6" />
+          <circle cx={8} cy={-60} r={9} fill="#c9ced6" />
+        </g>
+      );
+    case "tunnel-action":
+      // Tunnel d'action (Smart Tech) : arche violette et éclair jaune.
+      return (
+        <g>
+          <rect x={-72} y={-40} width={144} height={80} rx={18} fill="#6b3fb3" stroke="#3e2270" strokeWidth={5} />
+          <path
+            d="M8 -30 L-14 4 H2 L-8 30 L18 -6 H2 Z"
+            fill="#ffd23f"
+            stroke="#3e2270"
+            strokeWidth={2}
+            strokeLinejoin="round"
+          />
+          <circle cx={-46} cy={-18} r={7} fill="#5ec6c0" />
+          <circle cx={46} cy={18} r={7} fill="var(--accent)" />
+        </g>
+      );
+    case "tunnel-metro":
+      // Tunnel phosphorescent : bleu nuit constellé de points lumineux.
+      return (
+        <g>
+          <rect x={-72} y={-38} width={144} height={76} rx={12} fill="#16213d" stroke="#5ec6c0" strokeWidth={5} />
+          {[
+            [-48, -18],
+            [-20, 14],
+            [10, -22],
+            [40, 8],
+            [-40, 20],
+            [26, 24],
+            [52, -20],
+          ].map(([x, y]) => (
+            <circle key={`${x}${y}`} cx={x} cy={y} r={4} fill="#b9ff8a" />
+          ))}
         </g>
       );
     case "tree":
@@ -301,8 +481,9 @@ export function TrackPlan({
       Math.max(...a.tracks.flat().map((q) => q[2]), 0) - Math.max(...b.tracks.flat().map((q) => q[2]), 0) ||
       Number(steps?.[a.id] === "current") - Number(steps?.[b.id] === "current"),
   );
-  const tunnels = accessories.filter((a) => a.kind === "tunnel");
-  const besides = accessories.filter((a) => a.kind !== "tunnel");
+  // Les tunnels (de toutes sortes) se posent sur la voie, les autres décors à côté.
+  const tunnels = accessories.filter((a) => a.kind.startsWith("tunnel"));
+  const besides = accessories.filter((a) => !a.kind.startsWith("tunnel"));
 
   const drawPiece = (p: (typeof pieces)[number]) => {
     const state = steps?.[p.id];
@@ -457,7 +638,7 @@ export function TrackPlan({
             transform={`translate(${sx} ${sy}) rotate(${-angle})`}
             opacity={0.92}
           >
-            <AccessoryShape kind="tunnel" />
+            <AccessoryShape kind={a.kind} />
           </g>
         );
       })}

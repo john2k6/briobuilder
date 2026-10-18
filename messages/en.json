@@ -120,7 +120,18 @@
     "signal-box": "Signal box",
     "curve-ascending-reverse": "Reverse ascending curve (half turn)",
     "lift": "Warehouse lift",
-    "stacking-bridge": "Stacking bridge"
+    "stacking-bridge": "Stacking bridge",
+    "station-platform": "Covered platform",
+    "station-central": "Clock tower central station",
+    "station-metro": "Metro station",
+    "station-space": "Space base",
+    "station-castle": "Castle station",
+    "station-winter": "Snowy station",
+    "station-modern": "Modern station",
+    "tunnel-mountain": "Mountain tunnel",
+    "tunnel-volcano": "Dinosaur volcano",
+    "tunnel-action": "Action tunnel",
+    "tunnel-metro": "Glow-in-the-dark tunnel"
   },
   "setNames": {
     "travel-switching": "Travel Switching Set",

@@ -158,4 +158,14 @@ describe("générateur de circuits", () => {
     // Même un petit coffret (8 courbes) a une forme qui n'est pas un ovale.
     expect(generateLayouts(boxes("firefighter"), catalog).buildable.length).toBeGreaterThan(0);
   });
+
+  it("pose des gares et des tunnels tous différents selon les produits possédés", () => {
+    const inv = boxes("deluxe-railway", "ref-33649", "ref-33889", "ref-36092");
+    const r = generateLayouts(inv, catalog, { families: ["terminus", "fork", "siding"], decorate: true, limit: 20 });
+    const kinds = new Set(r.buildable.flatMap((c) => c.accessories.map((a) => a.kind)));
+    for (const k of ["station-central", "station-platform", "tunnel-mountain", "tunnel-volcano"])
+      expect(kinds).toContain(k);
+    const c = r.buildable.find((x) => x.accessories.some((a) => a.kind === "station-central"))!;
+    expect(circuitFromCode(c.code)?.accessories).toEqual(c.accessories);
+  });
 });

@@ -1901,5 +1901,104 @@
     "lengthMm": 0,
     "connectors": [],
     "tracks": []
+  },
+  {
+    "id": "station-platform",
+    "ref": "33512",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "station-central",
+    "ref": "33649",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "station-metro",
+    "ref": "33513",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "station-space",
+    "ref": "36155",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "station-castle",
+    "ref": "33312",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "station-winter",
+    "ref": "36014",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "station-modern",
+    "ref": "33972",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "tunnel-mountain",
+    "ref": "33889",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "tunnel-volcano",
+    "ref": "36092",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "tunnel-action",
+    "ref": "33873",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "tunnel-metro",
+    "ref": "33970",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
   }
 ]

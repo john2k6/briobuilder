@@ -270,6 +270,19 @@ const pieces = [
   building("roundhouse", "33736"),
   building("garage", "33574"),
   building("signal-box", "33674"),
+  // Gares toutes différentes, chacune d'après sa famille de produits.
+  building("station-platform", "33512"),
+  building("station-central", "33649"),
+  building("station-metro", "33513"),
+  building("station-space", "36155"),
+  building("station-castle", "33312"),
+  building("station-winter", "36014"),
+  building("station-modern", "33972"),
+  // Tunnels différents : montagne, volcan, tunnel d'action, tunnel phosphorescent.
+  building("tunnel-mountain", "33889"),
+  building("tunnel-volcano", "36092"),
+  building("tunnel-action", "33873"),
+  building("tunnel-metro", "33970"),
 ];
 
 const url = new URL("../data/catalog/pieces.json", import.meta.url);

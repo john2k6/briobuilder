@@ -74,6 +74,17 @@ export const ACCESSORY_CODES = {
   D: "roundhouse",
   R: "garage",
   B: "signal-box",
+  S: "station-platform",
+  C: "station-central",
+  M: "station-metro",
+  X: "station-space",
+  K: "station-castle",
+  W: "station-winter",
+  N: "station-modern",
+  U: "tunnel-mountain",
+  V: "tunnel-volcano",
+  J: "tunnel-action",
+  Y: "tunnel-metro",
 } as const;
 type AccessoryLetter = keyof typeof ACCESSORY_CODES;
 export type AccessoryKind = (typeof ACCESSORY_CODES)[keyof typeof ACCESSORY_CODES];
@@ -1261,9 +1272,13 @@ function decorate(
   // Gares et bâtiments d'abord, au bout des voies sans issue (sinon le long de la ligne), chacun différent.
   // Le plus possible de ce qu'on possède : chaque gare et bâtiment différent, puis les autres décors.
   let buildings = 0;
-  const maxBuildings = Math.min(6, Math.max(3, ends.length + 2));
-  for (const letter of ["G", "H", "F", "P", "E", "R", "D"] as AccessoryLetter[]) {
-    const qty = Math.min(available[ACCESSORY_CODES[letter]] ?? 0, letter === "G" ? 3 : 1, maxBuildings - buildings);
+  const maxBuildings = Math.min(8, Math.max(3, ends.length + 2));
+  for (const letter of ["C", "G", "S", "M", "X", "K", "W", "N", "H", "F", "P", "E", "R", "D"] as AccessoryLetter[]) {
+    const qty = Math.min(
+      available[ACCESSORY_CODES[letter]] ?? 0,
+      "GS".includes(letter) ? 2 : 1,
+      maxBuildings - buildings,
+    );
     put(letter, nearEnds, qty);
     buildings += qty;
   }
@@ -1278,7 +1293,13 @@ function decorate(
     const [x, y] = middle(p);
     return high.some(([hx, hy]) => Math.hypot(hx - x, hy - y) < 120);
   });
-  put("T", [...underBridge, ...longFirst], Math.min(available.tunnel ?? 0, 2));
+  // Chaque tunnel différent qu'on possède (montagne, volcan…), deux au plus de chaque, trois en tout.
+  let tunnels = 0;
+  for (const letter of ["V", "U", "J", "Y", "T"] as AccessoryLetter[]) {
+    const qty = Math.min(available[ACCESSORY_CODES[letter]] ?? 0, 2, 3 - tunnels);
+    put(letter, [...underBridge, ...longFirst], qty);
+    tunnels += qty;
+  }
   put("Q", ground, Math.min(available.crane ?? 0, 2));
   put("B", ground, Math.min(available["signal-box"] ?? 0, 1));
   put("I", ground, Math.min(available.signal ?? 0, 2));

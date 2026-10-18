@@ -120,7 +120,18 @@
     "signal-box": "Poste d'aiguillage",
     "curve-ascending-reverse": "Courbe montante inversée (demi-tour)",
     "lift": "Ascenseur de l'entrepôt",
-    "stacking-bridge": "Pont empilable"
+    "stacking-bridge": "Pont empilable",
+    "station-platform": "Quai couvert",
+    "station-central": "Gare centrale à horloge",
+    "station-metro": "Station de métro",
+    "station-space": "Base spatiale",
+    "station-castle": "Gare du château",
+    "station-winter": "Gare enneigée",
+    "station-modern": "Gare moderne",
+    "tunnel-mountain": "Tunnel de montagne",
+    "tunnel-volcano": "Volcan des dinosaures",
+    "tunnel-action": "Tunnel d'action",
+    "tunnel-metro": "Tunnel phosphorescent"
   },
   "setNames": {
     "travel-switching": "Circuit Plateforme Voyageurs",
