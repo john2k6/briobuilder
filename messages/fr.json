@@ -490,7 +490,22 @@
     "crossing": "Un croisement",
     "decorate": "Des décors",
     "loading": "Le moteur cherche des circuits…",
-    "checked": "Chaque circuit a été vérifié par le moteur."
+    "checked": "Chaque circuit a été vérifié par le moteur.",
+    "type": "Type de circuit",
+    "allTypes": "Tous",
+    "groups": {
+      "loops": "Boucles",
+      "eights": "Huit",
+      "shapes": "Formes",
+      "branches": "Embranchements et gares",
+      "networks": "Ponts et grands réseaux"
+    },
+    "sortTitle": "Ordre",
+    "sort": {
+      "max": "Utiliser un maximum de mes pièces",
+      "simple": "Les plus simples d'abord"
+    },
+    "more": "Voir plus de circuits ({count} de plus)"
   },
   "families": {
     "circle": "Le rond",

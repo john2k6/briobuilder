@@ -490,7 +490,22 @@
     "crossing": "A crossing",
     "decorate": "Scenery",
     "loading": "The engine is looking for layouts…",
-    "checked": "Every layout has been checked by the engine."
+    "checked": "Every layout has been checked by the engine.",
+    "type": "Layout type",
+    "allTypes": "All",
+    "groups": {
+      "loops": "Loops",
+      "eights": "Figure eights",
+      "shapes": "Shapes",
+      "branches": "Branches and stations",
+      "networks": "Bridges and big networks"
+    },
+    "sortTitle": "Order",
+    "sort": {
+      "max": "Use as many of my pieces as possible",
+      "simple": "Simplest first"
+    },
+    "more": "Show more layouts ({count} more)"
   },
   "families": {
     "circle": "The circle",

@@ -4,11 +4,21 @@ import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { ChildPicker } from "@/components/ChildPicker";
 import { CircuitCard } from "@/components/CircuitCard";
-import { buttonPrimary, card, Icon, icons, PageHeader } from "@/components/ui";
+import { buttonPrimary, buttonSecondary, card, Icon, icons, PageHeader } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { generate } from "@/lib/circuits";
-import { actions, useAppState, type GeneratorPrefs } from "@/lib/store";
-import { totalPieces, type GeneratedLayout, type Size } from "@/lib/track-engine";
+import { actions, useAppState, type CircuitGroup, type GeneratorPrefs } from "@/lib/store";
+import { totalPieces, type Family, type GeneratedLayout, type Size } from "@/lib/track-engine";
+
+/** Types de circuits proposés dans les filtres. */
+const GROUPS: Record<CircuitGroup, Family[]> = {
+  loops: ["circle", "oval", "rectangle"],
+  eights: ["eight-crossing", "eight-bridge"],
+  shapes: ["l-shape", "u-shape", "bean", "triangle", "house", "octagon"],
+  branches: ["siding", "passing-loop", "terminus", "fork", "yard", "line"],
+  networks: ["hill", "network"],
+};
+const PAGE = 12;
 
 type Tab = "buildable" | "almost";
 const SIZES: Size[] = ["small", "medium", "large"];
@@ -41,6 +51,7 @@ export function CircuitsView() {
   const t = useTranslations();
   const { inventory, prefs, activeChildId, builds, favorites, ready } = useAppState();
   const [tab, setTab] = useState<Tab>("buildable");
+  const [shown, setShown] = useState(PAGE);
   const [result, setResult] = useState<{ key: string; buildable: GeneratedLayout[]; almost: GeneratedLayout[] } | null>(
     null,
   );
@@ -56,7 +67,9 @@ export function CircuitsView() {
         sizes: prefs.sizes,
         require: { bridge: prefs.bridge, switches: prefs.switches, crossing: prefs.crossing },
         decorate: prefs.decorate,
-        limit: 18,
+        families: (prefs.groups ?? []).flatMap((g) => GROUPS[g]),
+        sort: prefs.sort,
+        limit: 120,
       });
       setResult({ key, ...r });
     }, 30);
@@ -65,7 +78,11 @@ export function CircuitsView() {
 
   const builtCount = (code: string) => builds.filter((b) => b.childId === activeChildId && b.layoutId === code).length;
   const isFavorite = (code: string) => favorites.some((f) => f.childId === activeChildId && f.layoutId === code);
-  const setPrefs = (patch: Partial<GeneratorPrefs>) => actions.setPrefs(patch);
+  const setPrefs = (patch: Partial<GeneratorPrefs>) => {
+    setShown(PAGE);
+    actions.setPrefs(patch);
+  };
+  const groups = prefs.groups ?? [];
 
   // « Quelle pièce acheter ? » : les pièces qui, seules, débloquent le plus de circuits presque réalisables.
   const suggestions = useMemo(() => {
@@ -152,6 +169,35 @@ export function CircuitsView() {
             </Toggle>
           </div>
         </div>
+        <div className="space-y-3">
+          <h2 className="text-xl font-extrabold text-ink">{t("generator.type")}</h2>
+          <div className="flex flex-wrap gap-2">
+            <Toggle pressed={groups.length === 0} onClick={() => setPrefs({ groups: [] })}>
+              {t("generator.allTypes")}
+            </Toggle>
+            {(Object.keys(GROUPS) as CircuitGroup[]).map((g) => (
+              <Toggle
+                key={g}
+                pressed={groups.includes(g)}
+                onClick={() =>
+                  setPrefs({ groups: groups.includes(g) ? groups.filter((x) => x !== g) : [...groups, g] })
+                }
+              >
+                {t(`generator.groups.${g}`)}
+              </Toggle>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-3">
+          <h2 className="text-xl font-extrabold text-ink">{t("generator.sortTitle")}</h2>
+          <div className="flex flex-wrap gap-2">
+            {(["max", "simple"] as const).map((sort) => (
+              <Toggle key={sort} pressed={(prefs.sort ?? "max") === sort} onClick={() => setPrefs({ sort })}>
+                {t(`generator.sort.${sort}`)}
+              </Toggle>
+            ))}
+          </div>
+        </div>
       </section>
 
       <ChildPicker />
@@ -164,7 +210,10 @@ export function CircuitsView() {
               role="tab"
               type="button"
               aria-selected={tab === id}
-              onClick={() => setTab(id)}
+              onClick={() => {
+                setTab(id);
+                setShown(PAGE);
+              }}
               className="inline-flex min-h-11 items-center gap-2 rounded-full px-5 font-bold text-muted aria-selected:bg-surface aria-selected:text-ink aria-selected:shadow"
             >
               {t(id === "buildable" ? "circuits.tabBuildable" : "circuits.tabAlmost")}
@@ -196,7 +245,7 @@ export function CircuitsView() {
         </p>
       ) : (
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((c) => (
+          {list.slice(0, shown).map((c) => (
             <li key={c.code}>
               <CircuitCard
                 circuit={c}
@@ -207,6 +256,11 @@ export function CircuitsView() {
             </li>
           ))}
         </ul>
+      )}
+      {!loading && list.length > shown && (
+        <button type="button" className={`${buttonSecondary} w-full`} onClick={() => setShown(shown + PAGE)}>
+          {t("generator.more", { count: list.length - shown })}
+        </button>
       )}
 
       {/* Idée cadeau (EF-25) */}

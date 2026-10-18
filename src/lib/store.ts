@@ -36,7 +36,13 @@ export interface GeneratorPrefs {
   switches: boolean;
   crossing: boolean;
   decorate: boolean;
+  /** Types de circuits voulus (tous si vide). */
+  groups: CircuitGroup[];
+  /** « max » : ceux qui utilisent le plus de pièces d'abord ; « simple » : les plus faciles d'abord. */
+  sort: "max" | "simple";
 }
+
+export type CircuitGroup = "loops" | "eights" | "shapes" | "branches" | "networks";
 
 interface Box {
   /** Coffrets possédés : identifiant → nombre. */
@@ -74,7 +80,15 @@ const initial: AppState = {
   activeChildId: null,
   builds: [],
   favorites: [],
-  prefs: { sizes: [], bridge: false, switches: false, crossing: false, decorate: true },
+  prefs: {
+    sizes: [],
+    bridge: false,
+    switches: false,
+    crossing: false,
+    decorate: true,
+    groups: [],
+    sort: "max",
+  },
   createdAt: "",
 };
 
