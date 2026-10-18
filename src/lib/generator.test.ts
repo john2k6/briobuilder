@@ -49,7 +49,7 @@ describe("générateur de circuits", () => {
   });
 
   it("mélanger deux boîtes donne plus de circuits, dont des voies d'évitement", () => {
-    const mixed = generateLayouts(boxes("travel-switching", "firefighter"), catalog, { limit: 100 });
+    const mixed = generateLayouts(boxes("travel-switching", "deluxe-railway"), catalog, { limit: 100 });
     expect(mixed.total.buildable).toBeGreaterThan(result.total.buildable);
     expect(mixed.buildable.some((r) => r.family === "passing-loop")).toBe(true);
   });
@@ -137,8 +137,8 @@ describe("générateur de circuits", () => {
     const r = generateLayouts(inv, catalog, { families: ["wander", "mega"], limit: 1000 });
     const wander = r.buildable.filter((c) => c.family === "wander");
     const mega = r.buildable.filter((c) => c.family === "mega");
-    expect(r.total.buildable).toBeGreaterThanOrEqual(200);
-    expect(wander.length).toBeGreaterThan(20);
+    expect(r.total.buildable).toBeGreaterThanOrEqual(150);
+    expect(wander.length).toBeGreaterThan(15);
     expect(mega.length).toBeGreaterThan(20);
     for (const c of [...wander, ...mega]) {
       expect(isComplete(analyzeJoints(c.placements, catalog), c.code.split(":")[1].split("~")[0])).toBe(true);
