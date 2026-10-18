@@ -104,6 +104,85 @@ export function AccessoryShape({ kind }: { kind: AccessoryKind }) {
           <circle r={10} fill="var(--ink)" />
         </g>
       );
+    case "cargo-station":
+      return (
+        <g>
+          <rect
+            x={-64}
+            y={-30}
+            width={128}
+            height={60}
+            rx={6}
+            fill="var(--wood)"
+            stroke="var(--wood-dark)"
+            strokeWidth={4}
+          />
+          <path d="M-64 -10 H64 M-64 10 H64" stroke="var(--wood-dark)" strokeWidth={3} />
+          <rect x={-50} y={-24} width={22} height={22} fill="#e0a020" stroke="var(--wood-dark)" strokeWidth={3} />
+          <rect x={26} y={2} width={22} height={22} fill="#e0a020" stroke="var(--wood-dark)" strokeWidth={3} />
+        </g>
+      );
+    case "fire-station":
+      return (
+        <g>
+          <rect x={-60} y={-32} width={120} height={64} rx={6} fill="var(--accent)" />
+          <rect x={-48} y={-4} width={40} height={36} rx={3} fill="var(--surface)" />
+          <rect x={8} y={-4} width={40} height={36} rx={3} fill="var(--surface)" />
+          <path d="M-48 8 H-8 M-48 20 H-8 M8 8 H48 M8 20 H48" stroke="var(--accent)" strokeWidth={3} />
+          <circle cx={0} cy={-18} r={8} fill="#ffd23f" />
+        </g>
+      );
+    case "police-station":
+      return (
+        <g>
+          <rect x={-60} y={-30} width={120} height={60} rx={6} fill="var(--ink)" />
+          <rect x={-60} y={-30} width={120} height={14} rx={6} fill="#2f7fc1" />
+          <rect x={-12} y={4} width={24} height={26} fill="var(--surface)" />
+          <circle cx={-34} cy={8} r={7} fill="#2f7fc1" />
+          <circle cx={34} cy={8} r={7} fill="var(--accent)" />
+        </g>
+      );
+    case "farm":
+      return (
+        <g>
+          <rect x={-56} y={-34} width={112} height={68} rx={4} fill="#b4322a" />
+          <path d="M-56 0 H56" stroke="#7d1f19" strokeWidth={5} />
+          <rect x={-18} y={6} width={36} height={28} fill="var(--surface)" />
+          <path d="M-18 6 L18 34 M18 6 L-18 34" stroke="#b4322a" strokeWidth={4} />
+        </g>
+      );
+    case "roundhouse":
+      return (
+        <g>
+          <path d="M-70 30 A70 70 0 0 1 70 30 Z" fill="#5e6873" />
+          <path d="M-40 30 L-56 -6 M0 30 L0 -36 M40 30 L56 -6" stroke="var(--wood)" strokeWidth={6} />
+          <rect x={-70} y={24} width={140} height={10} rx={3} fill="var(--ink)" />
+        </g>
+      );
+    case "garage":
+      return (
+        <g>
+          <rect x={-56} y={-30} width={112} height={60} rx={8} fill="#8b96a3" />
+          <path d="M-36 30 V-4 A36 36 0 0 1 36 -4 V30 Z" fill="var(--ink)" />
+        </g>
+      );
+    case "signal-box":
+      return (
+        <g>
+          <rect x={-34} y={-34} width={68} height={68} rx={8} fill="var(--green)" />
+          <rect x={-22} y={-22} width={44} height={22} rx={3} fill="#cfe8ff" />
+          <rect x={-8} y={8} width={16} height={26} fill="var(--green-dark)" />
+        </g>
+      );
+    case "traffic-light":
+      return (
+        <g>
+          <rect x={-13} y={-36} width={26} height={72} rx={9} fill="var(--ink)" />
+          <circle cx={0} cy={-21} r={7} fill="var(--accent)" />
+          <circle cx={0} cy={0} r={7} fill="#ffd23f" />
+          <circle cx={0} cy={21} r={7} fill="var(--green)" />
+        </g>
+      );
     case "tree":
       return (
         <g>

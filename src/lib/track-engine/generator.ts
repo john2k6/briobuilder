@@ -57,7 +57,16 @@ export const ACCESSORY_CODES = {
   Q: "crane",
   A: "tree",
   O: "turntable",
+  L: "traffic-light",
+  H: "cargo-station",
+  F: "fire-station",
+  P: "police-station",
+  E: "farm",
+  D: "roundhouse",
+  R: "garage",
+  B: "signal-box",
 } as const;
+type AccessoryLetter = keyof typeof ACCESSORY_CODES;
 export type AccessoryKind = (typeof ACCESSORY_CODES)[keyof typeof ACCESSORY_CODES];
 
 export interface AccessoryPlacement {
@@ -684,7 +693,8 @@ export function sizeOf(pieces: number): Size {
 
 const FAMILY_CAP = 40;
 
-const TRACK_ACCESSORIES = new Set(["support", "tunnel", "station", "signal", "crane", "tree", "turntable"]);
+/** Pièces qui ne sont pas des rails : décors, bâtiments, trains. */
+const NOT_TRACK = new Set(["accessory", "building", "vehicle"]);
 
 function expand(elems: Elem[], pool: Inventory, missing: Inventory, allowMissing: number): string | null {
   let out = "";
@@ -738,7 +748,7 @@ function decorate(
   const used = new Set<number>();
   const codes: string[] = [];
   const list: AccessoryPlacement[] = [];
-  const put = (letter: keyof typeof ACCESSORY_CODES, candidates: { p: Placement; i: number }[], qty: number) => {
+  const put = (letter: AccessoryLetter, candidates: { p: Placement; i: number }[], qty: number) => {
     for (let n = 0; n < qty; n++) {
       const spot = candidates.find(({ i }) => !used.has(i));
       if (!spot) return;
@@ -752,12 +762,21 @@ function decorate(
   );
   const distance = ({ p }: { p: Placement }) => Math.min(...ends.map(([x, y]) => Math.hypot(p.x - x, p.y - y)));
   const nearEnds = ends.length ? [...ground].sort((a, b) => distance(a) - distance(b)) : [...ground].reverse();
-  // La gare d'abord (au bout d'une voie sans issue, sinon sur la ligne), puis le reste du décor.
-  put("G", nearEnds, Math.min(available.station ?? 0, Math.max(2, Math.min(ends.length, 3))));
+  // Gares et bâtiments d'abord, au bout des voies sans issue (sinon le long de la ligne), chacun différent.
+  let buildings = 0;
+  const maxBuildings = Math.max(2, Math.min(ends.length + 1, 4));
+  for (const letter of ["G", "H", "F", "P", "E", "R", "D"] as AccessoryLetter[]) {
+    const want = Math.min(available[ACCESSORY_CODES[letter]] ?? 0, letter === "G" && ends.length > 1 ? 2 : 1);
+    const qty = Math.min(want, maxBuildings - buildings);
+    put(letter, nearEnds, qty);
+    buildings += qty;
+  }
   if (ends.length) put("O", nearEnds, Math.min(available.turntable ?? 0, 1));
   put("T", longFirst, Math.min(available.tunnel ?? 0, 1));
   put("Q", ground, Math.min(available.crane ?? 0, 1));
+  put("B", ground, Math.min(available["signal-box"] ?? 0, 1));
   put("I", ground, Math.min(available.signal ?? 0, 1));
+  put("L", ground, Math.min(available["traffic-light"] ?? 0, 1));
   put(
     "A",
     curves.filter((_, n) => n % 3 === 1),
@@ -782,7 +801,7 @@ export function generateLayouts(
     216 * (inventory["suspension-bridge"] ?? 0);
   const maxRun = Math.min(1512, straightLength / 2 + 216 * maxMissing);
   const totalOwned = Object.entries(inventory)
-    .filter(([id]) => !TRACK_ACCESSORIES.has(id))
+    .filter(([id]) => !NOT_TRACK.has(catalog[id]?.category ?? "accessory"))
     .reduce((s, [, q]) => s + q, 0);
 
   const seen = new Set<string>();

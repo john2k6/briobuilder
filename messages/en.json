@@ -89,8 +89,8 @@
     "adapter-female-female": "Hole–hole adapter",
     "support": "Support",
     "tunnel": "Tunnel",
-    "station": "Station",
-    "signal": "Signal",
+    "station": "Passenger station",
+    "signal": "Bell signal",
     "crane": "Crane",
     "tree": "Tree",
     "switch-small": "Small switch",
@@ -99,7 +99,15 @@
     "curve-ascending": "Ascending curve",
     "lifting-bridge": "Lifting bridge",
     "curved-bridge": "Curved bridge",
-    "turntable": "Turntable"
+    "turntable": "Turntable",
+    "traffic-light": "Traffic lights",
+    "cargo-station": "Goods station",
+    "fire-station": "Fire station",
+    "police-station": "Police station",
+    "farm": "Farm barn",
+    "roundhouse": "Roundhouse",
+    "garage": "Train garage",
+    "signal-box": "Signal box"
   },
   "setNames": {
     "travel-switching": "Travel Switching Set",

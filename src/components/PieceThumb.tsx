@@ -1,13 +1,13 @@
 import { catalog } from "@/lib/catalog";
-import type { AccessoryKind } from "@/lib/track-engine";
+import { ACCESSORY_CODES, type AccessoryKind } from "@/lib/track-engine";
 import { AccessoryShape, TrackPlan } from "./TrackPlan";
 
-const ACCESSORY_KINDS = new Set<string>(["tunnel", "station", "signal", "crane", "tree", "turntable"]);
+const ACCESSORY_KINDS = new Set<string>(Object.values(ACCESSORY_CODES));
 
 /** Vignette d'une pièce : son tracé (même échelle pour toutes) ou le dessin de l'accessoire. */
 export function PieceThumb({ id, className = "w-full" }: { id: string; className?: string }) {
   const piece = catalog[id];
-  if (piece?.category === "accessory") {
+  if (piece?.category === "accessory" || piece?.category === "building") {
     return (
       <svg viewBox="-110 -80 220 160" className={className} aria-hidden="true">
         {ACCESSORY_KINDS.has(id) ? (

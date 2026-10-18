@@ -147,15 +147,10 @@ const ascendingCurve = {
 /** Pont courbe : une grande courbe E portée en hauteur. */
 const curvedBridge = { ...curve("curved-bridge", "33699", E, false), category: "bridge" };
 
-const accessory = (id, ref = null) => ({
-  id,
-  ref,
-  category: "accessory",
-  verified: true,
-  lengthMm: 0,
-  connectors: [],
-  tracks: [],
+const accessory = (id, ref = null, category = "accessory") => ({
+  id, ref, category, verified: true, lengthMm: 0, connectors: [], tracks: [],
 });
+const building = (id, ref = null) => accessory(id, ref, "building");
 
 const pieces = [
   straight("straight-long", "33341", 216, true),
@@ -241,13 +236,22 @@ const pieces = [
       ],
     ],
   },
-  accessory("support"),
-  accessory("tunnel"),
-  accessory("station"),
-  accessory("signal"),
-  accessory("crane"),
+  accessory("support", "33254"),
+  accessory("tunnel", "33735"),
+  accessory("signal", "33754"),
+  accessory("traffic-light", "33743"),
+  accessory("crane", "33835"),
   accessory("tree"),
   accessory("turntable", "33361"),
+  // Gares et bâtiments : chacun a son dessin et sa place dans les circuits.
+  building("station", "33649"),
+  building("cargo-station", "33280"),
+  building("fire-station", "33833"),
+  building("police-station", "33813"),
+  building("farm", "36012"),
+  building("roundhouse", "33736"),
+  building("garage", "33574"),
+  building("signal-box", "33674"),
 ];
 
 const url = new URL("../data/catalog/pieces.json", import.meta.url);

@@ -800,7 +800,7 @@
   },
   {
     "id": "support",
-    "ref": null,
+    "ref": "33254",
     "category": "accessory",
     "verified": true,
     "lengthMm": 0,
@@ -809,16 +809,7 @@
   },
   {
     "id": "tunnel",
-    "ref": null,
-    "category": "accessory",
-    "verified": true,
-    "lengthMm": 0,
-    "connectors": [],
-    "tracks": []
-  },
-  {
-    "id": "station",
-    "ref": null,
+    "ref": "33735",
     "category": "accessory",
     "verified": true,
     "lengthMm": 0,
@@ -827,7 +818,16 @@
   },
   {
     "id": "signal",
-    "ref": null,
+    "ref": "33754",
+    "category": "accessory",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "traffic-light",
+    "ref": "33743",
     "category": "accessory",
     "verified": true,
     "lengthMm": 0,
@@ -836,7 +836,7 @@
   },
   {
     "id": "crane",
-    "ref": null,
+    "ref": "33835",
     "category": "accessory",
     "verified": true,
     "lengthMm": 0,
@@ -856,6 +856,78 @@
     "id": "turntable",
     "ref": "33361",
     "category": "accessory",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "station",
+    "ref": "33649",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "cargo-station",
+    "ref": "33280",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "fire-station",
+    "ref": "33833",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "police-station",
+    "ref": "33813",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "farm",
+    "ref": "36012",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "roundhouse",
+    "ref": "33736",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "garage",
+    "ref": "33574",
+    "category": "building",
+    "verified": true,
+    "lengthMm": 0,
+    "connectors": [],
+    "tracks": []
+  },
+  {
+    "id": "signal-box",
+    "ref": "33674",
+    "category": "building",
     "verified": true,
     "lengthMm": 0,
     "connectors": [],

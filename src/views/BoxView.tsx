@@ -114,7 +114,9 @@ export function BoxView({ previews }: { previews: Record<string, string | null> 
       (!q || normalize(t(`setNames.${s.id}`)).includes(q) || (s.ref ?? "").includes(q)),
   );
   const tracks = Object.entries(inventory)
-    .filter(([id]) => pieceList.find((p) => p.id === id)?.category !== "accessory")
+    .filter(
+      ([id]) => !["accessory", "building", "vehicle"].includes(pieceList.find((p) => p.id === id)?.category ?? ""),
+    )
     .reduce((s, [, n]) => s + n, 0);
 
   const onAdd = (id: string) => {

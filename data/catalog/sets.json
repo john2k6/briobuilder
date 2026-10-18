@@ -78,7 +78,7 @@
         "quantity": 1
       },
       {
-        "pieceTypeId": "station",
+        "pieceTypeId": "fire-station",
         "quantity": 1
       },
       {
@@ -162,6 +162,10 @@
       {
         "pieceTypeId": "signal",
         "quantity": 1
+      },
+      {
+        "pieceTypeId": "signal-box",
+        "quantity": 1
       }
     ]
   },
@@ -227,6 +231,10 @@
       },
       {
         "pieceTypeId": "crane",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "cargo-station",
         "quantity": 1
       }
     ]
@@ -1014,6 +1022,10 @@
       {
         "pieceTypeId": "tree",
         "quantity": 2
+      },
+      {
+        "pieceTypeId": "signal-box",
+        "quantity": 1
       }
     ]
   },
@@ -1248,6 +1260,10 @@
       {
         "pieceTypeId": "signal",
         "quantity": 1
+      },
+      {
+        "pieceTypeId": "signal-box",
+        "quantity": 1
       }
     ]
   },
@@ -1302,6 +1318,10 @@
       {
         "pieceTypeId": "crane",
         "quantity": 1
+      },
+      {
+        "pieceTypeId": "cargo-station",
+        "quantity": 1
       }
     ]
   },
@@ -1343,6 +1363,10 @@
       },
       {
         "pieceTypeId": "crane",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "cargo-station",
         "quantity": 1
       }
     ]
@@ -1418,6 +1442,10 @@
       {
         "pieceTypeId": "tree",
         "quantity": 2
+      },
+      {
+        "pieceTypeId": "farm",
+        "quantity": 1
       }
     ]
   },
@@ -1443,6 +1471,10 @@
       },
       {
         "pieceTypeId": "crane",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "cargo-station",
         "quantity": 1
       }
     ]
@@ -1519,6 +1551,10 @@
       },
       {
         "pieceTypeId": "crane",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "cargo-station",
         "quantity": 1
       }
     ]
@@ -1621,6 +1657,10 @@
       },
       {
         "pieceTypeId": "crane",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "fire-station",
         "quantity": 1
       }
     ]

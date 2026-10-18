@@ -52,7 +52,7 @@ describe("catalogue", () => {
 
   it("chaque rail a de 1 à 4 connecteurs et au moins un tracé ; les accessoires aucun", () => {
     for (const piece of pieceList) {
-      if (piece.category === "accessory") {
+      if (["accessory", "building", "vehicle"].includes(piece.category)) {
         expect(piece.connectors).toHaveLength(0);
         continue;
       }

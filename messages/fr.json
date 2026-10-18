@@ -89,8 +89,8 @@
     "adapter-female-female": "Adaptateur trou-trou",
     "support": "Pilier",
     "tunnel": "Tunnel",
-    "station": "Gare",
-    "signal": "Signal",
+    "station": "Gare de voyageurs",
+    "signal": "Signal à cloche",
     "crane": "Grue",
     "tree": "Arbre",
     "switch-small": "Petit aiguillage",
@@ -99,7 +99,15 @@
     "curve-ascending": "Courbe montante",
     "lifting-bridge": "Pont levant",
     "curved-bridge": "Pont courbe",
-    "turntable": "Plaque tournante"
+    "turntable": "Plaque tournante",
+    "traffic-light": "Feux tricolores",
+    "cargo-station": "Gare de marchandises",
+    "fire-station": "Caserne de pompiers",
+    "police-station": "Commissariat",
+    "farm": "Grange de la ferme",
+    "roundhouse": "Dépôt de locomotives",
+    "garage": "Garage à trains",
+    "signal-box": "Poste d'aiguillage"
   },
   "setNames": {
     "travel-switching": "Circuit Plateforme Voyageurs",
