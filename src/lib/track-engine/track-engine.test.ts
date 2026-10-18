@@ -22,8 +22,18 @@ const straight: ChainStep = { pieceTypeId: "straight-long" };
 
 /** Ovale : 4 courbes, 2 droites, 4 courbes, 2 droites. */
 const ovalSteps: ChainStep[] = [
-  curve(), curve(), curve(), curve(), straight, straight,
-  curve(), curve(), curve(), curve(), straight, straight,
+  curve(),
+  curve(),
+  curve(),
+  curve(),
+  straight,
+  straight,
+  curve(),
+  curve(),
+  curve(),
+  curve(),
+  straight,
+  straight,
 ];
 
 describe("catalogue", () => {
@@ -47,10 +57,15 @@ describe("catalogue", () => {
 describe("connect", () => {
   const base = { x: 0, y: 0, level: 0 };
   it("accepte un mâle face à une femelle", () => {
-    expect(connect({ ...base, angle: 0, gender: "male" }, { ...base, angle: 180, gender: "female" })).toEqual({ ok: true });
+    expect(connect({ ...base, angle: 0, gender: "male" }, { ...base, angle: 180, gender: "female" })).toEqual({
+      ok: true,
+    });
   });
   it("refuse un mâle face à un mâle", () => {
-    expect(connect({ ...base, angle: 0, gender: "male" }, { ...base, angle: 180, gender: "male" })).toEqual({ ok: false, reason: "same-gender" });
+    expect(connect({ ...base, angle: 0, gender: "male" }, { ...base, angle: 180, gender: "male" })).toEqual({
+      ok: false,
+      reason: "same-gender",
+    });
   });
   it("refuse deux extrémités trop éloignées, mal orientées ou à des niveaux différents", () => {
     const m = { ...base, angle: 0, gender: "male" as const };
@@ -59,7 +74,9 @@ describe("connect", () => {
     expect(connect(m, { ...base, angle: 180, gender: "female", level: 1 })).toMatchObject({ reason: "level" });
   });
   it("tolère 3 mm d'écart", () => {
-    expect(connect({ ...base, angle: 0, gender: "male" }, { ...base, x: 2.5, angle: 180.5, gender: "female" }).ok).toBe(true);
+    expect(connect({ ...base, angle: 0, gender: "male" }, { ...base, x: 2.5, angle: 180.5, gender: "female" }).ok).toBe(
+      true,
+    );
   });
 });
 
@@ -96,7 +113,15 @@ describe("fermeture (critères du lot 0)", () => {
   });
 
   it("un cercle de 8 courbes est fermé", () => {
-    expect(isClosed(chain(Array.from({ length: 8 }, () => curve()), catalog), catalog)).toBe(true);
+    expect(
+      isClosed(
+        chain(
+          Array.from({ length: 8 }, () => curve()),
+          catalog,
+        ),
+        catalog,
+      ),
+    ).toBe(true);
   });
 
   it("un circuit ouvert est détecté ouvert", () => {
@@ -179,7 +204,13 @@ describe("inventaire", () => {
 
   it("classe les circuits réalisables et presque réalisables", () => {
     const oval = { id: "oval", placements: chain(ovalSteps, catalog) };
-    const circle = { id: "circle", placements: chain(Array.from({ length: 8 }, () => curve()), catalog) };
+    const circle = {
+      id: "circle",
+      placements: chain(
+        Array.from({ length: 8 }, () => curve()),
+        catalog,
+      ),
+    };
     const big = { id: "big", placements: chain([...ovalSteps, straight, straight, straight, straight], catalog) };
 
     const result = matchInventory({ "curve-large": 8, "straight-long": 2 }, [oval, circle, big]);

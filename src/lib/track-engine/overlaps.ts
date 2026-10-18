@@ -48,10 +48,7 @@ export function overlaps(placements: Placement[], catalog: Catalog): [string, st
         (pa) =>
           !nearJoint(pa, ends) &&
           b.points.some(
-            (pb) =>
-              pa[2] === pb[2] &&
-              Math.hypot(pa[0] - pb[0], pa[1] - pb[1]) < TRACK_WIDTH &&
-              !nearJoint(pb, ends),
+            (pb) => pa[2] === pb[2] && Math.hypot(pa[0] - pb[0], pa[1] - pb[1]) < TRACK_WIDTH && !nearJoint(pb, ends),
           ),
       );
       if (hit) result.push([a.id, b.id]);

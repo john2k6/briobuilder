@@ -1,11 +1,4 @@
-import type {
-  Catalog,
-  Connector,
-  PieceType,
-  Placement,
-  TrackPoint,
-  WorldConnector,
-} from "./types";
+import type { Catalog, Connector, PieceType, Placement, TrackPoint, WorldConnector } from "./types";
 
 /** Écart de position toléré entre deux connecteurs raccordés (mm). */
 export const POSITION_TOLERANCE = 3;

@@ -1,9 +1,7 @@
 import { ANGLE_TOLERANCE, POSITION_TOLERANCE, angleDiff, getPiece, transform } from "./geometry";
 import type { Catalog, Connector, Placement, WorldConnector } from "./types";
 
-export type ConnectResult =
-  | { ok: true }
-  | { ok: false; reason: "too-far" | "misaligned" | "level" | "same-gender" };
+export type ConnectResult = { ok: true } | { ok: false; reason: "too-far" | "misaligned" | "level" | "same-gender" };
 
 /** Vérifie si deux connecteurs placés peuvent être raccordés. */
 export function connect(a: Connector, b: Connector): ConnectResult {

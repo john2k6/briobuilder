@@ -9,6 +9,10 @@
   --muted: #6b6f73;
   --accent: #d2232a;
   --accent-ink: #ffffff;
+  --accent-dark: #9e1a20;
+  --floor: #f1e4cd;
+  --highlight: #f6b8ad;
+  --floor-line: #e6d4b6;
   --green: #1f8a4c;
   --green-ink: #ffffff;
   --header: #2e3236;
@@ -29,6 +33,10 @@
     --muted: #a9aeb3;
     --accent: #ef4a4f;
     --accent-ink: #ffffff;
+    --accent-dark: #a3262b;
+    --floor: #3a3128;
+    --highlight: #b9544f;
+    --floor-line: #44392e;
     --green: #3fb36f;
     --green-ink: #10251a;
     --header: #15181a;
@@ -65,4 +73,34 @@
 body {
   background: var(--background);
   color: var(--foreground);
+  overflow-x: clip;
+}
+
+/* Parquet clair sous les plans de circuits. */
+.wood-floor {
+  background-color: var(--floor);
+  background-image: repeating-linear-gradient(0deg, transparent 0 46px, var(--floor-line) 46px 48px);
+}
+
+/* Confettis de fin de construction : courts (600 ms) et masqués si les animations sont réduites. */
+.confetti {
+  opacity: 0;
+  animation: confetti 600ms ease-out forwards;
+}
+
+@keyframes confetti {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
+  }
+}
+
+@media print {
+  body {
+    background: white;
+  }
 }

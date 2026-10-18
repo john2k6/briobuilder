@@ -1,0 +1,13 @@
+[
+  { "id": "circle", "theme": "classic", "ageMin": 3, "difficulty": 1, "minutes": 5, "addedAt": "2026-10-18", "sequence": "CCCCCCCC" },
+  { "id": "oval", "theme": "classic", "ageMin": 3, "difficulty": 1, "minutes": 8, "addedAt": "2026-10-18", "sequence": "CCCCLLCCCCLL" },
+  { "id": "stadium", "theme": "classic", "ageMin": 3, "difficulty": 1, "minutes": 8, "addedAt": "2026-10-18", "sequence": "CCLCCLCCLCCL" },
+  { "id": "long-oval", "theme": "classic", "ageMin": 4, "difficulty": 2, "minutes": 10, "addedAt": "2026-10-18", "sequence": "CCCCLSLCCCCLSL" },
+  { "id": "rectangle", "theme": "city", "ageMin": 4, "difficulty": 2, "minutes": 10, "addedAt": "2026-10-18", "sequence": "CCLLCCLCCLLCCL" },
+  { "id": "giant-oval", "theme": "countryside", "ageMin": 5, "difficulty": 2, "minutes": 12, "addedAt": "2026-10-18", "sequence": "CCCCLLLCCCCLLL" },
+  { "id": "medium-oval", "theme": "classic", "ageMin": 3, "difficulty": 1, "minutes": 8, "addedAt": "2026-10-18", "sequence": "CCCCMMCCCCMM" },
+  { "id": "mixed-oval", "theme": "classic", "ageMin": 4, "difficulty": 2, "minutes": 9, "addedAt": "2026-10-18", "sequence": "CCCCMSCCCCMS" },
+  { "id": "small-circle", "theme": "classic", "ageMin": 3, "difficulty": 1, "minutes": 4, "addedAt": "2026-10-18", "sequence": "cccccccc" },
+  { "id": "small-oval", "theme": "city", "ageMin": 3, "difficulty": 1, "minutes": 6, "addedAt": "2026-10-18", "sequence": "ccccLccccL" },
+  { "id": "small-long-oval", "theme": "city", "ageMin": 4, "difficulty": 2, "minutes": 8, "addedAt": "2026-10-18", "sequence": "ccccLLccccLL" }
+]
