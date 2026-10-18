@@ -14,6 +14,13 @@ import {
   type Inventory,
 } from "./track-engine";
 
+/** Ajoute à la nomenclature les gares, tunnels et décors posés le long du circuit. */
+function withAccessories(bom: Inventory, accessories: { kind: string }[]): Inventory {
+  const out = { ...bom };
+  for (const a of accessories) out[a.kind] = (out[a.kind] ?? 0) + 1;
+  return out;
+}
+
 /** Adresse de la fiche (ou du mode pas à pas) d'un circuit : le circuit voyage dans l'adresse. */
 export const circuitHref = (code: string, build = false) => ({
   pathname: build ? "/circuit/build" : "/circuit",
@@ -38,7 +45,7 @@ export function circuitFromCode(code: string): Circuit | null {
       const features = featuresOf(tokens);
       circuit = {
         ...decoded,
-        bom: fullBillOfMaterials(decoded.placements, catalog),
+        bom: withAccessories(fullBillOfMaterials(decoded.placements, catalog), decoded.accessories),
         gap: Math.round(report.maxGap * 10) / 10,
         pieces,
         size: sizeOf(pieces),

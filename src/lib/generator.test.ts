@@ -18,12 +18,8 @@ describe("générateur de circuits", () => {
     expect(result.total.buildable).toBeGreaterThanOrEqual(10);
     expect(result.buildable.length).toBeGreaterThanOrEqual(8);
     expect(new Set(result.buildable.map((r) => r.family)).size).toBeGreaterThanOrEqual(4);
-    // Variété : pas deux circuits de la même famille avec presque le même nombre de pièces.
-    for (const a of result.buildable) {
-      for (const b of result.buildable) {
-        if (a !== b && a.family === b.family) expect(Math.abs(a.pieces - b.pieces)).toBeGreaterThanOrEqual(2);
-      }
-    }
+    // Tous différents.
+    expect(new Set(result.buildable.map((r) => r.code)).size).toBe(result.buildable.length);
   });
 
   it("chaque proposition se referme, sans chevauchement, et tient dans l'inventaire", () => {

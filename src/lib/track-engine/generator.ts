@@ -405,9 +405,52 @@ function withBranch(loop: Elem[], runIndex: number, before: number, sw: string, 
 const END: Elem = { end: true };
 
 function* templates(maxRun: number): Generator<Template> {
-  const runs = RUN_LENGTHS.filter((l) => l <= maxRun);
+  // Du plus grand au plus petit : les grands circuits, qui utilisent le plus de pièces, passent en premier.
+  const runs = RUN_LENGTHS.filter((l) => l <= maxRun).reverse();
   const positive = runs.filter((l) => l > 0);
   const upTo = (max: number) => runs.filter((l) => l <= max);
+
+  // Huit avec croisement : deux boucles de 270° autour du croisement, de tailles et de courbes différentes.
+  // Boucle : ligne p, virage, ligne u, virage, ligne w, virage, ligne q ; w et q se déduisent de p et u.
+  const loop270 = (curve: "C" | "c" | "R" | "r", p: number, u: number): Elem[] | null => {
+    const radius = curve === "C" || curve === "R" ? RADIUS.C : RADIUS.c;
+    const w = p + 108 - radius;
+    const q = u + radius - 108;
+    const [w2, q2] = [nearestRun(w), nearestRun(q)];
+    if (w < -3 || Math.abs(w2 - w) > 6 || Math.abs(q2 - q) > 6) return null;
+    const c2 = curve + curve;
+    return [{ run: p }, c2, { run: u }, c2, { run: w2 }, c2, { run: q2 }];
+  };
+  // Pour chaque type de courbe, quelques boucles réalisables (du plus grand au plus petit).
+  const loopsFor = (curve: "C" | "c" | "R" | "r") => {
+    const sizes = RUN_LENGTHS.filter((l) => l <= Math.min(432, maxRun)).reverse();
+    const found: Elem[][] = [];
+    for (const p of sizes) {
+      for (const u of sizes) {
+        const loop = loop270(curve, p, u);
+        if (loop) found.push(loop);
+      }
+    }
+    // Une dizaine de boucles réparties du plus grand au plus petit.
+    const step = Math.max(1, Math.floor(found.length / 10));
+    return found.filter((_, i) => i % step === 0 || i === found.length - 1);
+  };
+  for (const [first, second] of [
+    ["R", "C"],
+    ["r", "c"],
+    ["R", "c"],
+    ["r", "C"],
+  ] as const) {
+    for (const a of loopsFor(first)) {
+      for (const b of loopsFor(second)) {
+        yield {
+          family: "eight-crossing",
+          elems: [{ tag: "x", token: "X" }, ...a, { jump: "x", connector: 3 }, ...b],
+          checkOverlaps: true,
+        };
+      }
+    }
+  }
 
   for (const k of ["C", "c"] as const) {
     const R = RADIUS[k];
@@ -480,25 +523,6 @@ function* templates(maxRun: number): Generator<Template> {
           checkOverlaps: true,
         };
       }
-    }
-    // Huit avec croisement : deux boucles de 270°, éventuellement allongées par des lignes droites (u).
-    for (const u of upTo(324)) {
-      const p = nearestRun(u + R - 108);
-      const loop = (c: string) => [c + c, { run: u }, c + c, { run: u }, c + c];
-      yield {
-        family: "eight-crossing",
-        elems: [
-          { tag: "x", token: "X" },
-          { run: p },
-          ...loop(r),
-          { run: p },
-          { jump: "x", connector: 3 },
-          { run: p },
-          ...loop(k),
-          { run: p },
-        ],
-        checkOverlaps: true,
-      };
     }
     // Huit avec pont : la voie verticale monte, passe au-dessus de l'autre, puis redescend.
     for (const u of upTo(432)) {
@@ -698,6 +722,8 @@ export interface GeneratorOptions {
   maxMissing?: number;
   /** Nombre maximal de propositions par catégorie. */
   limit?: number;
+  /** « max » : d'abord les circuits qui utilisent le plus de pièces possédées ; « simple » : les plus faciles. */
+  sort?: "max" | "simple";
 }
 
 export interface GeneratedLayout extends DecodedLayout {
@@ -791,11 +817,11 @@ function decorate(
   const distance = ({ p }: { p: Placement }) => Math.min(...ends.map(([x, y]) => Math.hypot(p.x - x, p.y - y)));
   const nearEnds = ends.length ? [...ground].sort((a, b) => distance(a) - distance(b)) : [...ground].reverse();
   // Gares et bâtiments d'abord, au bout des voies sans issue (sinon le long de la ligne), chacun différent.
+  // Le plus possible de ce qu'on possède : chaque gare et bâtiment différent, puis les autres décors.
   let buildings = 0;
-  const maxBuildings = Math.max(2, Math.min(ends.length + 1, 4));
+  const maxBuildings = Math.min(6, Math.max(3, ends.length + 2));
   for (const letter of ["G", "H", "F", "P", "E", "R", "D"] as AccessoryLetter[]) {
-    const want = Math.min(available[ACCESSORY_CODES[letter]] ?? 0, letter === "G" && ends.length > 1 ? 2 : 1);
-    const qty = Math.min(want, maxBuildings - buildings);
+    const qty = Math.min(available[ACCESSORY_CODES[letter]] ?? 0, letter === "G" ? 3 : 1, maxBuildings - buildings);
     put(letter, nearEnds, qty);
     buildings += qty;
   }
@@ -810,15 +836,15 @@ function decorate(
     const [x, y] = middle(p);
     return high.some(([hx, hy]) => Math.hypot(hx - x, hy - y) < 120);
   });
-  put("T", [...underBridge, ...longFirst], Math.min(available.tunnel ?? 0, 1));
-  put("Q", ground, Math.min(available.crane ?? 0, 1));
+  put("T", [...underBridge, ...longFirst], Math.min(available.tunnel ?? 0, 2));
+  put("Q", ground, Math.min(available.crane ?? 0, 2));
   put("B", ground, Math.min(available["signal-box"] ?? 0, 1));
-  put("I", ground, Math.min(available.signal ?? 0, 1));
-  put("L", ground, Math.min(available["traffic-light"] ?? 0, 1));
+  put("I", ground, Math.min(available.signal ?? 0, 2));
+  put("L", ground, Math.min(available["traffic-light"] ?? 0, 2));
   put(
     "A",
-    curves.filter((_, n) => n % 3 === 1),
-    Math.min(available.tree ?? 0, 3),
+    curves.filter((_, n) => n % 2 === 1),
+    Math.min(available.tree ?? 0, 6),
   );
   return { codes, list };
 }
@@ -855,6 +881,9 @@ export function generateLayouts(
   for (const template of all()) {
     if (options.families?.length && !options.families.includes(template.family)) continue;
     if (full(template.family, "buildable") && full(template.family, "almost")) continue;
+    // Plus de lignes droites que de rails disponibles : inutile d'essayer.
+    const runTotal = template.elems.reduce((sum, e) => sum + (typeof e === "object" && "run" in e ? e.run : 0), 0);
+    if (runTotal > straightLength + 216 * maxMissing) continue;
     // Pièces fixes : on écarte d'emblée ce qui manque trop.
     const fixedMissing = Object.entries(fixedNeeds(template.elems)).reduce(
       (s, [id, q]) => s + Math.max(0, q - (inventory[id] ?? 0)),
@@ -912,6 +941,8 @@ export function generateLayouts(
       accessories = deco.list;
       if (deco.codes.length) fullCode = `${code}~${deco.codes.join(".")}`;
     }
+    // Les gares, tunnels et décors posés font partie des pièces à sortir de la caisse.
+    for (const a of accessories) bom[a.kind] = (bom[a.kind] ?? 0) + 1;
 
     const special = Number(features.bridge) + Number(features.switches) + Number(features.crossing);
     const deadEndCount = openEndCount(tokens) + (bom["buffer-stop"] ?? 0);
@@ -932,7 +963,7 @@ export function generateLayouts(
       difficulty: difficultyOf(pieces, features),
       minutes: minutesOf(pieces, features),
       score:
-        usage * 3 +
+        (options.sort === "simple" ? -pieces * 0.15 : usage * 6 + accessories.length * 0.15) +
         special * 0.8 +
         Math.min(deadEndCount, 2) * 0.3 +
         (report.maxGap < 1 ? 0.3 : 0) -
@@ -941,12 +972,12 @@ export function generateLayouts(
   }
 
   const pick = (list: GeneratedLayout[]) => {
-    // Variété : au plus 4 circuits par famille, de tailles différentes ; on alterne les familles.
+    // Variété : au plus 10 circuits par famille, tous différents ; on alterne les familles.
     const byFamily = new Map<Family, GeneratedLayout[]>();
     for (const r of [...list].sort((a, b) => b.score - a.score)) {
       const group = byFamily.get(r.family) ?? [];
-      const similar = group.some((g) => Math.abs(g.pieces - r.pieces) < 2);
-      if (!similar && group.length < 4) group.push(r);
+      const similar = group.some((g) => g.pieces === r.pieces && g.code.length === r.code.length);
+      if (!similar && group.length < 10) group.push(r);
       byFamily.set(r.family, group);
     }
     const out: GeneratedLayout[] = [];

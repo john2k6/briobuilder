@@ -160,14 +160,6 @@ export function CircuitView() {
             })}
           </ul>
 
-          {circuit.accessories.length > 0 && (
-            <p className="text-sm text-muted">
-              {t("circuit.decor", {
-                list: [...new Set(circuit.accessories.map((a) => t(`pieceNames.${a.kind}`)))].join(", "),
-              })}
-            </p>
-          )}
-
           {missingCount > 0 && (
             <p className="rounded-xl bg-accent/10 p-4 font-bold text-accent">
               {t("circuit.missingCount", { count: missingCount })}
