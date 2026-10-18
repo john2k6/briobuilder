@@ -1,0 +1,537 @@
+[
+  {
+    "id": "straight-long",
+    "ref": "33341",
+    "category": "straight",
+    "verified": true,
+    "lengthMm": 216,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 216,
+        "y": 0,
+        "angle": 0,
+        "gender": "male",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          216,
+          0,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "straight-medium",
+    "ref": "33335",
+    "category": "straight",
+    "verified": false,
+    "lengthMm": 144,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 144,
+        "y": 0,
+        "angle": 0,
+        "gender": "male",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          144,
+          0,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "straight-short",
+    "ref": "33334",
+    "category": "straight",
+    "verified": true,
+    "lengthMm": 108,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 108,
+        "y": 0,
+        "angle": 0,
+        "gender": "male",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          108,
+          0,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "curve-large",
+    "ref": "33342",
+    "category": "curve",
+    "verified": false,
+    "lengthMm": 142.94,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 128.69,
+        "y": 53.31,
+        "angle": 45,
+        "gender": "male",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          15.86,
+          0.69,
+          0
+        ],
+        [
+          31.6,
+          2.76,
+          0
+        ],
+        [
+          47.11,
+          6.2,
+          0
+        ],
+        [
+          62.25,
+          10.98,
+          0
+        ],
+        [
+          76.92,
+          17.05,
+          0
+        ],
+        [
+          91,
+          24.38,
+          0
+        ],
+        [
+          104.39,
+          32.91,
+          0
+        ],
+        [
+          116.99,
+          42.58,
+          0
+        ],
+        [
+          128.69,
+          53.31,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "curve-small",
+    "ref": "33337",
+    "category": "curve",
+    "verified": false,
+    "lengthMm": 70.69,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 63.64,
+        "y": 26.36,
+        "angle": 45,
+        "gender": "male",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          7.84,
+          0.34,
+          0
+        ],
+        [
+          15.63,
+          1.37,
+          0
+        ],
+        [
+          23.29,
+          3.07,
+          0
+        ],
+        [
+          30.78,
+          5.43,
+          0
+        ],
+        [
+          38.04,
+          8.43,
+          0
+        ],
+        [
+          45,
+          12.06,
+          0
+        ],
+        [
+          51.62,
+          16.28,
+          0
+        ],
+        [
+          57.85,
+          21.06,
+          0
+        ],
+        [
+          63.64,
+          26.36,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "switch",
+    "ref": "33344",
+    "category": "switch",
+    "verified": false,
+    "lengthMm": 145,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 145,
+        "y": 0,
+        "angle": 0,
+        "gender": "male",
+        "level": 0
+      },
+      {
+        "x": 128.69,
+        "y": 53.31,
+        "angle": 45,
+        "gender": "male",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          145,
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          15.86,
+          0.69,
+          0
+        ],
+        [
+          31.6,
+          2.76,
+          0
+        ],
+        [
+          47.11,
+          6.2,
+          0
+        ],
+        [
+          62.25,
+          10.98,
+          0
+        ],
+        [
+          76.92,
+          17.05,
+          0
+        ],
+        [
+          91,
+          24.38,
+          0
+        ],
+        [
+          104.39,
+          32.91,
+          0
+        ],
+        [
+          116.99,
+          42.58,
+          0
+        ],
+        [
+          128.69,
+          53.31,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "ramp",
+    "ref": "33332",
+    "category": "ramp",
+    "verified": true,
+    "lengthMm": 216,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 216,
+        "y": 0,
+        "angle": 0,
+        "gender": "male",
+        "level": 1
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          216,
+          0,
+          1
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "crossing",
+    "ref": "33388",
+    "category": "crossing",
+    "verified": false,
+    "lengthMm": 144,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 144,
+        "y": 0,
+        "angle": 0,
+        "gender": "male",
+        "level": 0
+      },
+      {
+        "x": 72,
+        "y": -72,
+        "angle": 270,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 72,
+        "y": 72,
+        "angle": 90,
+        "gender": "male",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          144,
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          72,
+          -72,
+          0
+        ],
+        [
+          72,
+          72,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "adapter-male-male",
+    "ref": "33393",
+    "category": "adapter",
+    "verified": false,
+    "lengthMm": 54,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "male",
+        "level": 0
+      },
+      {
+        "x": 54,
+        "y": 0,
+        "angle": 0,
+        "gender": "male",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          54,
+          0,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "adapter-female-female",
+    "ref": "33393",
+    "category": "adapter",
+    "verified": false,
+    "lengthMm": 54,
+    "connectors": [
+      {
+        "x": 0,
+        "y": 0,
+        "angle": 180,
+        "gender": "female",
+        "level": 0
+      },
+      {
+        "x": 54,
+        "y": 0,
+        "angle": 0,
+        "gender": "female",
+        "level": 0
+      }
+    ],
+    "tracks": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          54,
+          0,
+          0
+        ]
+      ]
+    ]
+  }
+]

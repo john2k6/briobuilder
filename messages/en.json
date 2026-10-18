@@ -1,0 +1,71 @@
+{
+  "app": {
+    "name": "Rail Builder",
+    "description": "Find out which wooden train layouts you can build right now with the pieces you already own."
+  },
+  "nav": {
+    "home": "Home",
+    "pieces": "Piece catalogue",
+    "language": "Language"
+  },
+  "home": {
+    "title": "What can you build with your wooden track?",
+    "subtitle": "Tell us which pieces are in your box: the app shows the layouts you can build right now and guides your child step by step.",
+    "soon": "Coming soon",
+    "seePieces": "Browse the piece catalogue",
+    "stepsTitle": "How it works",
+    "step1Title": "Your box",
+    "step1Text": "Add your sets in one tap, then adjust piece by piece.",
+    "step2Title": "Your layouts",
+    "step2Text": "See the layouts you can build with what you have, and the ones missing just one to three pieces.",
+    "step3Title": "Let's build",
+    "step3Text": "Your child follows the plan step by step, with big buttons and instructions read aloud.",
+    "demoTitle": "Example: the oval",
+    "demoText": "{curves} curves and {straights} straights. The engine checks every joint and makes sure the loop closes.",
+    "demoClosed": "Closed loop",
+    "demoOpen": "Open track"
+  },
+  "pieces": {
+    "title": "Piece catalogue",
+    "intro": "Each piece is described by its shape and its ends (male or female): that is how we can check that a layout closes.",
+    "ref": "Ref. {ref}",
+    "length": "{length} mm",
+    "connectors": "{count, plural, one {# end} other {# ends}}",
+    "toMeasure": "To be measured",
+    "setsTitle": "Sets",
+    "setsIntro": "Adding a set puts all of its pieces in your box at once.",
+    "setPieces": "{count, plural, one {# piece} other {# pieces}}",
+    "example": "Example"
+  },
+  "categories": {
+    "straight": "Straight track",
+    "curve": "Curved track",
+    "switch": "Switches",
+    "crossing": "Crossings",
+    "ramp": "Ramps and bridges",
+    "adapter": "Adapters",
+    "tunnel": "Tunnels",
+    "building": "Stations and buildings",
+    "train": "Trains"
+  },
+  "pieceNames": {
+    "straight-long": "Long straight",
+    "straight-medium": "Medium straight",
+    "straight-short": "Short straight",
+    "curve-large": "Large curve",
+    "curve-small": "Small curve",
+    "switch": "Switch",
+    "ramp": "Ascending track",
+    "crossing": "Crossing",
+    "adapter-male-male": "Male–male adapter",
+    "adapter-female-female": "Female–female adapter"
+  },
+  "setNames": {
+    "starter": "Starter set",
+    "expansion-switches": "Switch expansion",
+    "expansion-bridge": "Bridge expansion"
+  },
+  "footer": {
+    "compat": "Compatible with BRIO®-type wooden railway track. BRIO is a registered trademark of its owner; this site is not affiliated with or endorsed by it."
+  }
+}

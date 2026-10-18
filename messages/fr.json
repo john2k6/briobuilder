@@ -1,0 +1,71 @@
+{
+  "app": {
+    "name": "Rail Builder",
+    "description": "Découvrez quels circuits de train en bois vous pouvez construire dès maintenant avec les pièces que vous avez."
+  },
+  "nav": {
+    "home": "Accueil",
+    "pieces": "Catalogue des pièces",
+    "language": "Langue"
+  },
+  "home": {
+    "title": "Que construire avec vos rails en bois ?",
+    "subtitle": "Indiquez les pièces de votre caisse : l'app vous propose les circuits réalisables dès maintenant, et guide votre enfant pas à pas pour les monter.",
+    "soon": "Bientôt disponible",
+    "seePieces": "Voir le catalogue des pièces",
+    "stepsTitle": "Comment ça marche",
+    "step1Title": "Votre caisse",
+    "step1Text": "Ajoutez vos coffrets en un geste, puis ajustez pièce par pièce.",
+    "step2Title": "Vos circuits",
+    "step2Text": "L'app affiche les circuits que vous pouvez monter avec ce que vous avez, et ceux auxquels il manque une à trois pièces.",
+    "step3Title": "On construit",
+    "step3Text": "Votre enfant suit le plan étape par étape, avec de grands boutons et des consignes lues à voix haute.",
+    "demoTitle": "Exemple : l'ovale",
+    "demoText": "{curves} courbes et {straights} droites. Le moteur vérifie que chaque raccord est correct et que le circuit se referme.",
+    "demoClosed": "Circuit fermé",
+    "demoOpen": "Circuit ouvert"
+  },
+  "pieces": {
+    "title": "Catalogue des pièces",
+    "intro": "Chaque pièce est décrite par sa forme et ses extrémités (mâle ou femelle) : c'est ce qui permet de vérifier qu'un circuit se referme.",
+    "ref": "Réf. {ref}",
+    "length": "{length} mm",
+    "connectors": "{count, plural, one {# extrémité} other {# extrémités}}",
+    "toMeasure": "À mesurer",
+    "setsTitle": "Coffrets",
+    "setsIntro": "Ajouter un coffret ajoute d'un coup toutes ses pièces à votre caisse.",
+    "setPieces": "{count, plural, one {# pièce} other {# pièces}}",
+    "example": "Exemple"
+  },
+  "categories": {
+    "straight": "Rails droits",
+    "curve": "Rails courbes",
+    "switch": "Aiguillages",
+    "crossing": "Croisements",
+    "ramp": "Rampes et ponts",
+    "adapter": "Adaptateurs",
+    "tunnel": "Tunnels",
+    "building": "Gares et bâtiments",
+    "train": "Trains"
+  },
+  "pieceNames": {
+    "straight-long": "Rail droit long",
+    "straight-medium": "Rail droit moyen",
+    "straight-short": "Petit rail droit",
+    "curve-large": "Grand rail courbe",
+    "curve-small": "Petit rail courbe",
+    "switch": "Aiguillage",
+    "ramp": "Rail montant",
+    "crossing": "Croisement",
+    "adapter-male-male": "Adaptateur mâle-mâle",
+    "adapter-female-female": "Adaptateur femelle-femelle"
+  },
+  "setNames": {
+    "starter": "Coffret de démarrage",
+    "expansion-switches": "Extension aiguillages",
+    "expansion-bridge": "Extension pont"
+  },
+  "footer": {
+    "compat": "Compatible avec les rails en bois de type BRIO®. BRIO est une marque déposée de son propriétaire ; ce site n'est ni affilié ni approuvé par celui-ci."
+  }
+}

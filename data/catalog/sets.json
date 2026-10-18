@@ -1,0 +1,34 @@
+[
+  {
+    "id": "starter",
+    "ref": null,
+    "verified": false,
+    "contents": [
+      { "pieceTypeId": "curve-large", "quantity": 8 },
+      { "pieceTypeId": "straight-long", "quantity": 4 },
+      { "pieceTypeId": "straight-short", "quantity": 2 }
+    ]
+  },
+  {
+    "id": "expansion-switches",
+    "ref": null,
+    "verified": false,
+    "contents": [
+      { "pieceTypeId": "switch", "quantity": 2 },
+      { "pieceTypeId": "straight-medium", "quantity": 4 },
+      { "pieceTypeId": "curve-small", "quantity": 4 },
+      { "pieceTypeId": "adapter-male-male", "quantity": 1 },
+      { "pieceTypeId": "adapter-female-female", "quantity": 1 }
+    ]
+  },
+  {
+    "id": "expansion-bridge",
+    "ref": null,
+    "verified": false,
+    "contents": [
+      { "pieceTypeId": "ramp", "quantity": 2 },
+      { "pieceTypeId": "straight-long", "quantity": 2 },
+      { "pieceTypeId": "crossing", "quantity": 1 }
+    ]
+  }
+]
