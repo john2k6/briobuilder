@@ -46,6 +46,14 @@ export const TOKENS: Record<string, ChainStep> = {
   N: { pieceTypeId: "switch-small" },
   n: { pieceTypeId: "switch-small", flipped: true },
   H: { pieceTypeId: "lifting-bridge" },
+  // Courbes montantes en plastique (demi-tour) : E monte en tournant à gauche, e à droite ;
+  // F redescend en tournant à gauche, f à droite (pièce inverse posée à l'envers).
+  E: { pieceTypeId: "curve-ascending" },
+  e: { pieceTypeId: "curve-ascending", flipped: true },
+  F: { pieceTypeId: "curve-ascending-reverse", flipped: true, inConnector: 1, outConnector: 0 },
+  f: { pieceTypeId: "curve-ascending-reverse", inConnector: 1, outConnector: 0 },
+  // Ascenseur de l'entrepôt : le train monte d'un niveau.
+  G: { pieceTypeId: "lift" },
 };
 
 /** « | » marque une voie sans issue laissée ouverte (pas de butoir disponible) : ce n'est pas une pièce. */
@@ -95,7 +103,9 @@ export type Family =
   | "fork"
   | "yard"
   | "line"
-  | "network";
+  | "network"
+  | "spiral"
+  | "lift";
 
 export const FAMILIES: Family[] = [
   "circle",
@@ -117,6 +127,8 @@ export const FAMILIES: Family[] = [
   "yard",
   "line",
   "network",
+  "spiral",
+  "lift",
 ];
 
 /** Transforme une suite de jetons en étapes de pose. « @3.2 » : repartir du connecteur 2 de la 3e pièce. */
@@ -161,7 +173,7 @@ export interface CircuitFeatures {
 }
 
 export function featuresOf(tokens: string): CircuitFeatures {
-  return { bridge: tokens.includes("U"), switches: /[WwYyJNn]/.test(tokens), crossing: tokens.includes("X") };
+  return { bridge: /[UEeG]/.test(tokens), switches: /[WwYyJNn]/.test(tokens), crossing: tokens.includes("X") };
 }
 
 export function difficultyOf(pieces: number, features: CircuitFeatures): 1 | 2 | 3 {
@@ -683,6 +695,41 @@ function* templates(maxRun: number): Generator<Template> {
         }
       }
     }
+
+    // Deux niveaux avec les courbes montantes en plastique (demi-tour de rayon E) et l'ascenseur.
+    if (k === "C") {
+      const high = (run: number): Elem => ({ run, elevated: true });
+      for (const a of upTo(648)) {
+        // Spirale : on monte dans un virage, on roule en hauteur, on redescend dans l'autre virage.
+        if (a > 0) yield { family: "spiral", elems: ["E", high(a), "F", { run: a }], checkOverlaps: true };
+        for (const b of upTo(216)) {
+          // On monte dans le virage et on redescend par un rail montant (ou l'inverse).
+          yield {
+            family: "spiral",
+            elems: ["E", high(a), "V", { run: b }, k4, { run: a + 216 + b }],
+            checkOverlaps: true,
+          };
+          yield {
+            family: "spiral",
+            elems: [{ run: b }, "U", high(a), "F", { run: a + 216 + b }, k4],
+            checkOverlaps: true,
+          };
+          // Ascenseur : on monte avec l'ascenseur, on redescend dans le virage ou par un rail montant.
+          yield {
+            family: "lift",
+            elems: [k4, { run: b }, "G", high(a), "F", { run: a + 144 + b }],
+            checkOverlaps: true,
+          };
+          for (const c of [0, 108, 216]) {
+            yield {
+              family: "lift",
+              elems: [k4, { run: b }, "G", high(a), "V", { run: c }, k4, { run: a + 144 + b + 216 + c }],
+              checkOverlaps: true,
+            };
+          }
+        }
+      }
+    }
   }
 }
 
@@ -915,6 +962,13 @@ export function generateLayouts(
     if (!isComplete(report, tokens)) continue;
 
     const bom = fullBillOfMaterials(placements, catalog);
+    // Les ponts empilables portent la voie comme des piliers : on les utilise d'abord.
+    const stacked = Math.min(inventory["stacking-bridge"] ?? 0, bom.support ?? 0);
+    if (stacked > 0) {
+      bom["stacking-bridge"] = stacked;
+      bom.support -= stacked;
+      if (bom.support === 0) delete bom.support;
+    }
     const lacking: Inventory = {};
     for (const [id, need] of Object.entries(bom)) {
       const lack = need - (inventory[id] ?? 0);
@@ -952,6 +1006,10 @@ export function generateLayouts(
 
     const special = Number(features.bridge) + Number(features.switches) + Number(features.crossing);
     const deadEndCount = openEndCount(tokens) + (bom["buffer-stop"] ?? 0);
+    // Pièces spéciales utilisées (aiguillages, rampes, ponts, ascenseur…) : plus il y en a, mieux c'est.
+    const specials = Object.keys(bom).filter(
+      (id) => !["straight", "curve"].includes(catalog[id]?.category ?? "straight"),
+    ).length;
     const usage = totalOwned > 0 ? Math.min(1, (pieces - missingCount) / totalOwned) : 0;
     perFamily.set(`${template.family}:${kind}`, (perFamily.get(`${template.family}:${kind}`) ?? 0) + 1);
     results.push({
@@ -969,7 +1027,7 @@ export function generateLayouts(
       difficulty: difficultyOf(pieces, features),
       minutes: minutesOf(pieces, features),
       score:
-        (options.sort === "simple" ? -pieces * 0.15 : usage * 6 + accessories.length * 0.15) +
+        (options.sort === "simple" ? -pieces * 0.15 : usage * 6 + accessories.length * 0.15 + specials * 0.7) +
         special * 0.8 +
         Math.min(deadEndCount, 2) * 0.3 +
         (report.maxGap < 1 ? 0.3 : 0) -

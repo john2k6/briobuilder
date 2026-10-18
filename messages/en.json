@@ -96,7 +96,7 @@
     "switch-small": "Small switch",
     "switch-t": "Y switch",
     "crossing-curved": "Curved crossing",
-    "curve-ascending": "Ascending curve",
+    "curve-ascending": "Ascending curve (half turn)",
     "lifting-bridge": "Lifting bridge",
     "curved-bridge": "Curved bridge",
     "turntable": "Turntable",
@@ -107,7 +107,10 @@
     "farm": "Farm barn",
     "roundhouse": "Roundhouse",
     "garage": "Train garage",
-    "signal-box": "Signal box"
+    "signal-box": "Signal box",
+    "curve-ascending-reverse": "Reverse ascending curve (half turn)",
+    "lift": "Warehouse lift",
+    "stacking-bridge": "Stacking bridge"
   },
   "setNames": {
     "travel-switching": "Travel Switching Set",
@@ -523,7 +526,9 @@
     "fork": "The fork",
     "yard": "The shunting yard",
     "line": "The station-to-station line",
-    "network": "The big network"
+    "network": "The big network",
+    "spiral": "The two-level spiral",
+    "lift": "The lift"
   },
   "sizes": {
     "small": "small",

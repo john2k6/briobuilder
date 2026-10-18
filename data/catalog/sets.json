@@ -827,7 +827,7 @@
     "contents": [
       {
         "pieceTypeId": "curve-ascending",
-        "quantity": 2
+        "quantity": 1
       },
       {
         "pieceTypeId": "ramp",
@@ -844,6 +844,10 @@
       {
         "pieceTypeId": "support",
         "quantity": 6
+      },
+      {
+        "pieceTypeId": "curve-ascending-reverse",
+        "quantity": 1
       }
     ]
   },
@@ -1301,7 +1305,7 @@
       },
       {
         "pieceTypeId": "curve-ascending",
-        "quantity": 2
+        "quantity": 1
       },
       {
         "pieceTypeId": "ramp",
@@ -1321,6 +1325,10 @@
       },
       {
         "pieceTypeId": "cargo-station",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "curve-ascending-reverse",
         "quantity": 1
       }
     ]
@@ -1501,7 +1509,7 @@
       },
       {
         "pieceTypeId": "curve-ascending",
-        "quantity": 2
+        "quantity": 1
       },
       {
         "pieceTypeId": "level-crossing",
@@ -1513,6 +1521,10 @@
       },
       {
         "pieceTypeId": "station",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "curve-ascending-reverse",
         "quantity": 1
       }
     ]
@@ -1526,11 +1538,31 @@
     "verified": false,
     "contents": [
       {
-        "pieceTypeId": "curve-large",
-        "quantity": 8
+        "pieceTypeId": "lift",
+        "quantity": 1
       },
       {
-        "pieceTypeId": "straight-long",
+        "pieceTypeId": "curve-ascending",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "curve-ascending-reverse",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "stacking-bridge",
+        "quantity": 2
+      },
+      {
+        "pieceTypeId": "support",
+        "quantity": 7
+      },
+      {
+        "pieceTypeId": "curve-large",
+        "quantity": 6
+      },
+      {
+        "pieceTypeId": "curve-small",
         "quantity": 2
       },
       {
@@ -1539,22 +1571,10 @@
       },
       {
         "pieceTypeId": "straight-short",
-        "quantity": 2
+        "quantity": 1
       },
       {
         "pieceTypeId": "switch",
-        "quantity": 1
-      },
-      {
-        "pieceTypeId": "buffer-stop",
-        "quantity": 1
-      },
-      {
-        "pieceTypeId": "crane",
-        "quantity": 1
-      },
-      {
-        "pieceTypeId": "cargo-station",
         "quantity": 1
       }
     ]
@@ -1637,7 +1657,7 @@
       },
       {
         "pieceTypeId": "curve-ascending",
-        "quantity": 2
+        "quantity": 1
       },
       {
         "pieceTypeId": "ramp",
@@ -1661,6 +1681,10 @@
       },
       {
         "pieceTypeId": "fire-station",
+        "quantity": 1
+      },
+      {
+        "pieceTypeId": "curve-ascending-reverse",
         "quantity": 1
       }
     ]

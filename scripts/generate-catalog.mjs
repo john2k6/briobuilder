@@ -133,15 +133,30 @@ const curvedCrossing = {
   tracks: [arc(E, 45), arc(E, 45).map(([x, y, l]) => [x, r2(branch[1] - y), l])],
 };
 
-/** Courbe montante (plastique) : une courbe E qui passe du sol au niveau 1. */
-const ascendingCurve = {
-  id: "curve-ascending",
+/**
+ * Courbe montante en plastique : un demi-tour (180°, rayon E) qui monte d'un niveau.
+ * low = genre du bout bas ; la version inverse sert à redescendre.
+ */
+const halfTurn = arc(E, 180);
+const ascendingCurve = (id, low) => ({
+  id,
   ref: "33995",
   category: "ramp",
   verified: false,
-  lengthMm: r2(rad(45) * E),
-  connectors: [con(0, 0, 180, "female", 0), con(branch[0], branch[1], 45, "male", 1)],
-  tracks: [arc(E, 45).map(([x, y], i, all) => [x, y, r2(i / (all.length - 1))])],
+  lengthMm: r2(Math.PI * E),
+  connectors: [con(0, 0, 180, low, 0), con(halfTurn.at(-1)[0], halfTurn.at(-1)[1], 180, flip(low), 1)],
+  tracks: [halfTurn.map(([x, y], i, all) => [x, y, r2(i / (all.length - 1))])],
+});
+
+/** Ascenseur de l'entrepôt : le train entre en bas et ressort en haut (niveau 1), sur la longueur d'un rail A. */
+const lift = {
+  id: "lift",
+  ref: "33887",
+  category: "ramp",
+  verified: false,
+  lengthMm: 144,
+  connectors: [con(0, 0, 180, "female", 0), con(144, 0, 0, "male", 1)],
+  tracks: [[[0, 0, 0], [144, 0, 1]]],
 };
 
 /** Pont courbe : une grande courbe E portée en hauteur. */
@@ -190,7 +205,9 @@ const pieces = [
   straight("level-crossing", "33388", 144, false, "crossing"),
   ramp("ramp", "33332", "female"),
   ramp("ramp-reverse", "33332", "male"),
-  ascendingCurve,
+  ascendingCurve("curve-ascending", "female"),
+  ascendingCurve("curve-ascending-reverse", "male"),
+  lift,
   straight("suspension-bridge", "33683", 216, false, "bridge"),
   straight("lifting-bridge", "33757", 216, false, "bridge"),
   curvedBridge,
@@ -237,6 +254,7 @@ const pieces = [
     ],
   },
   accessory("support", "33254"),
+  accessory("stacking-bridge", "33253"),
   accessory("tunnel", "33735"),
   accessory("signal", "33754"),
   accessory("traffic-light", "33743"),

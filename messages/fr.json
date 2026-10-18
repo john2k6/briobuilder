@@ -96,7 +96,7 @@
     "switch-small": "Petit aiguillage",
     "switch-t": "Aiguillage en Y",
     "crossing-curved": "Croisement courbe",
-    "curve-ascending": "Courbe montante",
+    "curve-ascending": "Courbe montante (demi-tour)",
     "lifting-bridge": "Pont levant",
     "curved-bridge": "Pont courbe",
     "turntable": "Plaque tournante",
@@ -107,7 +107,10 @@
     "farm": "Grange de la ferme",
     "roundhouse": "Dépôt de locomotives",
     "garage": "Garage à trains",
-    "signal-box": "Poste d'aiguillage"
+    "signal-box": "Poste d'aiguillage",
+    "curve-ascending-reverse": "Courbe montante inversée (demi-tour)",
+    "lift": "Ascenseur de l'entrepôt",
+    "stacking-bridge": "Pont empilable"
   },
   "setNames": {
     "travel-switching": "Circuit Plateforme Voyageurs",
@@ -523,7 +526,9 @@
     "fork": "La fourche",
     "yard": "La gare de triage",
     "line": "La ligne d'une gare à l'autre",
-    "network": "Le grand réseau"
+    "network": "Le grand réseau",
+    "spiral": "La spirale à deux niveaux",
+    "lift": "L'ascenseur"
   },
   "sizes": {
     "small": "petit",

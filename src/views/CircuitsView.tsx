@@ -16,7 +16,7 @@ const GROUPS: Record<CircuitGroup, Family[]> = {
   eights: ["eight-crossing", "eight-bridge"],
   shapes: ["l-shape", "u-shape", "bean", "triangle", "house", "octagon"],
   branches: ["siding", "passing-loop", "terminus", "fork", "yard", "line"],
-  networks: ["hill", "network"],
+  networks: ["hill", "network", "spiral", "lift"],
 };
 const PAGE = 12;
 

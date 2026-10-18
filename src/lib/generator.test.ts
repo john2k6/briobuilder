@@ -73,10 +73,10 @@ describe("générateur de circuits", () => {
     expect(circuitFromCode(decorated.code)?.accessories).toEqual(decorated.accessories);
   });
 
-  it("reste rapide (moins d'une seconde pour un gros inventaire)", () => {
+  it("reste rapide (moins de deux secondes pour un gros inventaire, même mesuré pendant la couverture)", () => {
     const t0 = performance.now();
     generateLayouts(boxes("deluxe-railway", "cargo-deluxe", "travel-switching"), catalog, { decorate: true });
-    expect(performance.now() - t0).toBeLessThan(1000);
+    expect(performance.now() - t0).toBeLessThan(2000);
   });
 
   it("un code invalide ou un circuit ouvert est refusé", () => {
@@ -120,5 +120,15 @@ describe("générateur de circuits", () => {
     const inv = boxes("deluxe-railway", "turntable-mechanical");
     const r = generateLayouts(inv, catalog, { families: ["terminus"], decorate: true, limit: 5 });
     expect(r.buildable[0].accessories.map((a) => a.kind)).toEqual(expect.arrayContaining(["station", "turntable"]));
+  });
+
+  it("utilise les pièces spéciales du coffret : ascenseur, courbes montantes, ponts empilables (33887)", () => {
+    const inv = boxes("warehouse", "expansion-intermediate");
+    const r = generateLayouts(inv, catalog, { limit: 40 });
+    const top = r.buildable.slice(0, 4);
+    expect(top.some((c) => c.bom.lift === 1)).toBe(true);
+    expect(top.some((c) => (c.bom["curve-ascending"] ?? 0) > 0)).toBe(true);
+    expect(top.some((c) => (c.bom["stacking-bridge"] ?? 0) > 0)).toBe(true);
+    for (const c of r.buildable) expect(overlaps(c.placements, catalog)).toEqual([]);
   });
 });

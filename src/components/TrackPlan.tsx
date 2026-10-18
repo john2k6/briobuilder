@@ -363,6 +363,34 @@ export function TrackPlan({
             </g>
           );
         })}
+        {p.type.id === "lift" &&
+          (() => {
+            const { at, angle } = middle(flat(p.tracks[0]));
+            const [sx, sy] = toSvg([at])[0];
+            return (
+              <g transform={`translate(${sx} ${sy}) rotate(${-angle})`}>
+                <rect x={-64} y={-44} width={128} height={88} rx={8} fill="var(--ink)" opacity={0.85} />
+                <rect x={-50} y={-30} width={100} height={60} rx={4} fill="none" stroke="#e0a020" strokeWidth={5} />
+                <path d="M0 -22 L14 -6 H5 V20 H-5 V-6 H-14 Z" fill="#e0a020" />
+              </g>
+            );
+          })()}
+        {p.type.id === "level-crossing" &&
+          (() => {
+            const { at, angle } = middle(flat(p.tracks[0]));
+            const [sx, sy] = toSvg([at])[0];
+            // Barrières rouges et blanches de chaque côté de la voie.
+            return (
+              <g transform={`translate(${sx} ${sy}) rotate(${-angle + 90})`}>
+                {[-1, 1].map((side) => (
+                  <g key={side}>
+                    <rect x={side * 36 - 5} y={-60} width={10} height={10} fill="var(--ink)" />
+                    <path d={`M${side * 36} -55 V-10`} stroke="var(--accent)" strokeWidth={6} strokeDasharray="8 6" />
+                  </g>
+                ))}
+              </g>
+            );
+          })()}
         {p.type.category === "ramp" &&
           (() => {
             const line = flat(p.tracks[0]);
