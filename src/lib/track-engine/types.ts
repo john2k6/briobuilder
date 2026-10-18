@@ -12,7 +12,11 @@ export type PieceCategory =
   | "bridge"
   | "adapter"
   | "buffer"
-  | "accessory";
+  | "accessory"
+  /** Gares et bâtiments posés au bord de la voie. */
+  | "building"
+  /** Locomotives et wagons : comptés dans la collection, sans effet sur les circuits. */
+  | "vehicle";
 
 /** Extrémité d'une pièce, dans le repère de la pièce. */
 export interface Connector {

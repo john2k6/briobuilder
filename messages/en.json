@@ -11,7 +11,8 @@
     "circuits": "Create a layout",
     "kids": "Kids",
     "settings": "Settings",
-    "menu": "Main menu"
+    "menu": "Main menu",
+    "collection": "My collection"
   },
   "home": {
     "eyebrow": "For compatible wooden railway track",
@@ -65,7 +66,9 @@
     "bridge": "Bridges",
     "buffer": "Buffer stops",
     "adapter": "Adapters",
-    "accessory": "Accessories and scenery"
+    "accessory": "Accessories and scenery",
+    "building": "Stations and buildings",
+    "vehicle": "Trains and wagons"
   },
   "pieceNames": {
     "straight-long": "Long straight",
@@ -360,5 +363,21 @@
   "official": {
     "credit": "Image © BRIO AB / Ravensburger, shown for illustration.",
     "page": "See the official page"
+  },
+  "collection": {
+    "title": "My collection",
+    "intro": "Everything you own, all boxes together: tracks, bridges, stations, scenery and trains.",
+    "empty": "Your collection is empty. Add your sets to see them here.",
+    "edit": "Edit my sets",
+    "sets": "sets",
+    "tracks": "tracks",
+    "length": "of track",
+    "meters": "{value} m",
+    "switches": "switches",
+    "bridges": "bridges and ramps",
+    "buildings": "stations and buildings",
+    "vehicles": "trains and wagons",
+    "mySets": "My sets",
+    "create": "Build a layout with all this"
   }
 }

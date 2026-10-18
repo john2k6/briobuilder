@@ -11,7 +11,8 @@
     "circuits": "Créer un circuit",
     "kids": "Enfants",
     "settings": "Réglages",
-    "menu": "Menu principal"
+    "menu": "Menu principal",
+    "collection": "Ma collection"
   },
   "home": {
     "eyebrow": "Pour les rails en bois compatibles",
@@ -65,7 +66,9 @@
     "bridge": "Ponts",
     "buffer": "Butoirs",
     "adapter": "Adaptateurs",
-    "accessory": "Accessoires et décors"
+    "accessory": "Accessoires et décors",
+    "building": "Gares et bâtiments",
+    "vehicle": "Trains et wagons"
   },
   "pieceNames": {
     "straight-long": "Rail droit long",
@@ -360,5 +363,21 @@
   "official": {
     "credit": "Image © BRIO AB / Ravensburger, reproduite à titre d'illustration.",
     "page": "Voir la page officielle"
+  },
+  "collection": {
+    "title": "Ma collection",
+    "intro": "Tout ce que vous avez, toutes boîtes réunies : rails, ponts, gares, décors et trains.",
+    "empty": "Votre collection est vide. Ajoutez vos coffrets pour la voir apparaître ici.",
+    "edit": "Modifier mes coffrets",
+    "sets": "coffrets",
+    "tracks": "rails",
+    "length": "de voie",
+    "meters": "{value} m",
+    "switches": "aiguillages",
+    "bridges": "ponts et rampes",
+    "buildings": "gares et bâtiments",
+    "vehicles": "trains et wagons",
+    "mySets": "Mes coffrets",
+    "create": "Créer un circuit avec tout ça"
   }
 }
