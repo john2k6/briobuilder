@@ -775,6 +775,8 @@ export interface GeneratorOptions {
   maxMissing?: number;
   /** Nombre maximal de propositions par catégorie. */
   limit?: number;
+  /** Profondeur de recherche (1 par défaut) : chaque niveau en plus cherche et montre deux fois plus de circuits. */
+  depth?: number;
   /** « max » : d'abord les circuits qui utilisent le plus de pièces possédées ; « simple » : les plus faciles. */
   sort?: "max" | "simple";
 }
@@ -913,6 +915,9 @@ export function generateLayouts(
 ): { buildable: GeneratedLayout[]; almost: GeneratedLayout[]; total: { buildable: number; almost: number } } {
   const maxMissing = options.maxMissing ?? 3;
   const limit = options.limit ?? 12;
+  const depth = Math.max(1, options.depth ?? 1);
+  const familyCap = FAMILY_CAP * 2 ** (depth - 1);
+  const perFamilyShown = 12 * 2 ** (depth - 1);
   const straightLength =
     GROUND_STRAIGHTS.reduce((s, t) => s + t.length * (inventory[t.id] ?? 0), 0) +
     216 * (inventory["suspension-bridge"] ?? 0);
@@ -926,7 +931,7 @@ export function generateLayouts(
 
   // Au-delà de quelques dizaines de circuits par famille, on n'en montrerait pas plus : on s'arrête là.
   const perFamily = new Map<string, number>();
-  const full = (family: Family, kind: string) => (perFamily.get(`${family}:${kind}`) ?? 0) >= FAMILY_CAP;
+  const full = (family: Family, kind: string) => (perFamily.get(`${family}:${kind}`) ?? 0) >= familyCap;
   const all = function* () {
     yield* templates(maxRun);
     yield* networks(maxRun);
@@ -1043,7 +1048,7 @@ export function generateLayouts(
       // Deux circuits sont « pareils » s'ils ont le même nombre de pièces et la même suite de virages.
       const turns = (c: GeneratedLayout) => c.code.split("~")[0].replace(/[^CRcr@]/g, "");
       const similar = group.some((g) => g.pieces === r.pieces && turns(g) === turns(r));
-      if (!similar && group.length < 12) group.push(r);
+      if (!similar && group.length < perFamilyShown) group.push(r);
       byFamily.set(r.family, group);
     }
     const out: GeneratedLayout[] = [];

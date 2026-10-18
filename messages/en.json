@@ -507,7 +507,8 @@
       "max": "Use as many of my pieces as possible",
       "simple": "Simplest first"
     },
-    "more": "Show more layouts ({count} more)"
+    "more": "Show more layouts ({count} more)",
+    "proposeMore": "Suggest more layouts"
   },
   "families": {
     "circle": "The circle",

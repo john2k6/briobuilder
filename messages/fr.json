@@ -507,7 +507,8 @@
       "max": "Utiliser un maximum de mes pièces",
       "simple": "Les plus simples d'abord"
     },
-    "more": "Voir plus de circuits ({count} de plus)"
+    "more": "Voir plus de circuits ({count} de plus)",
+    "proposeMore": "Proposer plus de circuits"
   },
   "families": {
     "circle": "Le rond",

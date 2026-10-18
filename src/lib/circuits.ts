@@ -74,3 +74,30 @@ export function missingFor(circuit: Circuit, inventory: Inventory): Inventory {
 export function generate(inventory: Inventory, options: GeneratorOptions) {
   return generateLayouts(inventory, catalog, options);
 }
+
+type Generated = ReturnType<typeof generate>;
+let worker: Worker | null | undefined;
+let nextId = 0;
+
+/** Comme `generate`, mais dans un fil à part quand le navigateur le permet (sinon directement). */
+export function generateAsync(inventory: Inventory, options: GeneratorOptions): Promise<Generated> {
+  if (worker === undefined) {
+    try {
+      worker = new Worker(new URL("./generator.worker.ts", import.meta.url));
+    } catch {
+      worker = null;
+    }
+  }
+  const w = worker;
+  if (!w) return Promise.resolve(generate(inventory, options));
+  const id = ++nextId;
+  return new Promise((resolve) => {
+    const onMessage = (event: MessageEvent<Generated & { id: number }>) => {
+      if (event.data.id !== id) return;
+      w.removeEventListener("message", onMessage);
+      resolve(event.data);
+    };
+    w.addEventListener("message", onMessage);
+    w.postMessage({ id, inventory, options });
+  });
+}

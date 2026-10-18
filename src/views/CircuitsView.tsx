@@ -6,7 +6,7 @@ import { ChildPicker } from "@/components/ChildPicker";
 import { CircuitCard } from "@/components/CircuitCard";
 import { buttonPrimary, buttonSecondary, card, Icon, icons, PageHeader } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
-import { generate } from "@/lib/circuits";
+import { generateAsync } from "@/lib/circuits";
 import { actions, useAppState, type CircuitGroup, type GeneratorPrefs } from "@/lib/store";
 import { totalPieces, type Family, type GeneratedLayout, type Size } from "@/lib/track-engine";
 
@@ -52,34 +52,39 @@ export function CircuitsView() {
   const { inventory, prefs, activeChildId, builds, favorites, ready } = useAppState();
   const [tab, setTab] = useState<Tab>("buildable");
   const [shown, setShown] = useState(PAGE);
+  const [depth, setDepth] = useState(1);
   const [result, setResult] = useState<{ key: string; buildable: GeneratedLayout[]; almost: GeneratedLayout[] } | null>(
     null,
   );
 
-  const key = useMemo(() => JSON.stringify({ inventory, prefs }), [inventory, prefs]);
+  const key = useMemo(() => JSON.stringify({ inventory, prefs, depth }), [inventory, prefs, depth]);
   const loading = ready && result?.key !== key;
 
-  // Le calcul prend quelques centaines de millisecondes : on laisse d'abord l'écran s'afficher.
+  // Le calcul se fait dans un fil à part : l'écran reste fluide pendant que le moteur cherche.
   useEffect(() => {
     if (!ready || totalPieces(inventory) === 0) return;
-    const timer = window.setTimeout(() => {
-      const r = generate(inventory, {
-        sizes: prefs.sizes,
-        require: { bridge: prefs.bridge, switches: prefs.switches, crossing: prefs.crossing },
-        decorate: prefs.decorate,
-        families: (prefs.groups ?? []).flatMap((g) => GROUPS[g]),
-        sort: prefs.sort,
-        limit: 120,
-      });
-      setResult({ key, ...r });
-    }, 30);
-    return () => window.clearTimeout(timer);
-  }, [key, ready, inventory, prefs]);
+    let cancelled = false;
+    void generateAsync(inventory, {
+      sizes: prefs.sizes,
+      require: { bridge: prefs.bridge, switches: prefs.switches, crossing: prefs.crossing },
+      decorate: prefs.decorate,
+      families: (prefs.groups ?? []).flatMap((g) => GROUPS[g]),
+      sort: prefs.sort,
+      depth,
+      limit: 120 * depth,
+    }).then((r) => {
+      if (!cancelled) setResult({ key, ...r });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [key, ready, inventory, prefs, depth]);
 
   const builtCount = (code: string) => builds.filter((b) => b.childId === activeChildId && b.layoutId === code).length;
   const isFavorite = (code: string) => favorites.some((f) => f.childId === activeChildId && f.layoutId === code);
   const setPrefs = (patch: Partial<GeneratorPrefs>) => {
     setShown(PAGE);
+    setDepth(1);
     actions.setPrefs(patch);
   };
   const groups = prefs.groups ?? [];
@@ -262,6 +267,19 @@ export function CircuitsView() {
       {!loading && list.length > shown && (
         <button type="button" className={`${buttonSecondary} w-full`} onClick={() => setShown(shown + PAGE)}>
           {t("generator.more", { count: list.length - shown })}
+        </button>
+      )}
+      {!loading && list.length > 0 && list.length <= shown && depth < 5 && (
+        <button
+          type="button"
+          className={`${buttonPrimary} w-full`}
+          onClick={() => {
+            setDepth(depth + 1);
+            setShown(shown + PAGE);
+          }}
+        >
+          <Icon d={icons.sparkle} className="size-5" />
+          {t("generator.proposeMore")}
         </button>
       )}
 
