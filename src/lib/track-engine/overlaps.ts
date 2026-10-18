@@ -23,10 +23,10 @@ function sample(track: TrackPoint[]): TrackPoint[] {
 }
 
 /**
- * Liste les paires de pièces qui se chevauchent au même niveau.
+ * Liste les paires de pièces qui se chevauchent au même niveau (`firstOnly` : s'arrête à la première).
  * Les ponts sont permis : une voie surélevée peut passer au-dessus d'une autre.
  */
-export function overlaps(placements: Placement[], catalog: Catalog): [string, string][] {
+export function overlaps(placements: Placement[], catalog: Catalog, firstOnly = false): [string, string][] {
   const items = placements.map((p) => {
     const piece = getPiece(catalog, p.pieceTypeId);
     const points = transformTracks(p, piece).flatMap(sample);
@@ -40,7 +40,7 @@ export function overlaps(placements: Placement[], catalog: Catalog): [string, st
     };
   });
   const nearJoint = (pt: TrackPoint, ends: { x: number; y: number }[]) =>
-    ends.some((c) => Math.hypot(c.x - pt[0], c.y - pt[1]) < JOINT_MARGIN);
+    ends.some((c) => (c.x - pt[0]) ** 2 + (c.y - pt[1]) ** 2 < JOINT_MARGIN ** 2);
 
   const result: [string, string][] = [];
   for (let i = 0; i < items.length; i++) {
@@ -63,10 +63,14 @@ export function overlaps(placements: Placement[], catalog: Catalog): [string, st
         (pa) =>
           !nearJoint(pa, ends) &&
           b.points.some(
-            (pb) => pa[2] === pb[2] && Math.hypot(pa[0] - pb[0], pa[1] - pb[1]) < TRACK_WIDTH && !nearJoint(pb, ends),
+            (pb) =>
+              pa[2] === pb[2] && (pa[0] - pb[0]) ** 2 + (pa[1] - pb[1]) ** 2 < TRACK_WIDTH ** 2 && !nearJoint(pb, ends),
           ),
       );
-      if (hit) result.push([a.id, b.id]);
+      if (hit) {
+        result.push([a.id, b.id]);
+        if (firstOnly) return result;
+      }
     }
   }
   return result;

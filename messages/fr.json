@@ -340,7 +340,17 @@
     "eight-crossing": "Le huit",
     "eight-bridge": "Le huit à pont",
     "siding": "La voie de garage",
-    "passing-loop": "La voie d'évitement"
+    "passing-loop": "La voie d'évitement",
+    "l-shape": "Le circuit en L",
+    "u-shape": "Le circuit en U",
+    "bean": "Le haricot",
+    "triangle": "Le triangle",
+    "house": "La maison",
+    "octagon": "L'octogone",
+    "terminus": "Le terminus",
+    "fork": "La fourche",
+    "yard": "La gare de triage",
+    "line": "La ligne d'une gare à l'autre"
   },
   "sizes": {
     "small": "petit",

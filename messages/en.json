@@ -340,7 +340,17 @@
     "eight-crossing": "The figure eight",
     "eight-bridge": "The bridge eight",
     "siding": "The siding",
-    "passing-loop": "The passing loop"
+    "passing-loop": "The passing loop",
+    "l-shape": "The L-shape",
+    "u-shape": "The U-shape",
+    "bean": "The bean",
+    "triangle": "The triangle",
+    "house": "The house",
+    "octagon": "The octagon",
+    "terminus": "The terminus",
+    "fork": "The fork",
+    "yard": "The shunting yard",
+    "line": "The station-to-station line"
   },
   "sizes": {
     "small": "small",

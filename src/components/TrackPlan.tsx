@@ -96,6 +96,14 @@ export function AccessoryShape({ kind }: { kind: AccessoryKind }) {
           <circle cx={70} cy={-30} r={8} fill="var(--accent)" />
         </g>
       );
+    case "turntable":
+      return (
+        <g>
+          <circle r={70} fill="var(--wood)" stroke="var(--wood-dark)" strokeWidth={4} />
+          <rect x={-70} y={-12} width={140} height={24} rx={4} fill="var(--wood-dark)" />
+          <circle r={10} fill="var(--ink)" />
+        </g>
+      );
     case "tree":
       return (
         <g>

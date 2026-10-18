@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { catalog, setList } from "./catalog";
 import { circuitFromCode, missingFor } from "./circuits";
-import { addSet, analyzeJoints, generateLayouts, overlaps, type Inventory } from "./track-engine";
+import { addSet, analyzeJoints, generateLayouts, isComplete, overlaps, type Inventory } from "./track-engine";
 
 const boxes = (...ids: string[]) =>
   ids.reduce<Inventory>((acc, id) => {
@@ -28,7 +28,7 @@ describe("générateur de circuits", () => {
 
   it("chaque proposition se referme, sans chevauchement, et tient dans l'inventaire", () => {
     for (const r of result.buildable) {
-      expect(analyzeJoints(r.placements, catalog).closed).toBe(true);
+      expect(isComplete(analyzeJoints(r.placements, catalog), r.code.split(":")[1].split("~")[0])).toBe(true);
       expect(overlaps(r.placements, catalog)).toEqual([]);
       for (const [id, q] of Object.entries(r.bom)) expect(travel[id] ?? 0).toBeGreaterThanOrEqual(q);
     }
@@ -88,5 +88,41 @@ describe("générateur de circuits", () => {
     expect(circuitFromCode("nope:CCCC")).toBeNull();
     expect(circuitFromCode("oval:CCCCL")).toBeNull();
     expect(circuitFromCode("circle:CCCCCCCC")?.pieces).toBe(8);
+  });
+
+  it("invente d'autres formes que des ronds : L, U, haricot, triangle, maison, octogone", () => {
+    const big = boxes("world-deluxe", "pack-deluxe-track");
+    const families = new Set(generateLayouts(big, catalog, { limit: 200 }).buildable.map((r) => r.family));
+    for (const f of ["l-shape", "u-shape", "bean", "triangle", "house", "octagon"]) expect(families).toContain(f);
+  });
+
+  it("part dans tous les sens avec les aiguillages : terminus, fourche, gare de triage, ligne", () => {
+    const inv = boxes("world-deluxe", "expansion-advanced", "pack-deluxe-track");
+    const r = generateLayouts(inv, catalog, { limit: 200, decorate: true });
+    const families = new Set(r.buildable.map((c) => c.family));
+    for (const f of ["terminus", "fork", "yard", "line"]) expect(families).toContain(f);
+    const fork = r.buildable.find((c) => c.family === "fork")!;
+    expect(fork.bom["switch-t"]).toBe(1);
+    expect(overlaps(fork.placements, catalog)).toEqual([]);
+    // Les gares vont au bout des voies sans issue.
+    expect(fork.accessories.some((a) => a.kind === "station")).toBe(true);
+  });
+
+  it("sans butoir, une voie sans issue reste ouverte et le code se relit", () => {
+    const inv = boxes("deluxe-railway");
+    delete inv["buffer-stop"];
+    const terminus = generateLayouts(inv, catalog, { families: ["terminus", "line"], limit: 10 }).buildable;
+    expect(terminus.length).toBeGreaterThan(0);
+    for (const c of terminus) {
+      expect(c.code).toContain("|");
+      expect(c.bom["buffer-stop"]).toBeUndefined();
+      expect(circuitFromCode(c.code)?.pieces).toBe(c.pieces);
+    }
+  });
+
+  it("utilise la plaque tournante et les gares disponibles dans le décor", () => {
+    const inv = boxes("deluxe-railway", "turntable-mechanical");
+    const r = generateLayouts(inv, catalog, { families: ["terminus"], decorate: true, limit: 5 });
+    expect(r.buildable[0].accessories.map((a) => a.kind)).toEqual(expect.arrayContaining(["station", "turntable"]));
   });
 });

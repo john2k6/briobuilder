@@ -1,4 +1,4 @@
-import { analyzeJoints } from "./connect";
+import { analyzeJoints, type ClosureReport } from "./connect";
 import { chain, type ChainStep } from "./chain";
 import { fullBillOfMaterials } from "./inventory";
 import { overlaps } from "./overlaps";
@@ -39,9 +39,25 @@ export const TOKENS: Record<string, ChainStep> = {
   Y: { pieceTypeId: "switch-reverse", inConnector: 1, outConnector: 0 },
   y: { pieceTypeId: "switch-reverse", flipped: true, inConnector: 1, outConnector: 0 },
   Z: { pieceTypeId: "buffer-stop" },
+  // Aiguillage en Y : une entrée, une branche à gauche (connecteur 1) et une à droite (connecteur 2).
+  J: { pieceTypeId: "switch-t" },
+  // Petit aiguillage (sortie droite courte, branche en petite courbe) ; n : branche à droite.
+  N: { pieceTypeId: "switch-small" },
+  n: { pieceTypeId: "switch-small", flipped: true },
+  H: { pieceTypeId: "lifting-bridge" },
 };
 
-export const ACCESSORY_CODES = { T: "tunnel", G: "station", I: "signal", Q: "crane", A: "tree" } as const;
+/** « | » marque une voie sans issue laissée ouverte (pas de butoir disponible) : ce n'est pas une pièce. */
+export const OPEN_END = "|";
+
+export const ACCESSORY_CODES = {
+  T: "tunnel",
+  G: "station",
+  I: "signal",
+  Q: "crane",
+  A: "tree",
+  O: "turntable",
+} as const;
 export type AccessoryKind = (typeof ACCESSORY_CODES)[keyof typeof ACCESSORY_CODES];
 
 export interface AccessoryPlacement {
@@ -58,7 +74,17 @@ export type Family =
   | "eight-crossing"
   | "eight-bridge"
   | "siding"
-  | "passing-loop";
+  | "passing-loop"
+  | "l-shape"
+  | "u-shape"
+  | "bean"
+  | "triangle"
+  | "house"
+  | "octagon"
+  | "terminus"
+  | "fork"
+  | "yard"
+  | "line";
 
 export const FAMILIES: Family[] = [
   "circle",
@@ -69,6 +95,16 @@ export const FAMILIES: Family[] = [
   "eight-bridge",
   "siding",
   "passing-loop",
+  "l-shape",
+  "u-shape",
+  "bean",
+  "triangle",
+  "house",
+  "octagon",
+  "terminus",
+  "fork",
+  "yard",
+  "line",
 ];
 
 /** Transforme une suite de jetons en étapes de pose. « @3.2 » : repartir du connecteur 2 de la 3e pièce. */
@@ -76,6 +112,7 @@ export function tokensToSteps(tokens: string): ChainStep[] {
   const steps: ChainStep[] = [];
   let from: ChainStep["from"];
   for (const [, jumpPiece, jumpConnector, code] of tokens.matchAll(/@(\d+)\.(\d+)|(\S)/g)) {
+    if (code === OPEN_END) continue;
     if (jumpPiece) {
       from = { index: Number(jumpPiece) - 1, connector: Number(jumpConnector) };
       continue;
@@ -93,6 +130,36 @@ export interface DecodedLayout {
   family: Family;
   placements: Placement[];
   accessories: AccessoryPlacement[];
+}
+
+/** Nombre de voies sans issue laissées ouvertes dans un circuit. */
+export const openEndCount = (tokens: string) => tokens.split(OPEN_END).length - 1;
+
+/** Un circuit est complet si tous ses raccords sont bons et que seules ses voies sans issue restent ouvertes. */
+export function isComplete(report: ClosureReport, tokens: string): boolean {
+  return (
+    report.joints.length > 0 && report.errors.length === 0 && report.openConnectors.length === openEndCount(tokens)
+  );
+}
+
+export interface CircuitFeatures {
+  bridge: boolean;
+  switches: boolean;
+  crossing: boolean;
+}
+
+export function featuresOf(tokens: string): CircuitFeatures {
+  return { bridge: tokens.includes("U"), switches: /[WwYyJNn]/.test(tokens), crossing: tokens.includes("X") };
+}
+
+export function difficultyOf(pieces: number, features: CircuitFeatures): 1 | 2 | 3 {
+  const special = Number(features.bridge) + Number(features.switches) + Number(features.crossing);
+  return Math.min(3, 1 + (pieces > 16 ? 1 : 0) + (special > 0 ? 1 : 0)) as 1 | 2 | 3;
+}
+
+export function minutesOf(pieces: number, features: CircuitFeatures): number {
+  const special = Number(features.bridge) + Number(features.switches) + Number(features.crossing);
+  return Math.round(pieces * 0.6 + special * 3 + 2);
 }
 
 /** Lit un code de circuit. Lève une erreur si le code est invalide. */
@@ -124,6 +191,7 @@ const GROUND_STRAIGHTS = [
 ];
 const ELEVATED_STRAIGHTS = [
   { token: "B", id: "suspension-bridge", length: 216 },
+  { token: "H", id: "lifting-bridge", length: 216 },
   ...GROUND_STRAIGHTS.filter((s) => s.token !== "K"),
 ];
 
@@ -155,7 +223,7 @@ function composeRun(
       if (t.length > rest) continue;
       const owned = (pool[t.id] ?? 0) > 0;
       // Les pièces spéciales (passage à niveau, pont) ne sont jamais « manquantes » : seulement si on les a.
-      if (!owned && (budget === 0 || t.token === "K" || t.token === "B")) continue;
+      if (!owned && (budget === 0 || "KBH".includes(t.token))) continue;
       if (owned) pool[t.id]--;
       else missing[t.id] = (missing[t.id] ?? 0) + 1;
       const restSolution = solve(rest - t.length, i, owned ? budget : budget - 1);
@@ -178,7 +246,9 @@ type Elem =
   | string
   | { run: number; elevated?: boolean }
   | { tag: string; token: string }
-  | { jump: string; connector: number };
+  | { jump: string; connector: number }
+  /** Voie sans issue : un butoir si on en a, sinon la voie reste ouverte. */
+  | { end: true };
 
 interface Template {
   family: Family;
@@ -193,6 +263,7 @@ function fixedNeeds(elems: Elem[]): Inventory {
   for (const e of elems) {
     const letters = typeof e === "string" ? e : "token" in e ? e.token : "";
     for (const letter of letters) {
+      if (!TOKENS[letter]) continue;
       const id = TOKENS[letter].pieceTypeId;
       needs[id] = (needs[id] ?? 0) + 1;
     }
@@ -206,6 +277,120 @@ const RADIUS = { C: 202, c: 110 } as const;
 function nearestRun(length: number): number {
   return RUN_LENGTHS.reduce((best, l) => (Math.abs(l - length) < Math.abs(best - length) ? l : best), 0);
 }
+
+// Formes libres : une suite de virages (lettres de courbes) séparés par des lignes droites.
+// Deux lignes droites (« x » et « y ») sont calculées pour que la forme se referme.
+
+const CURVE_TURN: Record<string, { radius: number; turn: 1 | -1 }> = {
+  C: { radius: 202, turn: 1 },
+  R: { radius: 202, turn: -1 },
+  c: { radius: 110, turn: 1 },
+  r: { radius: 110, turn: -1 },
+};
+const deg = (d: number) => (d * Math.PI) / 180;
+
+/** Déplacement (mm) et nouveau cap après une suite de courbes de 45°. */
+function turnMove(curves: string, heading: number): { dx: number; dy: number; heading: number } {
+  let dx = 0;
+  let dy = 0;
+  let h = heading;
+  for (const letter of curves) {
+    const { radius, turn } = CURVE_TURN[letter];
+    // Centre du virage à gauche (turn 1) ou à droite (turn -1) de la voie.
+    const cx = -turn * radius * Math.sin(deg(h));
+    const cy = turn * radius * Math.cos(deg(h));
+    const next = h + 45 * turn;
+    dx += cx + turn * radius * Math.sin(deg(next));
+    dy += cy - turn * radius * Math.cos(deg(next));
+    h = next;
+  }
+  return { dx, dy, heading: h };
+}
+
+/**
+ * Construit une forme fermée : `runs[i]` est la ligne droite avant le virage `turns[i]`.
+ * Une valeur nommée vient de `values` ; « x » et « y » sont calculées. Renvoie null si la forme ne ferme pas
+ * avec des longueurs de rails réalisables.
+ */
+function shape(turns: string[], runs: (string | number)[], values: Record<string, number>): Elem[] | null {
+  let px = 0;
+  let py = 0;
+  let heading = 0;
+  const dir: Record<string, [number, number]> = {};
+  for (let i = 0; i < turns.length; i++) {
+    const run = runs[i];
+    const ux = Math.cos(deg(heading));
+    const uy = Math.sin(deg(heading));
+    if (run === "x" || run === "y") dir[run] = [ux, uy];
+    else {
+      const length = typeof run === "number" ? run : values[run];
+      px += ux * length;
+      py += uy * length;
+    }
+    const move = turnMove(turns[i], heading);
+    px += move.dx;
+    py += move.dy;
+    heading = move.heading;
+  }
+  if (Math.round(heading) % 360 !== 0 || !dir.x || !dir.y) return null;
+  const [ax, ay] = dir.x;
+  const [bx, by] = dir.y;
+  const det = ax * by - ay * bx;
+  if (Math.abs(det) < 1e-6) return null;
+  const solved = { x: (-px * by + py * bx) / det, y: (ax * -py + ay * px) / det };
+  const lengths: Record<string, number> = { ...values };
+  for (const key of ["x", "y"] as const) {
+    const run = nearestRun(solved[key]);
+    if (solved[key] < -3 || Math.abs(run - solved[key]) > 6) return null;
+    lengths[key] = run;
+  }
+  return turns.flatMap((turn, i) => {
+    const run = runs[i];
+    const length = typeof run === "number" ? run : lengths[run];
+    return length > 0 ? [{ run: length }, turn] : [turn];
+  });
+}
+
+/** Toutes les combinaisons de valeurs des paramètres. */
+function* combos(params: Record<string, number[]>): Generator<Record<string, number>> {
+  const keys = Object.keys(params);
+  const walk = function* (i: number, acc: Record<string, number>): Generator<Record<string, number>> {
+    if (i === keys.length) {
+      yield { ...acc };
+      return;
+    }
+    for (const v of params[keys[i]]) yield* walk(i + 1, { ...acc, [keys[i]]: v });
+  };
+  yield* walk(0, {});
+}
+
+const maxRunOf = (elems: Elem[]) =>
+  elems.reduce((m, e) => (typeof e === "object" && "run" in e ? Math.max(m, e.run) : m), 0);
+
+/** Longueur d'aiguillage (partie droite) selon le jeton. */
+const SWITCH_LENGTH: Record<string, number> = { w: 144, W: 144, n: 108, N: 108, Y: 144, y: 144 };
+
+/**
+ * Ajoute un embranchement sur la ligne droite `runIndex` d'une boucle : l'aiguillage est posé après `before` mm,
+ * puis la branche (`branch`) part de sa sortie déviée.
+ */
+function withBranch(loop: Elem[], runIndex: number, before: number, sw: string, branch: Elem[]): Elem[] | null {
+  const run = loop[runIndex];
+  if (typeof run !== "object" || !("run" in run)) return null;
+  const after = run.run - before - SWITCH_LENGTH[sw];
+  if (after < 0 || !RUN_LENGTHS.includes(after)) return null;
+  return [
+    ...loop.slice(0, runIndex),
+    { run: before },
+    { tag: "br", token: sw },
+    { run: after },
+    ...loop.slice(runIndex + 1),
+    { jump: "br", connector: 2 },
+    ...branch,
+  ];
+}
+
+const END: Elem = { end: true };
 
 function* templates(maxRun: number): Generator<Template> {
   const runs = RUN_LENGTHS.filter((l) => l <= maxRun);
@@ -327,6 +512,135 @@ function* templates(maxRun: number): Generator<Template> {
         };
       }
     }
+
+    // Formes libres : L, U, haricot, triangle, maison, octogone.
+    const K2 = r + r;
+    const shapes: { family: Family; turns: string[]; runs: (string | number)[]; params: Record<string, number[]> }[] = [
+      {
+        family: "l-shape",
+        turns: [k2, k2, K2, k2, k2, k2],
+        runs: ["x", "a", "b", "c", "d", "y"],
+        params: { a: [108, 216, 324], b: [108, 216, 324], c: [108, 216], d: [108, 216, 324] },
+      },
+      {
+        family: "u-shape",
+        turns: [k2, k2, k2, K2, K2, k2, k2, k2],
+        runs: ["x", "a", "b", "c", "d", "c", "b", "y"],
+        params: { a: [216, 324, 432], b: [0, 108, 216], c: [108, 216], d: [108, 216, 324] },
+      },
+      {
+        family: "bean",
+        turns: [k, r, r, k, k2, k2, k2, k2],
+        runs: ["a", "d", "b", "d", "a", "h", "x", "y"],
+        params: { a: [108, 216], d: [0, 108], b: [0, 108, 216], h: [108, 216, 324] },
+      },
+      { family: "triangle", turns: [k2, k + k2, k + k2], runs: ["a", "x", "y"], params: { a: [216, 324, 432, 648] } },
+      {
+        family: "house",
+        turns: [k2, k, k2, k, k2],
+        runs: ["a", "h", "x", "y", "h"],
+        params: { a: [108, 216, 324, 432], h: [108, 216, 324] },
+      },
+      {
+        family: "octagon",
+        turns: Array(8).fill(k),
+        runs: ["s", "s", "s", "s", "s", "s", "x", "y"],
+        params: { s: [54, 108, 144, 216] },
+      },
+    ];
+    for (const { family, turns, runs: shapeRuns, params } of shapes) {
+      for (const values of combos(params)) {
+        const elems = shape(turns, shapeRuns, values);
+        if (elems && maxRunOf(elems) <= maxRun) yield { family, elems, checkOverlaps: true };
+      }
+    }
+
+    // Lignes avec embranchements, au départ d'un ovale ou d'un rectangle.
+    const loops: Elem[][] = [];
+    for (const a of positive.filter((l) => l >= 216 && l <= 864 && l % 36 === 0)) {
+      loops.push([k4, { run: a }, k4, { run: a }]);
+      for (const b of [108, 216].filter((l) => l <= a)) {
+        loops.push([k2, { run: a }, k2, { run: b }, k2, { run: a }, k2, { run: b }]);
+      }
+    }
+    for (const loop of loops) {
+      const runIndex = loop.length - 1; // la dernière ligne droite : l'embranchement part vers l'extérieur
+      const length = (loop[runIndex] as { run: number }).run;
+      // w, n : aiguillage vers l'extérieur ; Y : aiguillage « retourné », la branche part vers l'arrière.
+      for (const sw of ["w", "n", "Y"]) {
+        for (const before of [0, 54, 108].filter((l) => l <= length - SWITCH_LENGTH[sw])) {
+          // Terminus : une voie qui finit en gare (en biais, perpendiculaire ou parallèle).
+          for (const turn of ["", r, k]) {
+            for (const s of [216, 324, 432]) {
+              const elems = withBranch(loop, runIndex, before, sw, [turn, { run: s }, END]);
+              if (elems) yield { family: "terminus", elems, checkOverlaps: true };
+            }
+          }
+          // Fourche : la branche se sépare en deux voies sans issue grâce à l'aiguillage en Y.
+          for (const s of [108, 216]) {
+            for (const s2 of [108, 216, 324]) {
+              const elems = withBranch(loop, runIndex, before, sw, [
+                { run: s },
+                { tag: "y", token: "J" },
+                { run: s2 },
+                END,
+                { jump: "y", connector: 2 },
+                { run: s2 },
+                END,
+              ]);
+              if (elems) yield { family: "fork", elems, checkOverlaps: true };
+            }
+          }
+        }
+      }
+      // Gare de triage : deux aiguillages à la suite, deux voies sans issue.
+      if (length >= 432) {
+        for (const gapRun of [108, 216]) {
+          const rest = length - 288 - gapRun;
+          if (rest < 0 || !RUN_LENGTHS.includes(rest)) continue;
+          for (const [first, second] of [
+            ["w", "w"],
+            ["w", "Y"],
+          ]) {
+            for (const s of [108, 216, 324]) {
+              yield {
+                family: "yard",
+                elems: [
+                  ...loop.slice(0, runIndex),
+                  { tag: "a", token: first },
+                  { run: gapRun },
+                  { tag: "b", token: second },
+                  { run: rest },
+                  { jump: "a", connector: 2 },
+                  "C",
+                  { run: s },
+                  END,
+                  { jump: "b", connector: 2 },
+                  second === "w" ? r : "",
+                  { run: s },
+                  END,
+                ],
+                checkOverlaps: true,
+              };
+            }
+          }
+        }
+      }
+    }
+
+    // Ligne d'une gare à l'autre : pas de boucle, deux voies sans issue.
+    for (const a of [216, 432]) {
+      for (const b of [0, 216, 432]) {
+        for (const bend of [k2 + "|" + K2, k4]) {
+          const [first, second] = bend.includes("|") ? bend.split("|") : [k2, k2];
+          yield {
+            family: "line",
+            elems: [OPEN_END, { run: a }, first, { run: b }, second, { run: a }, END],
+            checkOverlaps: true,
+          };
+        }
+      }
+    }
   }
 }
 
@@ -368,7 +682,9 @@ export function sizeOf(pieces: number): Size {
   return pieces <= 12 ? "small" : pieces <= 20 ? "medium" : "large";
 }
 
-const TRACK_ACCESSORIES = new Set(["support", "tunnel", "station", "signal", "crane", "tree"]);
+const FAMILY_CAP = 40;
+
+const TRACK_ACCESSORIES = new Set(["support", "tunnel", "station", "signal", "crane", "tree", "turntable"]);
 
 function expand(elems: Elem[], pool: Inventory, missing: Inventory, allowMissing: number): string | null {
   let out = "";
@@ -387,6 +703,12 @@ function expand(elems: Elem[], pool: Inventory, missing: Inventory, allowMissing
       tags[e.tag] = count + 1;
       out += e.token;
       count += 1;
+    } else if ("end" in e) {
+      if ((pool["buffer-stop"] ?? 0) > 0) {
+        pool["buffer-stop"]--;
+        out += "Z";
+        count += 1;
+      } else out += OPEN_END;
     } else {
       out += `@${tags[e.jump]}.${e.connector}`;
     }
@@ -394,8 +716,21 @@ function expand(elems: Elem[], pool: Inventory, missing: Inventory, allowMissing
   return out;
 }
 
-/** Place les accessoires disponibles le long des lignes droites au sol. */
-function decorate(placements: Placement[], available: Inventory): { codes: string[]; list: AccessoryPlacement[] } {
+/** Bouts des voies sans issue (butoirs et extrémités ouvertes), pour y placer les gares. */
+export function deadEnds(placements: Placement[], report: ClosureReport, catalog: Catalog): [number, number][] {
+  const ends: [number, number][] = report.openConnectors.map((c) => [c.x, c.y]);
+  for (const p of placements) {
+    if (catalog[p.pieceTypeId]?.category === "buffer") ends.push([p.x, p.y]);
+  }
+  return ends;
+}
+
+/** Place les accessoires disponibles le long des lignes droites au sol ; gares et plaque tournante au bout des voies. */
+function decorate(
+  placements: Placement[],
+  available: Inventory,
+  ends: [number, number][] = [],
+): { codes: string[]; list: AccessoryPlacement[] } {
   const ground = placements
     .map((p, i) => ({ p, i }))
     .filter(({ p }) => !p.level && ["straight-long", "straight-medium", "straight-short"].includes(p.pieceTypeId));
@@ -415,8 +750,12 @@ function decorate(placements: Placement[], available: Inventory): { codes: strin
   const longFirst = [...ground].sort(
     (a, b) => (b.p.pieceTypeId === "straight-long" ? 1 : 0) - (a.p.pieceTypeId === "straight-long" ? 1 : 0),
   );
+  const distance = ({ p }: { p: Placement }) => Math.min(...ends.map(([x, y]) => Math.hypot(p.x - x, p.y - y)));
+  const nearEnds = ends.length ? [...ground].sort((a, b) => distance(a) - distance(b)) : [...ground].reverse();
+  // La gare d'abord (au bout d'une voie sans issue, sinon sur la ligne), puis le reste du décor.
+  put("G", nearEnds, Math.min(available.station ?? 0, Math.max(2, Math.min(ends.length, 3))));
+  if (ends.length) put("O", nearEnds, Math.min(available.turntable ?? 0, 1));
   put("T", longFirst, Math.min(available.tunnel ?? 0, 1));
-  put("G", [...ground].reverse(), Math.min(available.station ?? 0, 2));
   put("Q", ground, Math.min(available.crane ?? 0, 1));
   put("I", ground, Math.min(available.signal ?? 0, 1));
   put(
@@ -449,8 +788,12 @@ export function generateLayouts(
   const seen = new Set<string>();
   const results: GeneratedLayout[] = [];
 
+  // Au-delà de quelques dizaines de circuits par famille, on n'en montrerait pas plus : on s'arrête là.
+  const perFamily = new Map<string, number>();
+  const full = (family: Family, kind: string) => (perFamily.get(`${family}:${kind}`) ?? 0) >= FAMILY_CAP;
   for (const template of templates(maxRun)) {
     if (options.families?.length && !options.families.includes(template.family)) continue;
+    if (full(template.family, "buildable") && full(template.family, "almost")) continue;
     // Pièces fixes : on écarte d'emblée ce qui manque trop.
     const fixedMissing = Object.entries(fixedNeeds(template.elems)).reduce(
       (s, [id, q]) => s + Math.max(0, q - (inventory[id] ?? 0)),
@@ -473,8 +816,7 @@ export function generateLayouts(
       continue;
     }
     const report = analyzeJoints(placements, catalog);
-    if (!report.closed) continue;
-    if (template.checkOverlaps && overlaps(placements, catalog).length > 0) continue;
+    if (!isComplete(report, tokens)) continue;
 
     const bom = fullBillOfMaterials(placements, catalog);
     const lacking: Inventory = {};
@@ -488,11 +830,7 @@ export function generateLayouts(
     const pieces = placements.length;
     const size = sizeOf(pieces);
     if (options.sizes?.length && !options.sizes.includes(size)) continue;
-    const features = {
-      bridge: tokens.includes("U"),
-      switches: /[WwYy]/.test(tokens),
-      crossing: tokens.includes("X"),
-    };
+    const features = featuresOf(tokens);
     const req = options.require ?? {};
     if (
       (req.bridge && !features.bridge) ||
@@ -501,18 +839,23 @@ export function generateLayouts(
     ) {
       continue;
     }
+    const kind = missingCount === 0 ? "buildable" : "almost";
+    if (full(template.family, kind)) continue;
+    // Le test de chevauchement est le plus coûteux : on le fait en dernier.
+    if (template.checkOverlaps && overlaps(placements, catalog, true).length > 0) continue;
 
     let accessories: AccessoryPlacement[] = [];
     let fullCode = code;
     if (options.decorate) {
-      const deco = decorate(placements, inventory);
+      const deco = decorate(placements, inventory, deadEnds(placements, report, catalog));
       accessories = deco.list;
       if (deco.codes.length) fullCode = `${code}~${deco.codes.join(".")}`;
     }
 
     const special = Number(features.bridge) + Number(features.switches) + Number(features.crossing);
-    const difficulty = Math.min(3, 1 + (pieces > 16 ? 1 : 0) + (special > 0 ? 1 : 0)) as 1 | 2 | 3;
+    const deadEndCount = openEndCount(tokens) + (bom["buffer-stop"] ?? 0);
     const usage = totalOwned > 0 ? Math.min(1, (pieces - missingCount) / totalOwned) : 0;
+    perFamily.set(`${template.family}:${kind}`, (perFamily.get(`${template.family}:${kind}`) ?? 0) + 1);
     results.push({
       code: fullCode,
       family: template.family,
@@ -525,9 +868,14 @@ export function generateLayouts(
       pieces,
       size,
       features,
-      difficulty,
-      minutes: Math.round(pieces * 0.6 + special * 3 + 2),
-      score: usage * 3 + special * 0.8 + (report.maxGap < 1 ? 0.3 : 0) - missingCount * 0.5,
+      difficulty: difficultyOf(pieces, features),
+      minutes: minutesOf(pieces, features),
+      score:
+        usage * 3 +
+        special * 0.8 +
+        Math.min(deadEndCount, 2) * 0.3 +
+        (report.maxGap < 1 ? 0.3 : 0) -
+        missingCount * 0.5,
     });
   }
 

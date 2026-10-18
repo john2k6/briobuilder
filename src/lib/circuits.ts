@@ -2,7 +2,11 @@ import { catalog } from "./catalog";
 import {
   analyzeJoints,
   decodeLayout,
+  difficultyOf,
+  featuresOf,
   fullBillOfMaterials,
+  isComplete,
+  minutesOf,
   generateLayouts,
   sizeOf,
   type GeneratedLayout,
@@ -28,15 +32,10 @@ export function circuitFromCode(code: string): Circuit | null {
   try {
     const decoded = decodeLayout(code, catalog);
     const report = analyzeJoints(decoded.placements, catalog);
-    if (report.closed) {
-      const tokens = code.split(":")[1].split("~")[0];
+    const tokens = code.split(":")[1].split("~")[0];
+    if (isComplete(report, tokens)) {
       const pieces = decoded.placements.length;
-      const features = {
-        bridge: tokens.includes("U"),
-        switches: /[WwYy]/.test(tokens),
-        crossing: tokens.includes("X"),
-      };
-      const special = Number(features.bridge) + Number(features.switches) + Number(features.crossing);
+      const features = featuresOf(tokens);
       circuit = {
         ...decoded,
         bom: fullBillOfMaterials(decoded.placements, catalog),
@@ -44,8 +43,8 @@ export function circuitFromCode(code: string): Circuit | null {
         pieces,
         size: sizeOf(pieces),
         features,
-        difficulty: Math.min(3, 1 + (pieces > 16 ? 1 : 0) + (special > 0 ? 1 : 0)) as 1 | 2 | 3,
-        minutes: Math.round(pieces * 0.6 + special * 3 + 2),
+        difficulty: difficultyOf(pieces, features),
+        minutes: minutesOf(pieces, features),
       };
     }
   } catch {
