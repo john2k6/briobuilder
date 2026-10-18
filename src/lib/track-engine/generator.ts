@@ -485,7 +485,7 @@ function* templates(maxRun: number): Generator<Template> {
     }
     // Voie de garage : un aiguillage sur un côté, une voie parallèle à l'extérieur qui finit sur un butoir.
     for (const a1 of upTo(432)) {
-      for (const s of positive.filter((l) => l <= 432)) {
+      for (const s of [432, 324, 216, 108]) {
         yield {
           family: "siding",
           elems: [
@@ -604,7 +604,7 @@ function* templates(maxRun: number): Generator<Template> {
       const length = (loop[runIndex] as { run: number }).run;
       // w, n : aiguillage vers l'extérieur ; Y : aiguillage « retourné », la branche part vers l'arrière.
       for (const sw of ["w", "n", "Y"]) {
-        for (const before of [0, 54, 108].filter((l) => l <= length - SWITCH_LENGTH[sw])) {
+        for (const before of [0, 108].filter((l) => l <= length - SWITCH_LENGTH[sw])) {
           // Terminus : une voie qui finit en gare (en biais, perpendiculaire ou parallèle).
           for (const turn of ["", r, k]) {
             for (const s of [216, 324, 432]) {
@@ -614,7 +614,7 @@ function* templates(maxRun: number): Generator<Template> {
           }
           // Fourche : la branche se sépare en deux voies sans issue grâce à l'aiguillage en Y.
           for (const s of [108, 216]) {
-            for (const s2 of [108, 216, 324]) {
+            for (const s2 of [108, 216]) {
               const elems = withBranch(loop, runIndex, before, sw, [
                 { run: s },
                 { tag: "y", token: "J" },
@@ -667,12 +667,12 @@ function* templates(maxRun: number): Generator<Template> {
     // Ligne d'une gare à l'autre : pas de boucle, deux voies sans issue, avec 1 à 3 virages
     // (coude, S, U, zigzag…) choisis parmi les courbes disponibles.
     const bends = [k, r, k2, K2, k + k + k, k4];
-    const lineRuns = [432, 324, 216, 108];
+    const lineRuns = [432, 216];
     for (const b1 of bends) {
       for (const b2 of ["", ...bends]) {
         for (const b3 of b2 ? ["", ...bends] : [""]) {
           for (const a of lineRuns) {
-            for (const m of [216, 108]) {
+            for (const m of [216]) {
               const turns = [b1, b2, b3].filter(Boolean);
               const elems: Elem[] = [OPEN_END, { run: a }];
               for (const turn of turns) elems.push(turn, { run: m });
@@ -694,7 +694,7 @@ function* networks(maxRun: number): Generator<Template> {
   const bases = new Set<Family>(["hill", "eight-bridge", "eight-crossing", "passing-loop"]);
   let n = 0;
   for (const base of templates(maxRun)) {
-    if (!bases.has(base.family) || n++ % 3 !== 0) continue;
+    if (!bases.has(base.family) || n++ % 5 !== 0) continue;
     const runIndex = base.elems.findIndex((e) => typeof e === "object" && "run" in e && !e.elevated && e.run >= 252);
     if (runIndex < 0) continue;
     for (const sw of ["w", "n", "Y"]) {
