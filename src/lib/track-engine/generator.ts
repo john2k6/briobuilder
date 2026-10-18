@@ -664,16 +664,22 @@ function* templates(maxRun: number): Generator<Template> {
       }
     }
 
-    // Ligne d'une gare à l'autre : pas de boucle, deux voies sans issue.
-    for (const a of [216, 432]) {
-      for (const b of [0, 216, 432]) {
-        for (const bend of [k2 + "|" + K2, k4]) {
-          const [first, second] = bend.includes("|") ? bend.split("|") : [k2, k2];
-          yield {
-            family: "line",
-            elems: [OPEN_END, { run: a }, first, { run: b }, second, { run: a }, END],
-            checkOverlaps: true,
-          };
+    // Ligne d'une gare à l'autre : pas de boucle, deux voies sans issue, avec 1 à 3 virages
+    // (coude, S, U, zigzag…) choisis parmi les courbes disponibles.
+    const bends = [k, r, k2, K2, k + k + k, k4];
+    const lineRuns = [432, 324, 216, 108];
+    for (const b1 of bends) {
+      for (const b2 of ["", ...bends]) {
+        for (const b3 of b2 ? ["", ...bends] : [""]) {
+          for (const a of lineRuns) {
+            for (const m of [216, 108]) {
+              const turns = [b1, b2, b3].filter(Boolean);
+              const elems: Elem[] = [OPEN_END, { run: a }];
+              for (const turn of turns) elems.push(turn, { run: m });
+              elems.push(END);
+              yield { family: "line", elems, checkOverlaps: true };
+            }
+          }
         }
       }
     }
@@ -744,7 +750,7 @@ export function sizeOf(pieces: number): Size {
   return pieces <= 12 ? "small" : pieces <= 20 ? "medium" : "large";
 }
 
-const FAMILY_CAP = 40;
+const FAMILY_CAP = 60;
 
 /** Pièces qui ne sont pas des rails : décors, bâtiments, trains. */
 const NOT_TRACK = new Set(["accessory", "building", "vehicle"]);
@@ -972,12 +978,14 @@ export function generateLayouts(
   }
 
   const pick = (list: GeneratedLayout[]) => {
-    // Variété : au plus 10 circuits par famille, tous différents ; on alterne les familles.
+    // Variété : au plus 12 circuits par famille, tous différents ; on alterne les familles.
     const byFamily = new Map<Family, GeneratedLayout[]>();
     for (const r of [...list].sort((a, b) => b.score - a.score)) {
       const group = byFamily.get(r.family) ?? [];
-      const similar = group.some((g) => g.pieces === r.pieces && g.code.length === r.code.length);
-      if (!similar && group.length < 10) group.push(r);
+      // Deux circuits sont « pareils » s'ils ont le même nombre de pièces et la même suite de virages.
+      const turns = (c: GeneratedLayout) => c.code.split("~")[0].replace(/[^CRcr@]/g, "");
+      const similar = group.some((g) => g.pieces === r.pieces && turns(g) === turns(r));
+      if (!similar && group.length < 12) group.push(r);
       byFamily.set(r.family, group);
     }
     const out: GeneratedLayout[] = [];
