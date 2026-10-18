@@ -361,7 +361,8 @@
     "terminus": "The terminus",
     "fork": "The fork",
     "yard": "The shunting yard",
-    "line": "The station-to-station line"
+    "line": "The station-to-station line",
+    "network": "The big network"
   },
   "sizes": {
     "small": "small",

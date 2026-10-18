@@ -1,5 +1,6 @@
 import { analyzeJoints, type ClosureReport } from "./connect";
 import { chain, type ChainStep } from "./chain";
+import { getPiece, transformTracks } from "./geometry";
 import { fullBillOfMaterials } from "./inventory";
 import { overlaps } from "./overlaps";
 import type { Catalog, Inventory, Placement } from "./types";
@@ -93,7 +94,8 @@ export type Family =
   | "terminus"
   | "fork"
   | "yard"
-  | "line";
+  | "line"
+  | "network";
 
 export const FAMILIES: Family[] = [
   "circle",
@@ -114,6 +116,7 @@ export const FAMILIES: Family[] = [
   "fork",
   "yard",
   "line",
+  "network",
 ];
 
 /** Transforme une suite de jetons en étapes de pose. « @3.2 » : repartir du connecteur 2 de la 3e pièce. */
@@ -653,6 +656,30 @@ function* templates(maxRun: number): Generator<Template> {
   }
 }
 
+/**
+ * Grands réseaux : une boucle à pont, à croisement ou à voie d'évitement, plus un embranchement
+ * qui part d'une ligne droite au sol vers un terminus (ou une fourche).
+ */
+function* networks(maxRun: number): Generator<Template> {
+  const bases = new Set<Family>(["hill", "eight-bridge", "eight-crossing", "passing-loop"]);
+  let n = 0;
+  for (const base of templates(maxRun)) {
+    if (!bases.has(base.family) || n++ % 3 !== 0) continue;
+    const runIndex = base.elems.findIndex((e) => typeof e === "object" && "run" in e && !e.elevated && e.run >= 252);
+    if (runIndex < 0) continue;
+    for (const sw of ["w", "n", "Y"]) {
+      for (const branch of [
+        ["R", { run: 216 }, END],
+        [{ run: 324 }, END],
+        [{ run: 108 }, { tag: "y", token: "J" }, { run: 216 }, END, { jump: "y", connector: 2 }, { run: 216 }, END],
+      ] as Elem[][]) {
+        const elems = withBranch(base.elems, runIndex, 0, sw, branch);
+        if (elems) yield { family: "network", elems, checkOverlaps: true };
+      }
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------------------------
 // Génération
 
@@ -740,6 +767,7 @@ function decorate(
   placements: Placement[],
   available: Inventory,
   ends: [number, number][] = [],
+  catalog?: Catalog,
 ): { codes: string[]; list: AccessoryPlacement[] } {
   const ground = placements
     .map((p, i) => ({ p, i }))
@@ -772,7 +800,17 @@ function decorate(
     buildings += qty;
   }
   if (ends.length) put("O", nearEnds, Math.min(available.turntable ?? 0, 1));
-  put("T", longFirst, Math.min(available.tunnel ?? 0, 1));
+  // Le tunnel va de préférence sous le pont : la voie du bas passe dessous.
+  const middle = (p: Placement) => {
+    const track = catalog ? transformTracks(p, getPiece(catalog, p.pieceTypeId))[0] : undefined;
+    return track ? track[Math.floor(track.length / 2)] : [p.x, p.y];
+  };
+  const high = placements.filter((p) => (p.level ?? 0) > 0).map(middle);
+  const underBridge = ground.filter(({ p }) => {
+    const [x, y] = middle(p);
+    return high.some(([hx, hy]) => Math.hypot(hx - x, hy - y) < 120);
+  });
+  put("T", [...underBridge, ...longFirst], Math.min(available.tunnel ?? 0, 1));
   put("Q", ground, Math.min(available.crane ?? 0, 1));
   put("B", ground, Math.min(available["signal-box"] ?? 0, 1));
   put("I", ground, Math.min(available.signal ?? 0, 1));
@@ -810,7 +848,11 @@ export function generateLayouts(
   // Au-delà de quelques dizaines de circuits par famille, on n'en montrerait pas plus : on s'arrête là.
   const perFamily = new Map<string, number>();
   const full = (family: Family, kind: string) => (perFamily.get(`${family}:${kind}`) ?? 0) >= FAMILY_CAP;
-  for (const template of templates(maxRun)) {
+  const all = function* () {
+    yield* templates(maxRun);
+    yield* networks(maxRun);
+  };
+  for (const template of all()) {
     if (options.families?.length && !options.families.includes(template.family)) continue;
     if (full(template.family, "buildable") && full(template.family, "almost")) continue;
     // Pièces fixes : on écarte d'emblée ce qui manque trop.
@@ -866,7 +908,7 @@ export function generateLayouts(
     let accessories: AccessoryPlacement[] = [];
     let fullCode = code;
     if (options.decorate) {
-      const deco = decorate(placements, inventory, deadEnds(placements, report, catalog));
+      const deco = decorate(placements, inventory, deadEnds(placements, report, catalog), catalog);
       accessories = deco.list;
       if (deco.codes.length) fullCode = `${code}~${deco.codes.join(".")}`;
     }

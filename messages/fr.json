@@ -361,7 +361,8 @@
     "terminus": "Le terminus",
     "fork": "La fourche",
     "yard": "La gare de triage",
-    "line": "La ligne d'une gare à l'autre"
+    "line": "La ligne d'une gare à l'autre",
+    "network": "Le grand réseau"
   },
   "sizes": {
     "small": "petit",
