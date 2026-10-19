@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { PiecePhoto } from "@/components/PiecePhoto";
+import { communityEnabled } from "@/lib/community";
 import { TrackPlan, type StepState } from "@/components/TrackPlan";
 import { Avatar, Icon, icons } from "@/components/ui";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -285,6 +286,7 @@ export function BuildView() {
                   ))}
                 </div>
               )}
+              {communityEnabled && <p className="mx-auto max-w-2xl text-lg font-semibold">{t("community.kidsHint")}</p>}
               <Link
                 href="/circuits"
                 className="mx-auto flex min-h-20 w-full max-w-2xl items-center justify-center rounded-3xl bg-accent text-xl font-bold uppercase text-accent-ink"

@@ -14,6 +14,7 @@ Le **cahier des exigences** (PDF du 18 octobre 2026, identifiants EF-xx / ENF-xx
 - **Enfants (ENF-01)** : surnom, tranche d'âge et couleur seulement. Aucune donnée identifiante, aucun traceur publicitaire, jamais de publicité.
 - **Mode enfant** : cibles ≥ 64 px, aucune saisie clavier, consignes lues à voix haute, ni achat, ni lien affilié, ni lien externe (EF-51). Animations < 600 ms, coupées si « réduire les animations ».
 - Demande avant de créer une ressource en ligne ou d'activer un service payant (Supabase, Stripe, affiliation…).
+- **Circuits des internautes (19 octobre 2026)** : photos de circuits construits, publiées **par le parent seulement** (jamais depuis le mode enfant), avec la case « ni visage, ni prénom, ni adresse », **validées avant publication**, signalables (2 signalements → retour en validation), métadonnées supprimées (photo réencodée). Supabase région UE, compte anonyme par appareil (`src/lib/community.ts`, `supabase/migrations/`, guide `docs/supabase.md`). Sans `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`, le site affiche « Bientôt ».
 
 ## Stack
 Next.js 16 (App Router) + TypeScript strict, Tailwind CSS 4, next-intl (`/fr`, `/en`), Vitest, Playwright, Prettier.

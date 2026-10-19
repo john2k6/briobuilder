@@ -1,5 +1,6 @@
 "use client";
 
+import { deleteAllMyPhotos } from "@/lib/community";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { buttonPrimary, buttonSecondary, card, Icon, icons, PageHeader } from "@/components/ui";
@@ -24,6 +25,8 @@ export function SettingsView() {
   const deleteAll = () => {
     if (!window.confirm(t("deleteConfirm"))) return;
     actions.deleteAll();
+    // Les photos partagées depuis cet appareil sont retirées aussi.
+    void deleteAllMyPhotos().catch(() => undefined);
     setDeleted(true);
   };
 

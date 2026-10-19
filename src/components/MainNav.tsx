@@ -7,6 +7,7 @@ const items = [
   { href: "/box", key: "box" },
   { href: "/collection", key: "collection" },
   { href: "/circuits", key: "circuits" },
+  { href: "/community", key: "community" },
   { href: "/kids", key: "kids" },
   { href: "/settings", key: "settings" },
 ] as const;

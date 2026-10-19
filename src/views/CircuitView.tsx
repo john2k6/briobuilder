@@ -7,6 +7,7 @@ import { ChildPicker } from "@/components/ChildPicker";
 import { FeatureBadges, useCircuitName } from "@/components/CircuitCard";
 import { circuitHref } from "@/lib/circuits";
 import { PiecePhoto } from "@/components/PiecePhoto";
+import { SharePhoto } from "@/components/SharePhoto";
 import { TrackPlan } from "@/components/TrackPlan";
 import { buttonPrimary, buttonSecondary, card, Check, Icon, icons, Stars } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
@@ -103,16 +104,19 @@ export function CircuitView() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
-        <figure className="wood-floor self-start overflow-hidden rounded-tl-[2.5rem] rounded-br-[2.5rem] rounded-tr-xl rounded-bl-xl border border-border p-4 sm:p-8">
-          <TrackPlan
-            placements={circuit.placements}
-            catalog={catalog}
-            title={t("circuit.plan")}
-            accessories={circuit.accessories}
-            train
-            className="w-full"
-          />
-        </figure>
+        <div className="space-y-6 self-start">
+          <figure className="wood-floor overflow-hidden rounded-tl-[2.5rem] rounded-br-[2.5rem] rounded-tr-xl rounded-bl-xl border border-border p-4 sm:p-8">
+            <TrackPlan
+              placements={circuit.placements}
+              catalog={catalog}
+              title={t("circuit.plan")}
+              accessories={circuit.accessories}
+              train
+              className="w-full"
+            />
+          </figure>
+          <SharePhoto code={code} />
+        </div>
 
         <section className="space-y-4">
           <div>

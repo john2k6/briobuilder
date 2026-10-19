@@ -14,7 +14,8 @@
     "kids": "Enfants",
     "settings": "Réglages",
     "menu": "Menu principal",
-    "collection": "Ma collection"
+    "collection": "Ma collection",
+    "community": "Circuits des internautes"
   },
   "home": {
     "inspireEyebrow": "Notre idée",
@@ -605,5 +606,40 @@
     },
     "filter": "Filtrer",
     "officialHint": "Touchez un produit pour ouvrir sa page officielle (nouvel onglet)."
+  },
+  "community": {
+    "title": "Circuits des internautes",
+    "intro": "Les circuits construits par d'autres familles, avec le plan du site à côté de la photo. Une idée te plaît ? Construis-la !",
+    "soon": "Bientôt : les familles pourront partager la photo de leur circuit construit, à côté de son plan.",
+    "unavailable": "Les photos ne peuvent pas être chargées pour le moment. Réessaie plus tard.",
+    "loading": "Chargement des photos…",
+    "empty": "Pas encore de photo publiée. Construis un circuit et partage la tienne en premier !",
+    "first": "Choisir un circuit",
+    "photoAlt": "Photo du circuit construit",
+    "unknown": "Circuit",
+    "build": "Construire ce circuit",
+    "report": "Signaler",
+    "reported": "Merci, c'est signalé",
+    "more": "Voir plus de photos",
+    "rules": "Chaque photo est publiée par un parent et vérifiée avant d'apparaître : pas de visage, de prénom ni d'adresse. Une photo signalée deux fois est retirée en attendant une nouvelle vérification.",
+    "shareTitle": "Ton circuit en photo",
+    "shareIntro": "Tu l'as construit ? Partage la photo avec les autres familles. Elle apparaîtra dans « Circuits des internautes » après vérification.",
+    "choose": "Prendre ou choisir une photo",
+    "change": "Changer de photo",
+    "previewAlt": "Aperçu de la photo",
+    "safe": "Je suis le parent, et on ne voit sur la photo ni visage, ni prénom, ni adresse.",
+    "publish": "Envoyer pour vérification",
+    "sending": "Envoi…",
+    "sent": "Merci ! La photo sera visible après vérification.",
+    "error": "L'envoi n'a pas marché. Vérifie la connexion et réessaie.",
+    "mine": "Mes photos de ce circuit",
+    "remove": "Retirer",
+    "seeAll": "Voir les circuits des internautes",
+    "status": {
+      "pending": "En attente",
+      "approved": "Publiée",
+      "rejected": "Refusée"
+    },
+    "kidsHint": "Bravo ! Demande à un adulte de prendre ton circuit en photo pour le montrer aux autres familles."
   }
 }

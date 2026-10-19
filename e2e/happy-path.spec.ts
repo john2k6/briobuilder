@@ -89,3 +89,11 @@ test("un code de circuit invalide affiche un message clair", async ({ page }) =>
   await page.goto("/fr/circuit?c=oval:CCCCL");
   await expect(page.getByText("Ce circuit est introuvable ou ne se referme pas.")).toBeVisible();
 });
+
+test("circuits des internautes : page et partage annoncés tant que le stockage n'est pas branché", async ({ page }) => {
+  await page.goto("/fr/community");
+  await expect(page.getByRole("heading", { name: "Circuits des internautes" })).toBeVisible();
+  await expect(page.getByText(/Bientôt/)).toBeVisible();
+  await page.goto("/fr/circuit?c=circle:CCCCCCCC");
+  await expect(page.getByRole("heading", { name: "Ton circuit en photo" })).toBeVisible();
+});

@@ -14,7 +14,8 @@
     "kids": "Kids",
     "settings": "Settings",
     "menu": "Main menu",
-    "collection": "My collection"
+    "collection": "My collection",
+    "community": "Community layouts"
   },
   "home": {
     "inspireEyebrow": "Our idea",
@@ -605,5 +606,40 @@
     },
     "filter": "Filter",
     "officialHint": "Tap a product to open its official page (new tab)."
+  },
+  "community": {
+    "title": "Community layouts",
+    "intro": "Layouts built by other families, with the site's plan next to the photo. Like an idea? Build it!",
+    "soon": "Coming soon: families will be able to share a photo of their built layout, next to its plan.",
+    "unavailable": "Photos cannot be loaded right now. Please try again later.",
+    "loading": "Loading photos…",
+    "empty": "No photos yet. Build a layout and be the first to share yours!",
+    "first": "Pick a layout",
+    "photoAlt": "Photo of the built layout",
+    "unknown": "Layout",
+    "build": "Build this layout",
+    "report": "Report",
+    "reported": "Thanks, reported",
+    "more": "See more photos",
+    "rules": "Every photo is posted by a parent and checked before it appears: no faces, first names or addresses. A photo reported twice is hidden until it is checked again.",
+    "shareTitle": "Your layout in a photo",
+    "shareIntro": "Built it? Share the photo with other families. It will appear in “Community layouts” once checked.",
+    "choose": "Take or choose a photo",
+    "change": "Change photo",
+    "previewAlt": "Photo preview",
+    "safe": "I am the parent, and the photo shows no faces, first names or addresses.",
+    "publish": "Send for checking",
+    "sending": "Sending…",
+    "sent": "Thank you! The photo will be visible once checked.",
+    "error": "Sending failed. Check your connection and try again.",
+    "mine": "My photos of this layout",
+    "remove": "Remove",
+    "seeAll": "See community layouts",
+    "status": {
+      "pending": "Waiting",
+      "approved": "Published",
+      "rejected": "Declined"
+    },
+    "kidsHint": "Well done! Ask a grown-up to take a photo of your layout to show other families."
   }
 }
