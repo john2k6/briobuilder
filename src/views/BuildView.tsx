@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
+import { PiecePhoto } from "@/components/PiecePhoto";
 import { TrackPlan, type StepState } from "@/components/TrackPlan";
 import { Avatar, Icon, icons } from "@/components/ui";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -223,6 +224,7 @@ export function BuildView() {
                 className="w-full"
               />
             </span>
+            <PiecePhoto id={placement.pieceTypeId} className="w-24 shrink-0" />
             <span className="flex-1">
               <span className="block font-display text-xl font-bold uppercase leading-tight sm:text-2xl">
                 {instruction}
@@ -234,6 +236,7 @@ export function BuildView() {
               <span className="sr-only">{t("build.listen")}</span>
             </span>
           </button>
+          <p className="mx-auto max-w-2xl text-center text-xs text-muted">{t("official.credit")}</p>
           <div className="mx-auto grid max-w-2xl grid-cols-2 gap-4">
             <button
               type="button"

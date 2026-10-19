@@ -87,7 +87,8 @@ const ramp = (id, ref, low) => ({
 const smallBranch = arc(E1, 45).at(-1);
 const smallSwitch = {
   id: "switch-small",
-  ref: null,
+  // Vendu dans le coffret de démarrage 13 rails (pack B).
+  ref: "33394",
   category: "switch",
   verified: false,
   lengthMm: 108,
@@ -105,7 +106,8 @@ const smallSwitch = {
 const mirror = (pts) => pts.map(([x, y, l]) => [x, -y, l]);
 const tSwitch = {
   id: "switch-t",
-  ref: null,
+  // Aiguillage en Y, croisements : dans le coffret évolution avancé.
+  ref: "33307",
   category: "switch",
   verified: false,
   lengthMm: r2(rad(45) * E),
@@ -120,7 +122,7 @@ const tSwitch = {
 /** Croisement courbe (H3) : deux courbes E qui se croisent en X, pour relier deux boucles. */
 const curvedCrossing = {
   id: "crossing-curved",
-  ref: null,
+  ref: "33307",
   category: "crossing",
   verified: false,
   lengthMm: r2(rad(45) * E),
@@ -180,7 +182,7 @@ const pieces = [
   tSwitch,
   {
     id: "crossing",
-    ref: null,
+    ref: "33307",
     category: "crossing",
     verified: false,
     lengthMm: 216,
@@ -213,7 +215,7 @@ const pieces = [
   curvedBridge,
   {
     id: "buffer-stop",
-    ref: null,
+    ref: "33385",
     category: "buffer",
     verified: false,
     lengthMm: 40,

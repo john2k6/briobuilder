@@ -6,7 +6,7 @@ import { useState } from "react";
 import { ChildPicker } from "@/components/ChildPicker";
 import { FeatureBadges, useCircuitName } from "@/components/CircuitCard";
 import { circuitHref } from "@/lib/circuits";
-import { PieceThumb } from "@/components/PieceThumb";
+import { PiecePhoto } from "@/components/PiecePhoto";
 import { TrackPlan } from "@/components/TrackPlan";
 import { buttonPrimary, buttonSecondary, card, Check, Icon, icons, Stars } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
@@ -140,9 +140,7 @@ export function CircuitView() {
                     >
                       {isChecked && <Check />}
                     </span>
-                    <span className="wood-floor w-16 shrink-0 rounded-lg p-1">
-                      <PieceThumb id={pid} />
-                    </span>
+                    <PiecePhoto id={pid} className="w-24 shrink-0" />
                     <span className="min-w-0 flex-1">
                       <span className={`block font-bold ${isChecked ? "line-through" : ""}`}>
                         {t(`pieceNames.${pid}`)}
@@ -159,6 +157,8 @@ export function CircuitView() {
               );
             })}
           </ul>
+
+          <p className="text-xs text-muted">{t("official.credit")}</p>
 
           {missingCount > 0 && (
             <p className="rounded-xl bg-accent/10 p-4 font-bold text-accent">
