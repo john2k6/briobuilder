@@ -395,6 +395,11 @@
     "tabAlmost": "Avec 1 à 3 pièces en plus",
     "emptyBox": "Votre caisse est vide. Ajoutez vos coffrets pour voir ce que vous pouvez construire.",
     "fillBox": "Ajouter mes coffrets",
+    "closest": "Pas encore de circuit de ce type à construire tout de suite avec tes pièces : voici les plus proches, avec les pièces qui manquent.",
+    "relaxed": {
+      "missing": "Pour ce type de circuit, il te manque plus de 3 pièces : voici les plus proches, avec la liste de ce qui manque.",
+      "filters": "Rien avec tous ces réglages : on a mis de côté la taille et les envies pour te montrer quand même ce type de circuit."
+    },
     "noneBuildable": "Aucun circuit réalisable avec ces réglages. Essayez une autre taille ou retirez une option.",
     "noneAlmost": "Aucun circuit à qui il manque moins de 4 pièces avec ces réglages.",
     "missing": "Il manque",

@@ -307,6 +307,8 @@ interface Template {
   elems: Elem[];
   /** Vérifier les chevauchements (inutile pour les formes simples, toujours sans croisement). */
   checkOverlaps: boolean;
+  /** Version « avec gare » ou « avec pont » : passe en plus du plafond de sa famille. */
+  variant?: boolean;
 }
 
 /** Pièces fixes d'un gabarit (hors lignes droites), pour écarter vite les gabarits impossibles. */
@@ -962,6 +964,51 @@ function* derived(base: Template): Generator<Template> {
   }
 }
 
+/**
+ * Versions « avec gare » et « avec pont » de n'importe quel circuit, qui garde son nom :
+ * une voie part d'un aiguillage vers une gare, ou un côté monte sur un pont.
+ */
+function* variants(base: Template): Generator<Template> {
+  const strings = base.elems.filter((e): e is string => typeof e === "string").join("");
+  const elevated = /[UEG]/.test(strings) || base.elems.some((e) => typeof e === "object" && "elevated" in e);
+  for (const i of longestRuns(base.elems, 144, 2)) {
+    const run = (base.elems[i] as { run: number }).run;
+    for (const sw of ["w", "W"]) {
+      const away = sw === "W" ? "C" : "R";
+      const back = sw === "W" ? "R" : "C";
+      const before = nearestRun((run - SWITCH_LENGTH[sw]) / 2);
+      for (const spur of [
+        [{ run: 216 }, END],
+        [away, { run: 216 }, END],
+        [back, { run: 324 }, END],
+        [away, END],
+      ] as Elem[][]) {
+        const elems = withBranch(base.elems, i, before, sw, spur, "st");
+        if (elems) yield { family: base.family, elems, checkOverlaps: true, variant: true };
+      }
+    }
+    if (elevated) continue;
+    for (const side of [0, 108]) {
+      const top = run - 432 - 2 * side;
+      if (top < 108 || !RUN_LENGTHS.includes(top)) continue;
+      yield {
+        family: base.family,
+        elems: [
+          ...base.elems.slice(0, i),
+          { run: side },
+          "U",
+          { run: top, elevated: true },
+          "V",
+          { run: side },
+          ...base.elems.slice(i + 1),
+        ],
+        checkOverlaps: true,
+        variant: true,
+      };
+    }
+  }
+}
+
 /** Circuits auxquels on ajoute un embranchement pour en faire un grand réseau. */
 const NETWORK_BASES = new Set<Family>([
   "hill",
@@ -1312,15 +1359,46 @@ function decorate(
   return { codes, list };
 }
 
+export interface GeneratorResult {
+  buildable: GeneratedLayout[];
+  almost: GeneratedLayout[];
+  total: { buildable: number; almost: number };
+  /**
+   * Rien trouvé avec les réglages : « missing », on montre les plus proches avec plus de pièces manquantes ;
+   * « filters », on a aussi oublié la taille et les envies (pont, aiguillage…) pour garder le type demandé.
+   */
+  relaxed?: "missing" | "filters";
+}
+
 /**
  * Propose des circuits réalisables (et presque réalisables) avec l'inventaire, toutes boîtes mélangées.
- * Les propositions sont triées par pertinence, en variant les familles.
+ * Un type de circuit demandé ne renvoie jamais une liste vide : sans résultat, on élargit la recherche
+ * (plus de pièces manquantes, puis sans les autres filtres).
  */
 export function generateLayouts(
   inventory: Inventory,
   catalog: Catalog,
   options: GeneratorOptions = {},
-): { buildable: GeneratedLayout[]; almost: GeneratedLayout[]; total: { buildable: number; almost: number } } {
+): GeneratorResult {
+  const found = (r: GeneratorResult) => r.buildable.length + r.almost.length > 0;
+  const first = generateOnce(inventory, catalog, options);
+  if (found(first)) return first;
+  // Du moins coûteux au plus large : plus de pièces manquantes, puis sans la taille ni les envies.
+  const free: GeneratorOptions = { ...options, sizes: [], require: {} };
+  const attempts: [GeneratorOptions, GeneratorResult["relaxed"]][] = [
+    [{ ...options, maxMissing: 8 }, "missing"],
+    [free, "filters"],
+    [{ ...free, maxMissing: 8 }, "filters"],
+  ];
+  for (const [wider, relaxed] of attempts) {
+    const r = generateOnce(inventory, catalog, wider);
+    if (found(r)) return { ...r, relaxed };
+  }
+  return { ...generateOnce(inventory, catalog, { ...free, maxMissing: 20 }), relaxed: "filters" };
+}
+
+/** Une recherche avec les réglages donnés : propositions triées par pertinence, en variant les familles. */
+function generateOnce(inventory: Inventory, catalog: Catalog, options: GeneratorOptions = {}): GeneratorResult {
   const maxMissing = options.maxMissing ?? 3;
   const limit = options.limit ?? 12;
   const depth = Math.max(1, options.depth ?? 1);
@@ -1351,7 +1429,7 @@ export function generateLayouts(
   // Raccourcis, grands réseaux et villes des trains partent d'autres circuits : on les cherche aussi, sans les montrer.
   const wanted = (family: Family) => !options.families?.length || options.families.includes(family);
   const process = (template: Template): GeneratedLayout | null => {
-    if (full(template.family, "buildable") && full(template.family, "almost")) return null;
+    if (!template.variant && full(template.family, "buildable") && full(template.family, "almost")) return null;
     // Plus de lignes droites que de rails disponibles : inutile d'essayer.
     const runTotal = template.elems.reduce((sum, e) => sum + (typeof e === "object" && "run" in e ? e.run : 0), 0);
     if (runTotal > straightLength + 216 * maxMissing) return null;
@@ -1409,7 +1487,7 @@ export function generateLayouts(
       (req.crossing && !features.crossing) ||
       (req.stations && !/[|Z]/.test(tokens));
     const kind = missingCount === 0 ? "buildable" : "almost";
-    if (full(template.family, kind)) return null;
+    if (!template.variant && full(template.family, kind)) return null;
     // Le test de chevauchement est le plus coûteux : on le fait en dernier.
     if (template.checkOverlaps && overlaps(placements, catalog, true).length > 0) return null;
 
@@ -1542,10 +1620,43 @@ export function generateLayouts(
     }
   }
 
+  // Pour chaque type de circuit, des versions avec une gare au bout d'une voie, ou avec un pont.
+  {
+    // Les plus beaux de chaque famille, et les plus petits (il leur reste des rails pour la voie de la gare).
+    const firsts = (order: (a: GeneratedLayout, b: GeneratedLayout) => number, count: number) => {
+      const taken = new Map<Family, number>();
+      return [...results]
+        .filter((r) => r.family !== "line" && r.family !== "mega" && r.missingCount === 0)
+        .sort(order)
+        .filter((r) => {
+          taken.set(r.family, (taken.get(r.family) ?? 0) + 1);
+          return taken.get(r.family)! <= count;
+        });
+    };
+    const bases = new Set([
+      ...firsts((a, b) => b.score - a.score, 2 * depth),
+      ...firsts((a, b) => a.pieces - b.pieces, depth),
+    ]);
+    for (const base of bases) for (const template of variants(templateOf.get(base)!)) process(template);
+  }
+
   const pick = (list: GeneratedLayout[]) => {
     // Variété : au plus 12 circuits par famille, tous différents ; on alterne les familles.
     const byFamily = new Map<Family, GeneratedLayout[]>();
-    for (const r of [...list].sort((a, b) => b.score - a.score)) {
+    // Dans chaque famille, on alterne les circuits avec une gare au bout d'une voie et les autres.
+    const withStation = (c: GeneratedLayout) => /[|Z]/.test(c.code.split("~")[0]);
+    const sorted = [...list].sort((a, b) => b.score - a.score);
+    const alternated: GeneratedLayout[] = [];
+    for (const family of new Set(sorted.map((r) => r.family))) {
+      const mine = sorted.filter((r) => r.family === family);
+      const a = mine.filter(withStation);
+      const b = mine.filter((r) => !withStation(r));
+      while (a.length || b.length) {
+        if (b.length) alternated.push(b.shift()!);
+        if (a.length) alternated.push(a.shift()!);
+      }
+    }
+    for (const r of alternated) {
       const group = byFamily.get(r.family) ?? [];
       // Deux circuits sont « pareils » s'ils ont le même nombre de pièces et la même suite de virages.
       const turns = (c: GeneratedLayout) => c.code.split("~")[0].replace(/[^CRcr@]/g, "");

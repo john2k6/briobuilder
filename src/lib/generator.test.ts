@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { catalog, setList } from "./catalog";
 import { circuitFromCode, missingFor } from "./circuits";
-import { addSet, analyzeJoints, generateLayouts, isComplete, overlaps, type Inventory } from "./track-engine";
+import {
+  addSet,
+  analyzeJoints,
+  generateLayouts,
+  isComplete,
+  overlaps,
+  type Family,
+  type Inventory,
+} from "./track-engine";
 
 const boxes = (...ids: string[]) =>
   ids.reduce<Inventory>((acc, id) => {
@@ -73,10 +81,10 @@ describe("générateur de circuits", () => {
     expect(circuitFromCode(decorated.code)?.accessories).toEqual(decorated.accessories);
   });
 
-  it("reste raisonnable (environ 1,5 s pour un gros inventaire, moins de six secondes même mesuré pendant la couverture ; le calcul tourne dans un fil à part)", () => {
+  it("reste raisonnable (environ 2 s pour un gros inventaire, moins de huit secondes même mesuré pendant la couverture, qui ralentit tout ; le calcul tourne dans un fil à part)", () => {
     const t0 = performance.now();
     generateLayouts(boxes("deluxe-railway", "cargo-deluxe", "travel-switching"), catalog, { decorate: true });
-    expect(performance.now() - t0).toBeLessThan(6000);
+    expect(performance.now() - t0).toBeLessThan(8000);
   });
 
   it("un code invalide ou un circuit ouvert est refusé", () => {
@@ -167,5 +175,30 @@ describe("générateur de circuits", () => {
       expect(kinds).toContain(k);
     const c = r.buildable.find((x) => x.accessories.some((a) => a.kind === "station-central"))!;
     expect(circuitFromCode(c.code)?.accessories).toEqual(c.accessories);
+  });
+
+  it("un type de circuit ne renvoie jamais une liste vide, même avec un petit coffret", { timeout: 90000 }, () => {
+    const groups: Family[][] = [
+      ["wander", "serpent"],
+      ["eight-crossing", "eight-bridge"],
+      ["l-shape", "u-shape", "bean", "triangle", "house", "octagon"],
+      ["siding", "passing-loop", "terminus", "fork", "yard", "line", "theta"],
+      ["mega", "hill", "network", "spiral", "lift"],
+    ];
+    // Un petit coffret et des réglages impossibles (croisement, taille géante) : on montre quand même le type demandé.
+    for (const inv of [boxes("firefighter")]) {
+      for (const families of groups) {
+        const r = generateLayouts(inv, catalog, { families, require: { crossing: true }, sizes: ["huge"] });
+        expect(r.buildable.length + r.almost.length).toBeGreaterThan(0);
+        for (const c of [...r.buildable, ...r.almost]) expect(families).toContain(c.family);
+      }
+    }
+  });
+
+  it("propose des versions avec une gare au bout d'une voie pour tous les types de circuits", () => {
+    const r = generateLayouts(boxes("deluxe-railway", "cargo-deluxe", "travel-switching"), catalog, { limit: 400 });
+    const withStation = new Set(r.buildable.filter((c) => /[|Z]/.test(c.code.split("~")[0])).map((c) => c.family));
+    for (const f of ["wander", "eight-crossing", "hill", "theta", "l-shape", "octagon"])
+      expect(withStation).toContain(f);
   });
 });

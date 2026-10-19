@@ -8,7 +8,7 @@ import { buttonPrimary, buttonSecondary, card, Icon, icons, PageHeader } from "@
 import { Link } from "@/i18n/navigation";
 import { generateAsync } from "@/lib/circuits";
 import { actions, useAppState, type CircuitGroup, type GeneratorPrefs } from "@/lib/store";
-import { totalPieces, type Family, type GeneratedLayout, type Size } from "@/lib/track-engine";
+import { totalPieces, type Family, type GeneratorResult, type Size } from "@/lib/track-engine";
 
 /** Types de circuits proposés dans les filtres. */
 const GROUPS: Record<CircuitGroup, Family[]> = {
@@ -53,9 +53,7 @@ export function CircuitsView() {
   const [tab, setTab] = useState<Tab>("buildable");
   const [shown, setShown] = useState(PAGE);
   const [depth, setDepth] = useState(1);
-  const [result, setResult] = useState<{ key: string; buildable: GeneratedLayout[]; almost: GeneratedLayout[] } | null>(
-    null,
-  );
+  const [result, setResult] = useState<(GeneratorResult & { key: string }) | null>(null);
 
   const key = useMemo(() => JSON.stringify({ inventory, prefs, depth }), [inventory, prefs, depth]);
   const loading = ready && result?.key !== key;
@@ -124,7 +122,10 @@ export function CircuitsView() {
     );
   }
 
-  const list = (tab === "buildable" ? result?.buildable : result?.almost) ?? [];
+  // Jamais de liste vide : sans circuit réalisable tout de suite, on montre les plus proches.
+  const fallback = tab === "buildable" && !!result && result.buildable.length === 0 && result.almost.length > 0;
+  const list = (tab === "buildable" && !fallback ? result?.buildable : result?.almost) ?? [];
+  const notice = result?.relaxed ? `circuits.relaxed.${result.relaxed}` : fallback ? "circuits.closest" : null;
 
   return (
     <div className="space-y-10">
@@ -245,6 +246,12 @@ export function CircuitsView() {
 
       <p className="-mt-6 text-muted">{t(tab === "buildable" ? "circuits.hintBuildable" : "circuits.hintAlmost")}</p>
 
+      {!loading && notice && (
+        <p className="rounded-2xl border-2 border-accent bg-soft p-4 font-bold text-ink" role="status">
+          {t(notice)}
+        </p>
+      )}
+
       {!ready || loading ? (
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
           {[0, 1, 2].map((i) => (
@@ -264,7 +271,7 @@ export function CircuitsView() {
             <li key={c.code}>
               <CircuitCard
                 circuit={c}
-                missing={tab === "almost" ? c.missing : undefined}
+                missing={c.missingCount > 0 ? c.missing : undefined}
                 favorite={isFavorite(c.code)}
                 builtCount={builtCount(c.code)}
               />

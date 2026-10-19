@@ -395,6 +395,11 @@
     "tabAlmost": "With 1 to 3 more pieces",
     "emptyBox": "Your box is empty. Add your sets to see what you can build.",
     "fillBox": "Add my sets",
+    "closest": "No layout of this type you can build right away with your pieces yet: here are the closest ones, with the missing pieces.",
+    "relaxed": {
+      "missing": "For this type of layout you are missing more than 3 pieces: here are the closest ones, with what is missing.",
+      "filters": "Nothing with all these settings: we set aside size and wishes to still show you this type of layout."
+    },
     "noneBuildable": "No buildable layout with these settings. Try another size or remove an option.",
     "noneAlmost": "No layout missing fewer than 4 pieces with these settings.",
     "missing": "Missing",
